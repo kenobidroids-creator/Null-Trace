@@ -166,6 +166,29 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .nano-body textarea::-webkit-scrollbar-thumb{background:var(--border2);border-radius:0;}
 
 
+/* ── M5b STYLES ── */
+#impersonate-bar{display:none;position:fixed;bottom:22px;left:0;right:0;height:18px;background:rgba(163,113,247,0.15);border-top:1px solid var(--purple);z-index:400;align-items:center;padding:0 12px;gap:8px;pointer-events:none;}
+#impersonate-bar span{font-size:9px;font-family:var(--mono);color:var(--purple);letter-spacing:1px;}
+.mail-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.mail-tab{padding:5px 12px;font-size:9px;letter-spacing:2px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;}
+.mail-tab:hover{color:var(--text2);}.mail-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.compose-wrap{display:flex;flex-direction:column;height:100%;padding:10px;}
+.compose-field{display:flex;align-items:center;gap:8px;margin-bottom:6px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+.compose-lbl{font-size:9px;color:var(--text3);letter-spacing:2px;width:40px;flex-shrink:0;}
+.compose-inp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;user-select:text;-webkit-user-select:text;}
+.compose-inp::placeholder{color:var(--text3);}
+.compose-body{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:8px;outline:none;resize:none;line-height:1.7;margin-top:6px;user-select:text;-webkit-user-select:text;}
+.compose-footer{display:flex;align-items:center;gap:10px;margin-top:8px;}
+.compose-send{background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:2px;padding:5px 12px;cursor:pointer;}
+.compose-send:hover{background:var(--cyan);}
+.compose-from{font-size:9px;color:var(--text3);}.compose-from span{color:var(--purple);}
+.pw-rotated{font-size:9px;color:var(--red);background:var(--rbg);border:1px solid var(--rdim);padding:2px 6px;letter-spacing:1px;}
+.mission-path{margin-top:8px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);}
+.mission-path-hdr{font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:4px;}
+.mission-path-item{font-size:9px;color:var(--text2);padding:2px 0;display:flex;align-items:center;gap:6px;}
+.mission-path-item.done{color:var(--green);}.mission-path-item.done::before{content:'✓';color:var(--green);}
+.mission-path-item:not(.done)::before{content:'○';color:var(--text3);}
+
 #cmdpal{position:fixed;top:60px;left:50%;transform:translateX(-50%);width:480px;background:var(--bg2);border:1px solid var(--cyan3);z-index:2000;display:none;box-shadow:0 16px 48px rgba(0,0,0,0.8);}
 #cmdpal-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:12px 14px;outline:none;caret-color:var(--cyan);}
 #cmdpal-results{max-height:280px;overflow-y:auto;}
@@ -314,6 +337,7 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 <body>
 
 <div id="phish-outcome"></div>
+<div id="impersonate-bar"><span>IMPERSONATING:</span><span id="impersonate-name">—</span><span style="margin-left:auto;opacity:.6;">all outbound mail sent as this identity</span></div>
 
 <!-- COMMAND PALETTE -->
 <div id="cmdpal">
@@ -397,6 +421,10 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 let currentUser = 'ghost_0x1';
 let cwd = '/home/ghost_0x1';
 let connectedNode = null;   // current node id
+// M5b — impersonation state
+let impersonatedUser = null;   // {email, role, fname, lname} when logged in as stolen identity
+let rotatedPasswords = {};     // nodeId -> Set of emails whose passwords were rotated post-INCIDENT
+let socialObjectivesDone = {}; // track social eng objectives separately
 let traceLevel = 0;
 let traceActive = false;
 let traceTimer = null;
@@ -439,6 +467,8 @@ function escalateSecurity(nodeId,reason,newState){
       pline(`[!!] ${reason}`,'err');
       pline(`[!!] Trace rate CRITICAL. Entry vector being patched.`,'err');
       patchedExploits[nodeId]=true;
+      // M5b — trigger org-wide response for proc org
+      setTimeout(()=>triggerOrgWideIncidentResponse(nodeId, reason), 1500);
     } else if(newState==='LOCKDOWN'){
       pline(`[!!!] LOCKDOWN — ${NETWORK[nodeId].label} — DISCONNECT NOW`,'err');
       pline(`[!!!] ${reason}`,'err');
@@ -722,6 +752,14 @@ const OBJECTIVES = [
   {id:'clean',  text:'Delete session logs on at least 2 nodes',   hint:'Use rm-logs command before disconnecting from each node',   done:false},
 ];
 
+// M5b — Social engineering objectives (separate track — bonus)
+const SOCIAL_OBJECTIVES = [
+  {id:'phish-success', text:'Successfully phish any employee',          hint:'Open PHISH// and send a lure — check awareness levels first', done:false},
+  {id:'phish-high',    text:'Phish a HIGH-awareness target',            hint:'Security analysts and CTOs are harder — personalize the lure', done:false},
+  {id:'login-stolen',  text:'Login to a node using stolen credentials', hint:'Use: login [user] [pass] after connecting to a node',          done:false},
+  {id:'compose-mail',  text:'Send internal mail as impersonated user',  hint:'Open MAIL// compose tab while impersonating an identity',      done:false},
+];
+
 // ══════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════
@@ -974,13 +1012,13 @@ function buildTerminal(body, winId='terminal'){
   const isFirst=winId==='terminal';
   tPrintTo(winId,[
     {t:'╔═══════════════════════════════════════════╗',c:'cyan'},
-    {t:'║   NULL//TRACE OS v0.5  —  M5 BUILD        ║',c:'cyan'},
-    {t:'║   Social Engineering ONLINE               ║',c:'cyan'},
+    {t:'║   NULL//TRACE OS v0.5  —  M5b BUILD       ║',c:'cyan'},
+    {t:'║   Social Engineering + Impersonation      ║',c:'cyan'},
     {t:'╚═══════════════════════════════════════════╝',c:'cyan'},
     {t:'',c:'blank'},
     {t:`Identity: ${currentUser}`,c:'ok'},
     {t:`Ctrl+Space: command palette  |  Ctrl+T: new terminal`,c:'info'},
-    {t:`NEW: phish [email]  |  open phish  |  impersonate [email]`,c:'info'},
+    {t:`NEW: login [user] [pass]  |  logout  |  MAIL// compose tab`,c:'info'},
     {t:`Type 'help' for all commands`,c:'dim'},
     {t:'',c:'blank'},
   ]);
@@ -1023,7 +1061,9 @@ function updatePrompt(){
 function getPrompt(){
   const h=connectedNode?`@${NETWORK[connectedNode]?.label||connectedNode}`:'';
   const p=cwd.replace(`/home/${currentUser}`,'~');
-  return `${currentUser}${h}:${p}$ `;
+  const who = impersonatedUser ? impersonatedUser.email.split('@')[0] : currentUser;
+  const whoColor = impersonatedUser ? '' : ''; // prompt label handles color via CSS
+  return `${who}${h}:${p}$ `;
 }
 
 function onTermKey(e, winId){
@@ -1063,7 +1103,8 @@ function buildNote(body, winId){
 const ALL_COMMANDS=['help','clear','pwd','ls','cd','cat','mkdir','touch','rm',
   'whoami','status','ifconfig','scan','connect','disconnect','crack','exfil',
   'rm-logs','fw-unlock','secstate','nodes','history','uname','date','echo',
-  'man','sudo','exit','reboot','open','nano','note','phish','impersonate'];
+  'man','sudo','exit','reboot','open','nano','note','phish','impersonate',
+  'login','logout'];
 
 let tabSuggestions=[], tabIdx=-1;
 
@@ -1863,6 +1904,9 @@ function onPhishSuccess(target, template, subject, body){
 
   // Show outcome toast
   showPhishOutcome(`✓ CREDENTIAL CAPTURED — ${target.fname} ${target.lname} (${target.role})`, 'success');
+  // M5b — mark social engineering objectives
+  markSocialObjective('phish-success');
+  if(target.awareness === 'HIGH') markSocialObjective('phish-high');
 
   // Inject success mail into their inbox on mail server
   adminAlerts.push({
@@ -2056,6 +2100,414 @@ function onPhishSend(){
 // (called at end of initProceduralOrg — patched below)
 
 // ══════════════════════════════════════════════
+// M5b — IMPERSONATION VIA STOLEN CREDENTIALS
+// ══════════════════════════════════════════════
+
+function cmdLogin(args){
+  // login [user] [pass] — authenticate as a specific user on connected node
+  if(!connectedNode){ pline('login: not connected to a node','err'); return; }
+  if(args.length < 2){ pline('Usage: login [username] [password]','err'); pline('       Use stolen credentials from ~/intel/callbacks/','dim'); return; }
+
+  const username = args[0];
+  const password = args.slice(1).join(' ');
+  const nodeId = connectedNode;
+
+  // Check password rotation — if INCIDENT triggered, some passwords may be invalid
+  if(rotatedPasswords[nodeId]?.has(username)){
+    pline(`[!] LOGIN FAILED — credentials rotated after security incident`,'err');
+    pline(`[!] ${username}'s password was changed. Find updated credentials.`,'warn');
+    if(traceActive) traceLevel = Math.min(100, traceLevel + 10);
+    checkSecOnFailedAuth(nodeId);
+    return;
+  }
+
+  // Check against proc org employees
+  let matchedEmp = null;
+  if(proceduralOrg){
+    matchedEmp = proceduralOrg.employees.find(e =>
+      (e.email === username || e.email.split('@')[0] === username) &&
+      e.password === password
+    );
+  }
+
+  // Check against Axiom Corp known creds
+  const axiomCreds = {
+    'ksullivan': 'Sull1van#2024', 'ksullivan@axiom.corp': 'Sull1van#2024',
+    'webapp':    'Ax10m_W3b!2024','webapp@axiom-db':      'Ax10m_W3b!2024',
+    'rchen':     'AX-EXEC-7f3a9b2c1d', 'rchen@axiom.corp':'AX-EXEC-7f3a9b2c1d',
+  };
+  const axiomMatch = axiomCreds[username] === password;
+
+  if(matchedEmp || axiomMatch){
+    // Set impersonation state
+    if(matchedEmp){
+      impersonatedUser = {
+        email: matchedEmp.email,
+        role:  matchedEmp.role,
+        fname: matchedEmp.fname,
+        lname: matchedEmp.lname,
+        awareness: matchedEmp.awareness,
+      };
+    } else {
+      // Axiom corp user
+      const axiomUsers = {
+        'ksullivan': {email:'ksullivan@axiom.corp', role:'IT Admin',   fname:'Kate',    lname:'Sullivan'},
+        'webapp':    {email:'webapp@axiom-db',       role:'Service',    fname:'webapp',  lname:''},
+        'rchen':     {email:'rchen@axiom.corp',       role:'CFO',        fname:'Raymond', lname:'Chen'},
+      };
+      const key = username.includes('@') ? username.split('@')[0] : username;
+      impersonatedUser = axiomUsers[key] || {email:username, role:'User', fname:username, lname:''};
+    }
+
+    // Update UI
+    updateImpersonateBar();
+    updatePrompt();
+    plines([
+      {t:'',c:'blank'},
+      {t:`[+] AUTHENTICATED as ${impersonatedUser.email}`,c:'ok'},
+      {t:`[+] Role: ${impersonatedUser.role}`,c:'ok'},
+      {t:`[*] Prompt updated. Outbound mail will use this identity.`,c:'dim'},
+      {t:`[*] Higher-trust directories may now be accessible.`,c:'dim'},
+      {t:'',c:'blank'},
+    ]);
+
+    // Add intel
+    addIntel('credentials', {key:impersonatedUser.email, val:`ACTIVE SESSION — ${impersonatedUser.role}`, hot:true});
+
+    // Mark social objective
+    markSocialObjective('login-stolen');
+    scrollT();
+  } else {
+    pline(`[!] LOGIN FAILED — invalid credentials for ${username}`,'err');
+    pline(`[!] Failed auth logged on ${NETWORK[nodeId]?.label}`,'warn');
+    if(traceActive) traceLevel = Math.min(100, traceLevel + 8);
+    checkSecOnFailedAuth(nodeId);
+    scrollT();
+  }
+}
+
+function cmdLogout(){
+  if(!impersonatedUser){ pline('Not logged in as any identity.','warn'); return; }
+  const old = impersonatedUser.email;
+  impersonatedUser = null;
+  updateImpersonateBar();
+  updatePrompt();
+  pline(`[+] Logged out of ${old} — back to anonymous session`,'ok');
+}
+
+function updateImpersonateBar(){
+  const bar = document.getElementById('impersonate-bar');
+  const nameEl = document.getElementById('impersonate-name');
+  if(!bar || !nameEl) return;
+  if(impersonatedUser){
+    nameEl.textContent = `${impersonatedUser.fname} ${impersonatedUser.lname} <${impersonatedUser.email}> (${impersonatedUser.role})`;
+    bar.style.display = 'flex';
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+// Updated getPrompt to show impersonated identity
+// (overrides the existing getPrompt — defined later, this shadows it inline via closure)
+function getImpersonatedPrompt(){
+  const h = connectedNode ? `@${NETWORK[connectedNode]?.label||connectedNode}` : '';
+  const p = cwd.replace(`/home/${currentUser}`,'~');
+  const who = impersonatedUser ? impersonatedUser.email.split('@')[0] : currentUser;
+  return `${who}${h}:${p}$ `;
+}
+
+// ══════════════════════════════════════════════
+// M5b — PASSWORD ROTATION ON INCIDENT
+// ══════════════════════════════════════════════
+
+function rotatePasswordsOnIncident(nodeId){
+  if(!rotatedPasswords[nodeId]) rotatedPasswords[nodeId] = new Set();
+  // Rotate all known proc org credentials on this node
+  if(proceduralOrg && nodeId === 'PROC-ORG'){
+    proceduralOrg.employees.forEach(e => {
+      rotatedPasswords[nodeId].add(e.email);
+      rotatedPasswords[nodeId].add(e.email.split('@')[0]);
+      // Generate new password — old one invalid
+      e.oldPassword = e.password;
+      e.password = e.fname.toLowerCase() + Math.floor(Math.random()*9999) + '!';
+    });
+    pline(`[!] All ${proceduralOrg.name} credentials rotated post-incident`,'err');
+    pline(`[!] Previously stolen passwords are no longer valid`,'warn');
+    // If currently impersonating someone from this org, invalidate
+    if(impersonatedUser && proceduralOrg.employees.find(e=>e.email===impersonatedUser.email)){
+      pline(`[!] Your active session as ${impersonatedUser.email} has been terminated`,'err');
+      impersonatedUser = null;
+      updateImpersonateBar();
+      updatePrompt();
+    }
+    notify('Credentials rotated — re-phish required','warn');
+  }
+}
+
+// ══════════════════════════════════════════════
+// M5b — ORG-WIDE REACTIONS
+// ══════════════════════════════════════════════
+
+function triggerOrgWideIncidentResponse(nodeId, reason){
+  if(!proceduralOrg || nodeId !== 'PROC-ORG') return;
+  const org = proceduralOrg;
+  const t = getCurrentTime();
+  const secEmp = org.employees.find(e=>e.role==='Security Analyst')||
+                 org.employees.find(e=>e.role==='IT Admin')||
+                 org.employees[0];
+  const ceo = org.employees[0];
+
+  // 1. All-staff email
+  adminAlerts.push({
+    id: 3000 + adminAlerts.length,
+    from: secEmp.email,
+    subj: `[ALL STAFF] Security Incident — Immediate Action Required`,
+    time: t, unread: true, isAlert: true,
+    body: `FROM: ${secEmp.fname} ${secEmp.lname} <${secEmp.email}>
+TO: all-staff@${org.domain}
+SUBJ: [ALL STAFF] Security Incident
+
+All staff,
+
+We have detected a confirmed security incident on our systems.
+
+What we know:
+  ${reason}
+
+What you need to do IMMEDIATELY:
+  1. Do NOT click any suspicious links or emails
+  2. Change your passwords NOW
+  3. Report anything unusual to IT
+  4. Do not share credentials with anyone
+
+IT is actively investigating. All remote access
+has been temporarily suspended.
+
+— ${secEmp.fname} ${secEmp.lname}
+  ${secEmp.role}, ${org.name}`
+  });
+
+  // 2. Employee-to-employee reaction emails (they email each other)
+  if(org.employees.length >= 2){
+    const emp1 = org.employees[1];
+    const emp2 = org.employees[2] || org.employees[0];
+    adminAlerts.push({
+      id: 3001 + adminAlerts.length,
+      from: emp1.email,
+      subj: `RE: Security incident — are you ok?`,
+      time: t, unread: true, isAlert: false,
+      body: `FROM: ${emp1.email}
+TO: ${emp2.email}
+
+Hey ${emp2.fname},
+
+Did you see the IT email? Someone got into our systems.
+
+I got a weird email earlier asking me to reset my
+password. I didn't click it but I'm wondering if
+that was related.
+
+Should we be worried?
+
+— ${emp1.fname}`
+    });
+  }
+
+  // 3. Investigation file appears on the node
+  if(org.fs){
+    const investDir = '/var/log/investigation';
+    org.fs[investDir] = {t:'d'};
+    org.fs[`${investDir}/access_review.txt`] = {
+      t:'f', exfil:'low',
+      content: `SECURITY INVESTIGATION LOG
+Generated: ${t}
+Analyst: ${secEmp.fname} ${secEmp.lname}
+
+TRIGGER: ${reason}
+
+FINDINGS:
+  - Unauthorized access pattern detected
+  - Source IP: 10.0.0.47 (unresolved)
+  - Affected accounts: under review
+  - Phishing emails reported: YES
+  - Credential exposure: POSSIBLE
+
+ACTIONS TAKEN:
+  - All passwords force-rotated
+  - Remote access suspended
+  - Logs preserved for forensics
+  - External IR firm contacted
+
+STATUS: ACTIVE INVESTIGATION`
+    };
+  }
+
+  rotatePasswordsOnIncident(nodeId);
+  refreshMailList();
+  notify(`${org.name}: incident response triggered`,'err');
+}
+
+// ══════════════════════════════════════════════
+// M5b — MAIL COMPOSE (send as impersonated user)
+// ══════════════════════════════════════════════
+
+// Sent internal mails — visible in MAIL// sent view
+const sentMails = [];
+
+function buildMail(body){
+  body.innerHTML=`
+<div style="display:flex;flex-direction:column;height:100%;">
+  <div class="mail-tabs">
+    <div class="mail-tab active" id="tab-inbox" onclick="switchMailTab('inbox')">INBOX</div>
+    <div class="mail-tab" id="tab-compose" onclick="switchMailTab('compose')">COMPOSE${impersonatedUser?' ◉':''}</div>
+    <div class="mail-tab" id="tab-sent" onclick="switchMailTab('sent')">SENT (${sentMails.length})</div>
+  </div>
+  <div id="mail-inbox-view" style="display:flex;flex:1;overflow:hidden;">
+    <div class="ml-list" id="ml-list"></div>
+    <div id="ml-view" class="mv-empty">SELECT A MESSAGE</div>
+  </div>
+  <div id="mail-compose-view" style="display:none;flex:1;overflow:hidden;">
+  </div>
+  <div id="mail-sent-view" style="display:none;flex:1;overflow-y:auto;padding:10px;">
+  </div>
+</div>`;
+  renderMailList();
+  renderComposeTab();
+  renderSentTab();
+}
+
+let activeMailTab = 'inbox';
+function switchMailTab(tab){
+  activeMailTab = tab;
+  ['inbox','compose','sent'].forEach(t => {
+    document.getElementById(`tab-${t}`)?.classList.toggle('active', t===tab);
+    document.getElementById(`mail-${t}-view`).style.display = t===tab ? (t==='inbox'?'flex':'block') : 'none';
+  });
+  if(tab==='compose') renderComposeTab();
+  if(tab==='sent') renderSentTab();
+}
+
+function renderComposeTab(){
+  const view = document.getElementById('mail-compose-view'); if(!view) return;
+  const fromAddr = impersonatedUser ? impersonatedUser.email : `${currentUser}@null-trace.local`;
+  const fromLabel = impersonatedUser
+    ? `${impersonatedUser.fname} ${impersonatedUser.lname} <${impersonatedUser.email}>`
+    : `anonymous — <span style="color:var(--amber)">login as stolen identity to send as real user</span>`;
+
+  view.innerHTML=`
+<div class="compose-wrap">
+  <div class="compose-from">FROM: <span>${fromLabel}</span></div>
+  <div class="compose-field" style="margin-top:8px;">
+    <span class="compose-lbl">TO</span>
+    <input class="compose-inp" id="compose-to" placeholder="recipient@domain.corp" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="compose-field">
+    <span class="compose-lbl">SUBJ</span>
+    <input class="compose-inp" id="compose-subj" placeholder="Subject..." autocomplete="off" spellcheck="false">
+  </div>
+  <textarea class="compose-body" id="compose-body" placeholder="Write your message...&#10;&#10;Tip: If you have stolen intel on the recipient,&#10;a personalised message is far more convincing."></textarea>
+  <div class="compose-footer">
+    <button class="compose-send" onclick="sendComposedMail()">SEND ▶</button>
+    ${impersonatedUser
+      ? `<span class="compose-from">Sending as <span>${impersonatedUser.email}</span></span>`
+      : `<span style="font-size:9px;color:var(--text3);">Login with stolen creds to send as a real identity</span>`
+    }
+  </div>
+</div>`;
+}
+
+function renderSentTab(){
+  const view = document.getElementById('mail-sent-view'); if(!view) return;
+  if(!sentMails.length){
+    view.innerHTML=`<div style="color:var(--text3);font-size:10px;padding:8px;letter-spacing:1px;">No sent mail yet.</div>`;
+    return;
+  }
+  view.innerHTML = sentMails.map(m=>`
+<div style="padding:8px 10px;border-bottom:1px solid var(--border);">
+  <div style="font-size:9px;color:var(--text3);">TO: <span style="color:var(--text2);">${m.to}</span> &nbsp;·&nbsp; ${m.time}</div>
+  <div style="font-size:10px;color:var(--text2);margin-top:2px;">${m.subj}</div>
+  <div style="font-size:9px;color:var(--text3);margin-top:2px;">FROM: ${m.from}</div>
+</div>`).join('');
+}
+
+function sendComposedMail(){
+  const to    = document.getElementById('compose-to')?.value.trim();
+  const subj  = document.getElementById('compose-subj')?.value.trim();
+  const body  = document.getElementById('compose-body')?.value.trim();
+
+  if(!to || !subj || !body){ notify('Fill in all fields before sending','warn'); return; }
+
+  const fromAddr = impersonatedUser ? impersonatedUser.email : `${currentUser}@null-trace.local`;
+  const t = getCurrentTime();
+
+  // Store in sent
+  sentMails.push({from:fromAddr, to, subj, body, time:t});
+
+  // Check if target is a known proc org employee — they might respond
+  let targetEmp = null;
+  if(proceduralOrg) targetEmp = proceduralOrg.employees.find(e=>e.email===to);
+
+  // Generate a reply if target is real and message is relevant
+  if(targetEmp && impersonatedUser){
+    const replyChance = targetEmp.awareness==='LOW' ? 0.7 : targetEmp.awareness==='MED' ? 0.4 : 0.2;
+    if(Math.random() < replyChance){
+      setTimeout(()=>{
+        adminAlerts.push({
+          id: 4000 + adminAlerts.length,
+          from: targetEmp.email,
+          subj: `RE: ${subj}`,
+          time: getCurrentTime(),
+          unread: true, isAlert: false,
+          body: `FROM: ${targetEmp.email}\nTO: ${fromAddr}\nSUBJ: RE: ${subj}\n\nHi,\n\nThanks for your message. I'll look into this\nand get back to you shortly.\n\nBest,\n${targetEmp.fname}`
+        });
+        refreshMailList();
+        notify(`Reply received from ${targetEmp.fname}`,'info');
+      }, 3000 + Math.random()*4000);
+    }
+  }
+
+  // Inject into target's mail on MAIL-SRV or proc org fs
+  const mailContent = `FROM: ${fromAddr}\nTO: ${to}\nSUBJ: ${subj}\n\n${body}`;
+  if(proceduralOrg?.fs && targetEmp){
+    const dir = `/home/${targetEmp.fname.toLowerCase()}/inbox`;
+    if(!proceduralOrg.fs[dir]) proceduralOrg.fs[dir] = {t:'d'};
+    proceduralOrg.fs[`${dir}/msg_${Date.now()}.txt`] = {t:'f', content:mailContent};
+  }
+
+  // Update sent tab
+  renderSentTab();
+  // Update compose tab badge
+  document.getElementById('tab-sent').textContent = `SENT (${sentMails.length})`;
+
+  notify(`Mail sent to ${to}`,'ok');
+  markSocialObjective('compose-mail');
+
+  // Clear form
+  const toEl = document.getElementById('compose-to');
+  const subjEl = document.getElementById('compose-subj');
+  const bodyEl = document.getElementById('compose-body');
+  if(toEl) toEl.value='';
+  if(subjEl) subjEl.value='';
+  if(bodyEl) bodyEl.value='';
+}
+
+// ══════════════════════════════════════════════
+// M5b — SOCIAL OBJECTIVE TRACKING
+// ══════════════════════════════════════════════
+
+function markSocialObjective(id){
+  const obj = SOCIAL_OBJECTIVES.find(o=>o.id===id);
+  if(obj && !obj.done){
+    obj.done = true;
+    rep += 400;
+    document.getElementById('tb-rep')?.querySelector('span') &&
+      (document.getElementById('tb-rep').querySelector('span').textContent = rep);
+    notify(`BONUS OBJECTIVE: ${obj.text.substring(0,45)}...`, 'ok');
+    refreshMission();
+  }
+}
+
+// ══════════════════════════════════════════════
 // COMMANDS
 // ══════════════════════════════════════════════
 function runCmd(raw){
@@ -2095,6 +2547,8 @@ function runCmd(raw){
       if(!tmpl){pline(`phish: unknown template '${tmplId}'. Try: phish list-templates`,'err');return;}
       sendPhish(tmplId, email, fromEmail);
     },
+    login:(args)=>cmdLogin(args),
+    logout:()=>cmdLogout(),
     impersonate:(args)=>{
       if(!args[0]){pline('Usage: impersonate [email]  — sets FROM for next phish','err');return;}
       if(args[0]==='clear'){
@@ -2166,6 +2620,8 @@ function help(){
     {t:'  phish [email] --template [id] --from [email]',c:'out'},
     {t:'  impersonate [email]      set FROM identity for all phishes',c:'out'},
     {t:'  impersonate clear        reset impersonation',c:'out'},
+    {t:'  login [user] [pass]      authenticate as stolen identity on node',c:'out'},
+    {t:'  logout                   drop stolen identity session',c:'out'},
     {t:'',c:'blank'},
     {t:'  SHORTCUTS',c:'cyan'},
     {t:'  open [app]               open app (mail, netmap, intel, phish...)',c:'out'},
@@ -2753,10 +3209,6 @@ function refreshNetmap(){
 // ══════════════════════════════════════════════
 // MAIL
 // ══════════════════════════════════════════════
-function buildMail(body){
-  body.innerHTML=`<div class="ml-wrap"><div class="ml-list" id="ml-list"></div><div id="ml-view" class="mv-empty">SELECT A MESSAGE</div></div>`;
-  renderMailList();
-}
 function renderMailList(){
   const p=document.getElementById('ml-list'); if(!p)return;
   const all=getAllMails();
@@ -2810,6 +3262,7 @@ function buildMission(body){
 function refreshMission(){
   const el=document.getElementById('mission-inner'); if(!el)return;
   const done=OBJECTIVES.filter(o=>o.done).length;
+  const socialDone=SOCIAL_OBJECTIVES.filter(o=>o.done).length;
   let html=`<div class="mission-title">OP-VORTEX</div>
 <div class="mission-sub">TARGET: AXIOM INDUSTRIES CORP  |  ${done}/${OBJECTIVES.length} OBJECTIVES</div>`;
 
@@ -2823,12 +3276,31 @@ function refreshMission(){
   html+=`<div class="mission-reward">
 <div class="mission-reward-lbl">PAYOUT</div>
 <div class="mission-reward-val">4,200 cr base  +  800 cr clean exit bonus</div>
-</div>
-<div style="margin-top:8px;padding:8px;background:var(--bg3);border:1px solid var(--border);font-size:9px;color:var(--text3);">
-NETWORK PATH: GATEWAY → WEB-SRV → MAIL-SRV or DB-SRV → EXEC-TERM<br><br>
-HINT: Credentials are hidden across the network.<br>
-Read everything. The path reveals itself.
 </div>`;
+
+  // M5b — Alternate path display
+  html+=`<div class="mission-path">
+<div class="mission-path-hdr">TECHNICAL PATH</div>
+<div class="mission-path-item">GATEWAY → WEB-SRV → DB-SRV or MAIL-SRV → EXEC-TERM</div>
+</div>
+<div class="mission-path" style="border-color:var(--purple);">
+<div class="mission-path-hdr" style="color:var(--purple);">SOCIAL PATH (ALTERNATE)</div>
+<div class="mission-path-item ${socialDone>0?'done':''}">Phish employee → steal creds</div>
+<div class="mission-path-item ${socialDone>1?'done':''}">Login with stolen identity</div>
+<div class="mission-path-item ${socialDone>2?'done':''}">Compose mail as impersonated user</div>
+<div style="font-size:8px;color:var(--text3);margin-top:4px;padding-top:4px;border-top:1px solid var(--border);">Social path bypasses technical defenses entirely</div>
+</div>`;
+
+  // M5b — Social Engineering bonus objectives
+  html+=`<div style="margin-top:8px;padding:6px 8px;background:var(--pbg);border:1px solid rgba(163,113,247,0.3);">
+<div style="font-size:8px;letter-spacing:2px;color:var(--purple);margin-bottom:4px;">BONUS OBJECTIVES — SOCIAL ENG  |  ${socialDone}/${SOCIAL_OBJECTIVES.length}</div>`;
+  SOCIAL_OBJECTIVES.forEach(o=>{
+    html+=`<div class="obj-item" style="opacity:${o.done?1:0.7};">
+<div class="obj-check ${o.done?'done':''}" style="border-color:var(--purple);">${o.done?'✓':''}</div>
+<div><div class="obj-text ${o.done?'done':''}" style="${o.done?'':'color:var(--text3);'}">${o.text}</div>
+<div class="obj-hint">${o.hint}</div></div></div>`;
+  });
+  html+=`<div style="font-size:8px;color:var(--purple);margin-top:4px;">+400 cr per bonus objective</div></div>`;
 
   if(done===OBJECTIVES.length){
     html+=`<div style="margin-top:10px;padding:10px;background:var(--gbg);border:1px solid var(--gdim);font-size:11px;color:var(--green);letter-spacing:1px;">✓ ALL OBJECTIVES COMPLETE — OP-VORTEX SUCCESS</div>`;
