@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NULL//TRACE — OS v0.3</title>
+<title>NULL//TRACE — OS v0.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 :root {
@@ -100,13 +100,11 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 
 /* TERMINAL */
 #tout{flex:1;overflow-y:auto;padding:10px 12px;font-size:11.5px;line-height:1.7;scroll-behavior:smooth;}
-#tout::-webkit-scrollbar{width:3px;}
-#tout::-webkit-scrollbar-thumb{background:var(--border2);}
 .tl{white-space:pre-wrap;word-break:break-all;}
 .tl.cmd{color:var(--cyan);}.tl.out{color:var(--text2);}.tl.ok{color:var(--green);}.tl.err{color:var(--red);}.tl.warn{color:var(--amber);}.tl.info{color:var(--purple);}.tl.data{color:var(--text);}.tl.dim{color:var(--text3);}.tl.cyan{color:var(--cyan);}.tl.blank{height:6px;display:block;}.tl.blue{color:var(--blue);}
 .tpr{display:flex;align-items:center;padding:3px 12px 7px;gap:0;flex-shrink:0;border-top:1px solid var(--border);}
 .tprl{font-size:11.5px;color:var(--cyan);white-space:nowrap;flex-shrink:0;}
-#tinp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:11.5px;outline:none;caret-color:var(--cyan);}
+.tinp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:11.5px;outline:none;caret-color:var(--cyan);user-select:text;-webkit-user-select:text;}
 
 /* CRACKER PROGRESS */
 .crack-bar{height:3px;background:var(--bg4);margin:4px 0;}
@@ -127,8 +125,6 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 /* MAIL */
 .ml-wrap{display:flex;height:100%;}
 .ml-list{width:200px;border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;}
-.ml-list::-webkit-scrollbar{width:3px;}
-.ml-list::-webkit-scrollbar-thumb{background:var(--border2);}
 .ml-hdr{font-size:8px;letter-spacing:2px;color:var(--text3);padding:8px 10px 5px;border-bottom:1px solid var(--border);}
 .mi{padding:9px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
 .mi:hover{background:var(--bg3);}
@@ -138,8 +134,6 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .misubj{font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .mitime{font-size:8px;color:var(--text3);float:right;}
 .mv{flex:1;padding:14px;overflow-y:auto;font-size:11px;}
-.mv::-webkit-scrollbar{width:3px;}
-.mv::-webkit-scrollbar-thumb{background:var(--border2);}
 .mv-subj{font-size:13px;color:var(--text);margin-bottom:6px;font-weight:500;}
 .mv-meta{font-size:9px;color:var(--text3);line-height:1.9;}
 .mv-meta span{color:var(--text2);}
@@ -157,8 +151,103 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .bfill.ok{background:var(--green);}.bfill.warn{background:var(--amber);}.bfill.danger{background:var(--red);}
 .smdiv{border:none;border-top:1px solid var(--border);margin:2px 0;}
 
-/* SECURITY STATES */
-.sec-nominal{color:#3fb950;}.sec-suspicious{color:#d29922;}.sec-incident{color:#f85149;}.sec-lockdown{color:#a371f7;}
+/* ── GLOBAL SCROLLBAR STYLING ── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:0;}
+::-webkit-scrollbar-thumb:hover{background:var(--border3);}
+::-webkit-scrollbar-corner{background:transparent;}
+*{scrollbar-width:thin;scrollbar-color:var(--border2) transparent;}
+/* Explicit class for dynamically created elements with inline overflow styles */
+.tout-base::-webkit-scrollbar{width:4px;}
+.tout-base::-webkit-scrollbar-track{background:transparent;}
+.tout-base::-webkit-scrollbar-thumb{background:var(--border2);border-radius:0;}
+.nano-body textarea::-webkit-scrollbar{width:4px;}
+.nano-body textarea::-webkit-scrollbar-thumb{background:var(--border2);border-radius:0;}
+
+
+#cmdpal{position:fixed;top:60px;left:50%;transform:translateX(-50%);width:480px;background:var(--bg2);border:1px solid var(--cyan3);z-index:2000;display:none;box-shadow:0 16px 48px rgba(0,0,0,0.8);}
+#cmdpal-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:12px 14px;outline:none;caret-color:var(--cyan);}
+#cmdpal-results{max-height:280px;overflow-y:auto;}
+.cpr{padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
+.cpr:hover,.cpr.active{background:var(--cglow);}
+.cpr-icon{font-size:13px;color:var(--cyan);width:16px;text-align:center;}
+.cpr-name{font-size:12px;color:var(--text);flex:1;}
+.cpr-hint{font-size:10px;color:var(--text3);}
+#cmdpal-footer{padding:6px 14px;font-size:9px;color:var(--text3);letter-spacing:1px;border-top:1px solid var(--border);}
+
+/* ── NANO EDITOR ── */
+.nano-wrap{display:flex;flex-direction:column;height:100%;}
+.nano-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:4px 12px;font-size:9px;color:var(--text3);letter-spacing:2px;display:flex;justify-content:space-between;flex-shrink:0;}
+.nano-header span{color:var(--cyan);}
+.nano-body{flex:1;position:relative;}
+#nano-ta{width:100%;height:100%;background:var(--bg);border:none;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;resize:none;line-height:1.7;caret-color:var(--cyan);}
+.nano-footer{background:var(--bg3);border-top:1px solid var(--border);padding:4px 12px;font-size:9px;color:var(--text3);display:flex;gap:16px;flex-shrink:0;}
+.nano-key{color:var(--cyan);}
+
+/* ── STICKY NOTES ── */
+.sticky{position:absolute;background:#1a1a0a;border:1px solid #3a3a00;display:flex;flex-direction:column;min-width:180px;min-height:120px;z-index:200;}
+.sticky.focused{border-color:#6a6a00;box-shadow:0 4px 16px rgba(0,0,0,0.6);}
+.sticky-tb{height:24px;background:#222200;border-bottom:1px solid #3a3a00;display:flex;align-items:center;padding:0 6px;cursor:move;flex-shrink:0;gap:5px;}
+.sticky-title{flex:1;font-size:9px;color:#8a8a00;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sticky-close{background:none;border:none;color:#6a6a00;cursor:pointer;font-size:11px;padding:0;line-height:1;}
+.sticky-close:hover{color:#d29922;}
+.sticky-body{flex:1;padding:8px 10px;overflow-y:auto;font-size:11px;color:#c8c820;font-family:var(--mono);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+.sticky-rh{position:absolute;bottom:0;right:0;width:12px;height:12px;cursor:se-resize;}
+.sticky-rh::after{content:'';position:absolute;bottom:2px;right:2px;width:5px;height:5px;border-right:1px solid #3a3a00;border-bottom:1px solid #3a3a00;}
+
+/* ── TAB AUTOCOMPLETE ── */
+#tab-suggest{position:absolute;background:var(--bg2);border:1px solid var(--border2);font-size:11px;font-family:var(--mono);z-index:300;max-height:120px;overflow-y:auto;pointer-events:none;}
+.ts-item{padding:3px 10px;color:var(--text2);}
+.ts-item.active{background:var(--cglow);color:var(--cyan);}
+
+/* ── INTEL APP ── */
+.intel-wrap{padding:10px;font-size:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.intel-section{border:1px solid var(--border);background:var(--bg3);}
+.intel-section-hdr{padding:5px 8px;font-size:8px;letter-spacing:2px;color:var(--text3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
+.intel-section-hdr span{color:var(--cyan);}
+.intel-entry{padding:5px 8px;border-bottom:1px solid var(--border);font-size:10px;}
+.intel-entry:last-child{border-bottom:none;}
+.intel-key{color:var(--text3);margin-right:6px;}
+.intel-val{color:var(--text2);}
+.intel-val.hot{color:var(--amber);}
+.intel-val.crit{color:var(--red);}
+
+/* ── M5 PHISHING ENGINE ── */
+.phish-wrap{display:flex;height:100%;font-size:11px;}
+.phish-sidebar{width:200px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.phish-sidebar-hdr{font-size:8px;letter-spacing:2px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.phish-target-item{padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.phish-target-item:hover{background:var(--bg3);}
+.phish-target-item.sel{background:var(--cglow);border-left:2px solid var(--cyan);}
+.phish-target-name{font-size:10px;color:var(--text2);margin-bottom:2px;}
+.phish-target-role{font-size:8px;color:var(--text3);}
+.phish-aw{font-size:8px;float:right;padding:1px 4px;letter-spacing:1px;}
+.phish-aw.low{color:var(--green);background:var(--gbg);}
+.phish-aw.med{color:var(--amber);background:var(--abg);}
+.phish-aw.high{color:var(--red);background:var(--rbg);}
+.phish-composer{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.phish-chdr{padding:8px 12px;border-bottom:1px solid var(--border);font-size:8px;letter-spacing:2px;color:var(--text3);}
+.phish-field{display:flex;align-items:center;padding:5px 12px;border-bottom:1px solid var(--border);gap:8px;}
+.phish-flbl{font-size:9px;color:var(--text3);width:52px;flex-shrink:0;letter-spacing:1px;}
+.phish-fval{font-size:10px;color:var(--text2);flex:1;}
+.phish-sel{background:var(--bg);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;padding:2px 6px;outline:none;flex:1;user-select:text;-webkit-user-select:text;}
+.phish-sel:focus{border-color:var(--cyan3);}
+.phish-preview{flex:1;padding:10px 12px;overflow-y:auto;background:var(--bg);}
+.phish-preview-subj{font-size:11px;color:var(--text);font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.phish-preview-body{font-size:10px;color:var(--text2);line-height:1.8;white-space:pre-wrap;}
+.phish-token{color:var(--amber);}
+.phish-footer{padding:8px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.phish-send-btn{background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:2px;padding:6px 14px;cursor:pointer;transition:background .15s;}
+.phish-send-btn:hover{background:var(--cyan);}
+.phish-send-btn:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed;}
+.phish-quality{font-size:9px;color:var(--text3);}
+.phish-quality span{color:var(--amber);}
+#phish-outcome{position:fixed;top:38px;left:50%;transform:translateX(-50%);padding:10px 18px;font-size:11px;font-family:var(--mono);z-index:3000;display:none;letter-spacing:1px;animation:slideIn .2s ease;min-width:300px;text-align:center;}
+#phish-outcome.success{background:var(--gbg);border:1px solid var(--gdim);color:var(--green);}
+#phish-outcome.fail{background:var(--rbg);border:1px solid var(--rdim);color:var(--red);}
+#phish-outcome.alert{background:var(--abg);border:1px solid var(--adim);color:var(--amber);}
+{color:#3fb950;}.sec-suspicious{color:#d29922;}.sec-incident{color:#f85149;}.sec-lockdown{color:#a371f7;}
 .sec-badge{font-size:9px;padding:1px 5px;letter-spacing:1px;font-family:var(--mono);}
 .sec-badge.nominal{background:rgba(63,185,80,0.1);border:1px solid #238636;}
 .sec-badge.suspicious{background:rgba(210,153,34,0.1);border:1px solid #9e6a03;}
@@ -224,16 +313,28 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 </head>
 <body>
 
+<div id="phish-outcome"></div>
+
+<!-- COMMAND PALETTE -->
+<div id="cmdpal">
+  <input id="cmdpal-input" placeholder="open app or run command..." autocomplete="off" spellcheck="false">
+  <div id="cmdpal-results"></div>
+  <div id="cmdpal-footer">↑↓ navigate &nbsp;·&nbsp; ENTER select &nbsp;·&nbsp; ESC close &nbsp;·&nbsp; Ctrl+Space toggle</div>
+</div>
+
+<!-- TAB SUGGEST -->
+<div id="tab-suggest" style="display:none"></div>
+
 <!-- SCANLINES -->
 <div id="scanlines"></div>
 
 <!-- BOOT -->
-<div id="boot"><div id="blines"></div><div id="bbar"><div id="bbar-lbl">LOADING NULL//TRACE OS v0.2...</div><div id="bbar-t"><div id="bbar-f"></div></div></div></div>
+<div id="boot"><div id="blines"></div><div id="bbar"><div id="bbar-lbl">LOADING NULL//TRACE OS v0.5...</div><div id="bbar-t"><div id="bbar-f"></div></div></div></div>
 
 <!-- LOGIN -->
 <div id="login">
   <div class="ll">NULL//TRACE</div>
-  <div class="lv">OS v0.3.0 — M3 BUILD</div>
+  <div class="lv">OS v0.5.0 — M5 BUILD</div>
   <div class="lbox">
     <div class="lf"><label class="llbl">ALIAS</label><input class="li" id="lu" type="text" value="ghost_0x1" autocomplete="off" spellcheck="false" tabindex="1"></div>
     <div class="lf"><label class="llbl">PASSPHRASE</label><input class="li" id="lp" type="password" autocomplete="off" tabindex="2"></div>
@@ -252,7 +353,9 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
         <button class="tab" onclick="openApp('terminal')">TERM//</button>
         <button class="tab" onclick="openApp('netmap')">NET//MAP</button>
         <button class="tab" onclick="openApp('mail')">MAIL//</button>
+        <button class="tab" onclick="openApp('phish')">PHISH//</button>
         <button class="tab" onclick="openApp('exfil')">EXFIL//</button>
+        <button class="tab" onclick="openApp('intel')">INTEL//</button>
         <button class="tab" onclick="openApp('mission')">MISSION//</button>
         <button class="tab" onclick="openApp('secmon')">SEC//MON</button>
         <button class="tab" onclick="openApp('sysmon')">SYS//</button>
@@ -388,29 +491,59 @@ const ADMIN_NAMES={
 };
 
 function generateAdminAlert(nodeId,state,reason){
-  const adm=ADMIN_NAMES[nodeId];
-  const node=NETWORK[nodeId];
+  const node=NETWORK[nodeId]; if(!node)return;
   const t=`${String(Math.floor(ticks/3600)).padStart(2,'0')}:${String(Math.floor((ticks%3600)/60)).padStart(2,'0')}`;
+
+  // Build admin entry — static map for Axiom nodes, dynamic for generated orgs
+  let adm=ADMIN_NAMES[nodeId];
+  if(!adm && proceduralOrg){
+    const secEmp=proceduralOrg.employees.find(e=>e.role==='Security Analyst')||
+                 proceduralOrg.employees.find(e=>e.role==='IT Admin')||
+                 proceduralOrg.employees[0];
+    if(secEmp && secEmp.email) adm={name:`${secEmp.fname} ${secEmp.lname}`, email:secEmp.email};
+  }
+  if(!adm || !adm.email) return; // fully guard — skip if no valid admin
+
+  const admEmail = adm.email;
+  const admName  = adm.name;
+  const nodeLabel= node.label;
+
   const bodies={
-    SUSPICIOUS:`From: ${adm.email}\nTo: bwong@axiom.corp\nSubj: [ALERT] Suspicious activity — ${node.label}\n\nBrian,\n\nMonitoring flagged unusual activity on ${node.label} at ${t}.\n\nDetail: ${reason}\n\nTrace is active. Watching.\n— ${adm.name}`,
-    INCIDENT:`From: bwong@axiom.corp\nTo: all-staff@axiom.corp\nSubj: [INCIDENT] Active intrusion — ${node.label}\n\nAll staff,\n\nConfirmed active intrusion on ${node.label} at ${t}.\n\nDetail: ${reason}\n\nActions:\n- Trace running\n- Credentials rotating\n- Services under review\n\nReport anything unusual immediately.\n— B. Wong, Security`,
-    LOCKDOWN:`From: bwong@axiom.corp\nTo: rchen@axiom.corp; ksullivan@axiom.corp; jmartin@axiom.corp\nSubj: [LOCKDOWN] EMERGENCY — ${node.label}\n\nTeam,\n\nEmergency lockdown on ${node.label} at ${t}.\n\nDetail: ${reason}\n\nAll remote access suspended.\nContacting external IR team.\n— B. Wong`,
+    SUSPICIOUS:`From: ${admEmail}\nTo: ${admEmail}\nSubj: [ALERT] Suspicious activity — ${nodeLabel}\n\n${admName},\n\nMonitoring flagged unusual activity on ${nodeLabel} at ${t}.\n\nDetail: ${reason}\n\nTrace is active. Watching.\n— ${admName}`,
+    INCIDENT:`From: ${admEmail}\nTo: all-staff\nSubj: [INCIDENT] Active intrusion — ${nodeLabel}\n\nAll staff,\n\nConfirmed active intrusion on ${nodeLabel} at ${t}.\n\nDetail: ${reason}\n\nActions:\n- Trace running\n- Credentials rotating\n- Services under review\n\nReport anything unusual immediately.\n— ${admName}`,
+    LOCKDOWN:`From: ${admEmail}\nTo: all-staff\nSubj: [LOCKDOWN] EMERGENCY — ${nodeLabel}\n\nTeam,\n\nEmergency lockdown on ${nodeLabel} at ${t}.\n\nDetail: ${reason}\n\nAll remote access suspended.\nContacting external IR team.\n— ${admName}`,
   };
-  const body=bodies[state]; if(!body)return;
+  const body=bodies[state]; if(!body) return;
+
+  // Safe subject extraction — find the Subj: line regardless of position
+  const subjLine = body.split('\n').find(l=>l.startsWith('Subj: '));
+  const subj = subjLine ? subjLine.replace('Subj: ','') : `[${state}] ${nodeLabel}`;
+
   const alert={
     id:1000+adminAlerts.length,
-    from:adm.email,
-    subj:bodies[state].split('\n')[2].replace('Subj: ',''),
+    from:admEmail,
+    subj,
     time:t, unread:true, isAlert:true, body
   };
   adminAlerts.push(alert);
-  // Inject into MAIL-SRV filesystem
-  const mfs=NETWORK['MAIL-SRV'].fs;
-  if(!mfs['/var/mail/bwong']) mfs['/var/mail/bwong']={t:'d'};
-  mfs[`/var/mail/bwong/alert_${nodeId}_${state}.txt`]={t:'f',exfil:'med',content:body};
+
+  // Inject into filesystem
+  const isProcOrg = !ADMIN_NAMES[nodeId];
+  if(!isProcOrg && NETWORK['MAIL-SRV']){
+    const mfs=NETWORK['MAIL-SRV'].fs;
+    if(!mfs['/var/mail/bwong']) mfs['/var/mail/bwong']={t:'d'};
+    mfs[`/var/mail/bwong/alert_${nodeId}_${state}.txt`]={t:'f',exfil:'med',content:body};
+  } else if(isProcOrg && proceduralOrg?.fs){
+    const pfs=proceduralOrg.fs;
+    const adminDir=`/home/${admName.split(' ')[0].toLowerCase()}`;
+    if(!pfs[adminDir]) pfs[adminDir]={t:'d'};
+    pfs[`${adminDir}/security_alert_${state.toLowerCase()}.txt`]={t:'f',exfil:'med',content:body};
+  }
   refreshMailList();
 }
 
+// alias for backward compat
+function refreshMailList(){ renderMailList(); }
 function getAllMails(){ return [...MAILS,...adminAlerts]; }
 
 function cmdSecstate(){
@@ -565,7 +698,7 @@ const LFS = {
   '/home/ghost_0x1/intel/exfil':{t:'d'},
   '/home/ghost_0x1/logs':{t:'d'},
   '/home/ghost_0x1/logs/ops.log':{t:'f',content:`[00:00:01] OS initialized — ghost_0x1\n[00:00:02] Contract received: OP-VORTEX\n[00:00:03] Target network: Axiom Corp\n[00:00:04] Awaiting operator action`},
-  '/home/ghost_0x1/README.md':{t:'f',content:`NULL//TRACE v0.2 — OPERATOR REFERENCE\n\nCOMMANDS:\n  help            all commands\n  ls / cd / cat   filesystem navigation\n  pwd / whoami    info\n  scan [node]     probe a network node\n  connect [node]  connect to node\n  disconnect      leave current node\n  crack [file]    run password cracker\n  exfil [file]    exfiltrate file to vault\n  rm-logs         delete session logs on node\n  status          system status\n  clear           clear terminal\n\nNETWORK:\n  Type node names or IPs.\n  Firewalled nodes need credentials.\n  Use 'fw-unlock [node] [user] [pass]'\n  to bypass a firewall manually.\n\nMISSION: Open MISSION// for objectives.`},
+  '/home/ghost_0x1/README.md':{t:'f',content:`NULL//TRACE v0.5 — OPERATOR REFERENCE\n\nFILESYSTEM:\n  ls [path]         list directory contents\n  cd [path]         change directory (.. to go up)\n  cat [file]        read file contents\n  mkdir [name]      create directory\n  touch [name]      create file\n  rm [name]         remove file or empty directory\n  pwd               print working directory\n  nano [file]       open text editor (^S save, ^N sticky)\n  note [file]       pin file as sticky note\n\nSYSTEM:\n  whoami            current identity\n  ifconfig          network interfaces\n  status            connection & system status\n  uname             kernel info\n  history           command history\n  clear             clear terminal\n\nNETWORK:\n  nodes             list all network nodes\n  scan [host]       probe target for open services\n  connect [host]    connect to remote host\n  disconnect        close active connection\n  fw-unlock [node] [user] [pass]\n  secstate          security state of all nodes\n\nOPERATIONS:\n  crack [file]      run password cracker\n  exfil [file]      exfiltrate file to vault\n  rm-logs           delete session logs on node\n\nSHORTCUTS:\n  open [app]        open any app (mail, netmap, intel...)\n  Ctrl+Space        command palette\n  Ctrl+T            new terminal window\n  Tab               autocomplete command or filename`},
 };
 
 // ══════════════════════════════════════════════
@@ -593,7 +726,7 @@ const OBJECTIVES = [
 // BOOT
 // ══════════════════════════════════════════════
 const BOOTLINES = [
-  {t:'PHANTOM KERNEL v3.8 — NULL//TRACE OS v0.3',c:'cyan',d:0},
+  {t:'PHANTOM KERNEL v3.8 — NULL//TRACE OS v0.5',c:'cyan',d:0},
   {t:'',c:'',d:80},
   {t:'[  OK  ] Memory subsystems initialized',c:'ok',d:140},
   {t:'[  OK  ] Phantom filesystem mounted',c:'ok',d:240},
@@ -606,7 +739,7 @@ const BOOTLINES = [
   {t:'[  OK  ] Admin alert system online',c:'ok',d:1060},
   {t:'[  OK  ] Exfil vault initialized',c:'ok',d:1160},
   {t:'',c:'',d:1260},
-  {t:'NULL//TRACE v0.2 :: ALL SYSTEMS NOMINAL',c:'cyan',d:1340},
+  {t:'NULL//TRACE v0.5 :: ALL SYSTEMS NOMINAL',c:'cyan',d:1340},
 ];
 
 function runBoot(){
@@ -677,6 +810,7 @@ function launchDesktop(){
   startClock();
   setTimeout(()=>{openApp('terminal'); openApp('mission');},400);
   setTimeout(()=>openApp('netmap'),700);
+  setTimeout(()=>initProceduralOrg(),1200);
 }
 let ticks=0;
 function startClock(){
@@ -702,9 +836,23 @@ const WDEFS={
   mission: {title:'MISSION// — OP-VORTEX',w:380,h:380,x:420,y:70},
   secmon:  {title:'SEC//MON — SECURITY',  w:340,h:420,x:460,y:90},
   sysmon:  {title:'SYS// — MONITOR',      w:300,h:360,x:300,y:90},
+  phish:   {title:'PHISH// — SOCIAL ENGINEERING', w:620,h:460,x:130,y:65},
+  intel:   {title:'INTEL// — DATABASE',   w:400,h:440,x:120,y:80},
 };
 
+let termCount=0;
 function openApp(id){
+  // Multiple terminal instances — each gets a unique id
+  if(id==='terminal'){
+    // find next free terminal slot
+    let newId='terminal';
+    if(WINS['terminal']){
+      termCount++;
+      newId=`terminal-${termCount}`;
+      WDEFS[newId]={title:`TERM// [${termCount+1}] — NULL//TRACE`,w:680,h:440,x:130+termCount*28,y:70+termCount*18};
+      id=newId;
+    }
+  }
   if(WINS[id]){
     if(WINS[id].minimized){WINS[id].el.style.display='flex';WINS[id].minimized=false;}
     focusWin(id); return;
@@ -729,7 +877,10 @@ function focusWin(id){
   if(focusedWin&&WINS[focusedWin])WINS[focusedWin].el.classList.remove('focused');
   focusedWin=id;
   if(WINS[id]){WINS[id].el.classList.add('focused');WINS[id].el.style.zIndex=++zCnt;}
-  if(id==='terminal')setTimeout(()=>document.getElementById('tinp')?.focus(),50);
+  if(id==='terminal'||id.startsWith('terminal-')){
+    activeTermWin=id;
+    setTimeout(()=>document.getElementById(`tinp-${id}`)?.focus(),50);
+  }
 }
 function closeApp(id){
   if(!WINS[id])return;
@@ -757,11 +908,18 @@ function maxApp(id){
 }
 function syncTabs(){
   document.querySelectorAll('.tab').forEach(btn=>{
-    const m=btn.getAttribute('onclick')?.match(/'(\w+)'/);
+    const m=btn.getAttribute('onclick')?.match(/'([\w-]+)'/);
     if(!m)return;
     const id=m[1];
     btn.classList.remove('active','minimized');
-    if(WINS[id]){btn.classList.add('active');if(WINS[id].minimized)btn.classList.add('minimized');}
+    // For terminal button, mark active if ANY terminal window is open
+    if(id==='terminal'){
+      const anyTerm=Object.keys(WINS).some(k=>k==='terminal'||k.startsWith('terminal-'));
+      if(anyTerm) btn.classList.add('active');
+    } else if(WINS[id]){
+      btn.classList.add('active');
+      if(WINS[id].minimized)btn.classList.add('minimized');
+    }
   });
 }
 function makeDrag(win,handle){
@@ -788,64 +946,1114 @@ function makeResize(win,handle){
 // ══════════════════════════════════════════════
 function buildApp(id){
   const body=document.getElementById(`wbody-${id}`);
-  if(id==='terminal')buildTerminal(body);
+  if(id==='terminal'||id.startsWith('terminal-'))buildTerminal(body,id);
   else if(id==='netmap')buildNetmap(body);
   else if(id==='mail')buildMail(body);
+  else if(id==='phish')buildPhish(body);
   else if(id==='exfil')buildExfil(body);
   else if(id==='mission')buildMission(body);
   else if(id==='secmon')buildSecmon(body);
   else if(id==='sysmon')buildSysmon(body);
+  else if(id==='intel')buildIntel(body);
+  else if(id.startsWith('nano-'))buildNano(body,id);
+  else if(id.startsWith('note-'))buildNote(body,id);
 }
 
 // ══════════════════════════════════════════════
-// TERMINAL
+// TERMINAL — M4: multi-instance + tab complete
 // ══════════════════════════════════════════════
-function buildTerminal(body){
-  body.innerHTML=`<div id="tout"></div><div class="tpr"><span class="tprl" id="tprl">${getPrompt()}</span><input id="tinp" spellcheck="false" autocomplete="off"></div>`;
-  plines([
+// Each terminal instance has its own output/input ids based on winId
+function buildTerminal(body, winId='terminal'){
+  const oid=`tout-${winId}`, iid=`tinp-${winId}`, pid=`tprl-${winId}`;
+  body.innerHTML=`<div id="${oid}" class="tout-base" style="flex:1;padding:10px 12px;font-size:11.5px;line-height:1.7;scroll-behavior:smooth;overflow-y:auto;"></div><div class="tpr" style="position:relative;"><span class="tprl" id="${pid}">${getPrompt()}</span><input id="${iid}" class="tinp" spellcheck="false" autocomplete="off"><div id="tab-suggest-${winId}" style="display:none;position:absolute;bottom:100%;left:0;background:var(--bg2);border:1px solid var(--border2);font-size:11px;font-family:var(--mono);z-index:300;max-height:120px;overflow-y:auto;min-width:200px;"></div></div>`;
+
+  // scrollbar styles for dynamic output div
+  const s=document.getElementById(oid);
+  s.style.cssText+=';scroll-behavior:smooth;';
+
+  const isFirst=winId==='terminal';
+  tPrintTo(winId,[
     {t:'╔═══════════════════════════════════════════╗',c:'cyan'},
-    {t:'║   NULL//TRACE OS v0.3  —  M3 BUILD        ║',c:'cyan'},
-    {t:'║   Contract: OP-VORTEX  |  Target: AXIOM   ║',c:'cyan'},
-    {t:'║   Reactive security ONLINE                ║',c:'cyan'},
+    {t:'║   NULL//TRACE OS v0.5  —  M5 BUILD        ║',c:'cyan'},
+    {t:'║   Social Engineering ONLINE               ║',c:'cyan'},
     {t:'╚═══════════════════════════════════════════╝',c:'cyan'},
     {t:'',c:'blank'},
-    {t:`Identity: ${currentUser}  |  Check MISSION// for objectives`,c:'ok'},
-    {t:`NEW: secstate — monitor network security  |  SEC//MON app`,c:'info'},
-    {t:`Type 'help' or open NET//MAP to begin`,c:'dim'},
+    {t:`Identity: ${currentUser}`,c:'ok'},
+    {t:`Ctrl+Space: command palette  |  Ctrl+T: new terminal`,c:'info'},
+    {t:`NEW: phish [email]  |  open phish  |  impersonate [email]`,c:'info'},
+    {t:`Type 'help' for all commands`,c:'dim'},
     {t:'',c:'blank'},
   ]);
-  document.getElementById('tinp').addEventListener('keydown',onTermKey);
-  document.getElementById('tinp').focus();
+
+  const inp=document.getElementById(iid);
+  inp.addEventListener('keydown', e=>onTermKey(e, winId));
+  inp.addEventListener('keydown', e=>onTabKey(e, winId), true);
+  inp.focus();
 }
+
+// Per-terminal print helpers
+function tPrintTo(winId, lines){ lines.forEach(({t,c})=>tPLine(winId,t,c)); tScrollTo(winId); }
+function tPLine(winId, txt, cls='out'){
+  const out=document.getElementById(`tout-${winId}`); if(!out)return;
+  const el=document.createElement('div');
+  el.className=`tl ${cls}`; el.textContent=txt||' '; out.appendChild(el);
+}
+function tScrollTo(winId){
+  const out=document.getElementById(`tout-${winId}`);
+  if(out) out.scrollTop=out.scrollHeight;
+}
+
+// Active terminal — the one most recently focused
+let activeTermWin='terminal';
+function getActiveTerm(){ return activeTermWin; }
+
+// Override pline/plines/scrollT to route to active terminal
+function pline(txt,cls='out'){ tPLine(activeTermWin,txt,cls); }
+function plines(arr){ arr.forEach(({t,c})=>tPLine(activeTermWin,t,c)); tScrollTo(activeTermWin); }
+function scrollT(){ tScrollTo(activeTermWin); }
+
+function updatePrompt(){
+  // Update all open terminal prompts
+  Object.keys(WINS).filter(id=>id==='terminal'||id.startsWith('terminal-')).forEach(wid=>{
+    const l=document.getElementById(`tprl-${wid}`);
+    if(l) l.textContent=getPrompt();
+  });
+}
+
 function getPrompt(){
   const h=connectedNode?`@${NETWORK[connectedNode]?.label||connectedNode}`:'';
   const p=cwd.replace(`/home/${currentUser}`,'~');
   return `${currentUser}${h}:${p}$ `;
 }
-function onTermKey(e){
-  if(e.target.id !== 'tinp') return;
+
+function onTermKey(e, winId){
+  if(!e.target.id.startsWith('tinp-')) return;
+  activeTermWin=winId;
+  if(e.key==='Tab'){ e.preventDefault(); return; } // handled by capture listener
   if(e.key==='Enter'){
+    hideSuggest(winId);
     const cmd=e.target.value.trim(); e.target.value='';
     if(cmd){termHistory.unshift(cmd);histIdx=-1;}
-    pline(`${getPrompt()}${cmd}`,'cmd');
+    tPLine(winId,`${getPrompt()}${cmd}`,'cmd');
     if(cmd)runCmd(cmd);
-    scrollT();
+    tScrollTo(winId);
   } else if(e.key==='ArrowUp'){
     histIdx=Math.min(histIdx+1,termHistory.length-1);
     e.target.value=termHistory[histIdx]||''; e.preventDefault();
   } else if(e.key==='ArrowDown'){
     histIdx=Math.max(histIdx-1,-1);
     e.target.value=histIdx>=0?termHistory[histIdx]:''; e.preventDefault();
+  } else if(e.key==='Escape'){
+    hideSuggest(winId);
   }
 }
-function pline(txt,cls='out'){
-  const out=document.getElementById('tout'); if(!out)return;
-  const el=document.createElement('div');
-  el.className=`tl ${cls}`; el.textContent=txt||' '; out.appendChild(el);
+
+// buildNote — renders a note- window as a live-updating sticky panel
+// (used when openApp('note-filename') is called directly)
+function buildNote(body, winId){
+  const filepath=winId.replace(/^note-/,'').replace(/-\d+$/,'');
+  const resolved=Object.keys(LFS).find(p=>p.endsWith('/'+filepath))||
+    `/home/${currentUser}/${filepath}`;
+  const content=LFS[resolved]?.content||'(empty — create with nano)';
+  body.innerHTML=`<div style="padding:10px;font-size:11px;font-family:var(--mono);color:#c8c820;background:#1a1a0a;height:100%;overflow-y:auto;white-space:pre-wrap;line-height:1.7;" id="note-view-${winId}">${content.replace(/</g,'&lt;')}</div>`;
 }
-function plines(arr){arr.forEach(({t,c})=>pline(t,c));scrollT();}
-function scrollT(){const out=document.getElementById('tout');if(out)out.scrollTop=out.scrollHeight;}
-function updatePrompt(){const l=document.getElementById('tprl');if(l)l.textContent=getPrompt();}
+
+// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+const ALL_COMMANDS=['help','clear','pwd','ls','cd','cat','mkdir','touch','rm',
+  'whoami','status','ifconfig','scan','connect','disconnect','crack','exfil',
+  'rm-logs','fw-unlock','secstate','nodes','history','uname','date','echo',
+  'man','sudo','exit','reboot','open','nano','note','phish','impersonate'];
+
+let tabSuggestions=[], tabIdx=-1;
+
+function onTabKey(e, winId){
+  if(e.key!=='Tab') return;
+  e.preventDefault(); e.stopPropagation();
+  const inp=document.getElementById(`tinp-${winId}`);
+  const val=inp.value;
+  const parts=val.split(/\s+/);
+  const last=parts[parts.length-1];
+  if(!last){ hideSuggest(winId); return; }
+
+  // Build candidate list
+  let candidates=[];
+  if(parts.length===1){
+    // completing a command
+    candidates=ALL_COMMANDS.filter(c=>c.startsWith(last.toLowerCase()));
+  } else {
+    // completing a filepath
+    const fs=getCFS();
+    const partial=resolvePath(last);
+    const dir=partial.substring(0,partial.lastIndexOf('/'))||'/';
+    const stem=partial.split('/').pop();
+    candidates=Object.keys(fs)
+      .filter(p=>{
+        const parent=p.substring(0,p.lastIndexOf('/'))||'/';
+        return parent===dir && p.split('/').pop().startsWith(stem);
+      })
+      .map(p=>p.split('/').pop()+(fs[p].t==='d'?'/':''));
+  }
+
+  if(candidates.length===0){ hideSuggest(winId); return; }
+  if(candidates.length===1){
+    // single match — complete inline
+    parts[parts.length-1]=candidates[0];
+    inp.value=parts.join(' ');
+    hideSuggest(winId); return;
+  }
+
+  // Show dropdown
+  tabSuggestions=candidates; tabIdx=0;
+  showSuggest(winId, candidates, parts);
+}
+
+function showSuggest(winId, candidates, parts){
+  const box=document.getElementById(`tab-suggest-${winId}`);
+  if(!box) return;
+  box.style.display='block';
+  box.innerHTML=candidates.map((c,i)=>
+    `<div class="ts-item${i===0?' active':''}" data-val="${c}">${c}</div>`
+  ).join('');
+  box.querySelectorAll('.ts-item').forEach((el,i)=>{
+    el.addEventListener('mousedown', ev=>{
+      ev.preventDefault();
+      parts[parts.length-1]=candidates[i];
+      document.getElementById(`tinp-${winId}`).value=parts.join(' ');
+      hideSuggest(winId);
+    });
+  });
+}
+
+function hideSuggest(winId){
+  const box=document.getElementById(`tab-suggest-${winId}`);
+  if(box){ box.style.display='none'; box.innerHTML=''; }
+  tabSuggestions=[]; tabIdx=-1;
+}
+
+// ══════════════════════════════════════════════
+// M4 — COMMAND PALETTE (Ctrl+Space)
+// ══════════════════════════════════════════════
+const PALETTE_ITEMS=[
+  {icon:'❯_', name:'New Terminal',       hint:'Ctrl+T',       action:()=>openApp('terminal')},
+  {icon:'⬡',  name:'NET//MAP',           hint:'network map',  action:()=>openApp('netmap')},
+  {icon:'@',  name:'MAIL//',             hint:'inbox',        action:()=>openApp('mail')},
+  {icon:'✉',  name:'PHISH//',            hint:'social eng',   action:()=>openApp('phish')},
+  {icon:'◈',  name:'SEC//MON',           hint:'security',     action:()=>openApp('secmon')},
+  {icon:'◎',  name:'MISSION//',          hint:'objectives',   action:()=>openApp('mission')},
+  {icon:'↑',  name:'EXFIL// Vault',      hint:'stolen files', action:()=>openApp('exfil')},
+  {icon:'i',  name:'INTEL//',            hint:'intelligence', action:()=>openApp('intel')},
+  {icon:'◉',  name:'SYS// Monitor',      hint:'system',       action:()=>openApp('sysmon')},
+  {icon:'≡',  name:'secstate',           hint:'command',      action:()=>{ openApp('terminal'); focusWin('terminal'); setTimeout(()=>{ const i=document.getElementById('tinp-terminal'); if(i){i.value='secstate';i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));} },100); }},
+  {icon:'?',  name:'help',               hint:'command',      action:()=>{ openApp('terminal'); focusWin('terminal'); setTimeout(()=>{ const i=document.getElementById('tinp-terminal'); if(i){i.value='help';i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));} },100); }},
+];
+
+let palIdx=0;
+
+function openPalette(){
+  const pal=document.getElementById('cmdpal');
+  pal.style.display='block';
+  document.getElementById('cmdpal-input').value='';
+  document.getElementById('cmdpal-input').focus();
+  palIdx=0;
+  renderPalette('');
+}
+function closePalette(){
+  document.getElementById('cmdpal').style.display='none';
+}
+function renderPalette(q){
+  const filtered=q
+    ? PALETTE_ITEMS.filter(i=>i.name.toLowerCase().includes(q.toLowerCase())||i.hint.toLowerCase().includes(q.toLowerCase()))
+    : PALETTE_ITEMS;
+  const res=document.getElementById('cmdpal-results');
+  res.innerHTML=filtered.map((item,i)=>
+    `<div class="cpr${i===palIdx?' active':''}" data-idx="${i}">
+      <span class="cpr-icon">${item.icon}</span>
+      <span class="cpr-name">${item.name}</span>
+      <span class="cpr-hint">${item.hint}</span>
+    </div>`
+  ).join('');
+  res.querySelectorAll('.cpr').forEach((el,i)=>{
+    el.addEventListener('mousedown', ev=>{ ev.preventDefault(); filtered[i].action(); closePalette(); });
+  });
+  return filtered;
+}
+
+document.getElementById('cmdpal-input').addEventListener('input', e=>{
+  palIdx=0; renderPalette(e.target.value);
+});
+document.getElementById('cmdpal-input').addEventListener('keydown', e=>{
+  const q=document.getElementById('cmdpal-input').value;
+  const filtered=PALETTE_ITEMS.filter(i=>!q||i.name.toLowerCase().includes(q.toLowerCase())||i.hint.toLowerCase().includes(q.toLowerCase()));
+  if(e.key==='ArrowDown'){ palIdx=Math.min(palIdx+1,filtered.length-1); renderPalette(q); e.preventDefault(); }
+  else if(e.key==='ArrowUp'){ palIdx=Math.max(palIdx-1,0); renderPalette(q); e.preventDefault(); }
+  else if(e.key==='Enter'){ if(filtered[palIdx]){ filtered[palIdx].action(); closePalette(); } }
+  else if(e.key==='Escape'){ closePalette(); }
+});
+
+// Global keyboard shortcuts
+document.addEventListener('keydown', e=>{
+  // Ctrl+Space — command palette
+  if(e.ctrlKey && e.code==='Space'){
+    e.preventDefault();
+    const pal=document.getElementById('cmdpal');
+    if(pal.style.display==='none'||!pal.style.display) openPalette();
+    else closePalette();
+  }
+  // Ctrl+T — new terminal
+  if(e.ctrlKey && e.key==='t' && !e.target.closest('#cmdpal')){
+    e.preventDefault();
+    openApp('terminal');
+  }
+  // Escape — close palette if open
+  if(e.key==='Escape'){
+    const pal=document.getElementById('cmdpal');
+    if(pal.style.display==='block') closePalette();
+  }
+});
+
+// ══════════════════════════════════════════════
+// M4 — NANO EDITOR
+// ══════════════════════════════════════════════
+const nanoFiles={};  // winId -> {path, content}
+
+function openNano(filepath){
+  const fs=getCFS();
+  const resolved=resolvePath(filepath);
+  const fname=resolved.split('/').pop();
+  const existing=fs[resolved];
+  const content=existing?existing.content:'';
+  const nid=`nano-${fname}-${Date.now()}`;
+  WDEFS[nid]={title:`nano: ${fname}`,w:580,h:380,x:140+Math.random()*60,y:80+Math.random()*40};
+  nanoFiles[nid]={path:resolved,content,fname};
+  openApp(nid);
+}
+
+function buildNano(body, winId){
+  const {fname,content}=nanoFiles[winId]||{fname:'untitled',content:''};
+  body.innerHTML=`
+    <div class="nano-wrap">
+      <div class="nano-header"><span>${fname}</span><span id="nano-modified-${winId}"></span></div>
+      <div class="nano-body"><textarea id="nano-ta-${winId}" spellcheck="false">${content.replace(/</g,'&lt;')}</textarea></div>
+      <div class="nano-footer">
+        <span><span class="nano-key">^X</span> Exit</span>
+        <span><span class="nano-key">^S</span> Save</span>
+        <span><span class="nano-key">^N</span> Sticky</span>
+        <span id="nano-status-${winId}" style="margin-left:auto;color:var(--green)"></span>
+      </div>
+    </div>`;
+  const ta=document.getElementById(`nano-ta-${winId}`);
+  ta.style.cssText='width:100%;height:100%;background:var(--bg);border:none;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;resize:none;line-height:1.7;caret-color:var(--cyan);user-select:text;-webkit-user-select:text;';
+  ta.focus();
+  ta.addEventListener('input',()=>{
+    document.getElementById(`nano-modified-${winId}`).textContent='[modified]';
+    document.getElementById(`nano-modified-${winId}`).style.color='var(--amber)';
+    if(nanoFiles[winId]) nanoFiles[winId].content=ta.value;
+  });
+  ta.addEventListener('keydown', e=>{
+    if(e.ctrlKey && e.key==='s'){ e.preventDefault(); nanoSave(winId); }
+    if(e.ctrlKey && e.key==='x'){ e.preventDefault(); nanoSave(winId); closeApp(winId); }
+    if(e.ctrlKey && e.key==='n'){ e.preventDefault(); nanoSticky(winId); }
+  });
+}
+
+function nanoSave(winId){
+  const {path,content,fname}=nanoFiles[winId]||{};
+  if(!path) return;
+  const fs=connectedNode?NETWORK[connectedNode].fs:LFS;
+  fs[path]={t:'f',content};
+  const stat=document.getElementById(`nano-status-${winId}`);
+  const mod=document.getElementById(`nano-modified-${winId}`);
+  if(stat){ stat.textContent='Saved'; setTimeout(()=>{ if(stat) stat.textContent=''; },1500); }
+  if(mod){ mod.textContent=''; }
+  // Update intel if it's an intel file
+  refreshIntel();
+}
+
+function nanoSticky(winId){
+  const {path,fname}=nanoFiles[winId]||{};
+  if(!path) return;
+  openStickyNote(fname, path);
+  notify(`Sticky note created: ${fname}`,'ok');
+}
+
+// ══════════════════════════════════════════════
+// M4 — STICKY NOTES
+// ══════════════════════════════════════════════
+const stickyNotes={};
+let stickyCount=0;
+
+function openStickyNote(fname, filepath){
+  stickyCount++;
+  const sid=`sticky-${stickyCount}`;
+  const ws=document.getElementById('ws');
+  const el=document.createElement('div');
+  el.className='sticky';
+  el.id=sid;
+  const x=20+stickyCount*24, y=100+stickyCount*20;
+  el.style.cssText=`left:${x}px;top:${y}px;width:220px;height:160px;z-index:${++zCnt};`;
+
+  el.innerHTML=`
+    <div class="sticky-tb" id="stb-${sid}">
+      <span class="sticky-title">${fname}</span>
+      <button class="sticky-close" onclick="removeSticky('${sid}')">✕</button>
+    </div>
+    <div class="sticky-body" id="sbody-${sid}">Loading...</div>
+    <div class="sticky-rh" id="srh-${sid}"></div>`;
+
+  ws.appendChild(el);
+  stickyNotes[sid]={fname, filepath};
+  makeDrag(el, document.getElementById(`stb-${sid}`));
+  makeResize(el, document.getElementById(`srh-${sid}`));
+  el.addEventListener('mousedown',()=>{ el.style.zIndex=++zCnt; });
+  refreshStickyContent(sid, filepath);
+}
+
+function refreshStickyContent(sid, filepath){
+  const fs=LFS;
+  const node=fs[filepath];
+  const body=document.getElementById(`sbody-${sid}`);
+  if(body) body.textContent=node?node.content:'(empty)';
+}
+
+function removeSticky(sid){
+  const el=document.getElementById(sid);
+  if(el) el.remove();
+  delete stickyNotes[sid];
+}
+
+function refreshAllStickies(){
+  Object.entries(stickyNotes).forEach(([sid,{filepath}])=>refreshStickyContent(sid,filepath));
+}
+
+// ══════════════════════════════════════════════
+// M4 — INTEL// APP
+// ══════════════════════════════════════════════
+// Auto-populates as player discovers things
+const intelDB={
+  credentials:[],
+  nodes:[],
+  employees:[],
+  files:[],
+};
+
+function addIntel(category, entry){
+  const db=intelDB[category];
+  if(!db) return;
+  if(!db.find(e=>e.key===entry.key)) db.push({...entry, time:ticks});
+  refreshIntel();
+}
+
+function buildIntel(body){
+  body.innerHTML=`<div class="intel-wrap" id="intel-inner"></div>`;
+  refreshIntel();
+}
+
+function refreshIntel(){
+  const el=document.getElementById('intel-inner'); if(!el) return;
+  let html='';
+
+  const sections=[
+    {key:'credentials', label:'CREDENTIALS', icon:'🔑'},
+    {key:'nodes',       label:'NETWORK NODES', icon:'⬡'},
+    {key:'employees',   label:'PERSONNEL', icon:'@'},
+    {key:'files',       label:'EXFIL FILES', icon:'↑'},
+  ];
+
+  sections.forEach(({key,label})=>{
+    const entries=intelDB[key];
+    html+=`<div class="intel-section">
+<div class="intel-section-hdr">${label} <span>${entries.length} entries</span></div>`;
+    if(!entries.length){
+      html+=`<div class="intel-entry" style="color:var(--text3);font-size:9px;">No intel gathered yet.</div>`;
+    } else {
+      entries.slice(-8).forEach(e=>{
+        html+=`<div class="intel-entry"><span class="intel-key">${e.key}</span><span class="intel-val ${e.hot?'hot':''}">${e.val}</span></div>`;
+      });
+    }
+    html+=`</div>`;
+  });
+
+  // Also show local notes files
+  const noteFiles=Object.keys(LFS).filter(p=>
+    p.startsWith(`/home/${currentUser}/`)&&
+    (p.endsWith('.txt')||p.endsWith('.md'))&&
+    LFS[p].t==='f'
+  );
+  if(noteFiles.length){
+    html+=`<div class="intel-section"><div class="intel-section-hdr">LOCAL NOTES <span>${noteFiles.length} files</span></div>`;
+    noteFiles.forEach(p=>{
+      const fname=p.split('/').pop();
+      const preview=(LFS[p].content||'').substring(0,60).replace(/\n/g,' ');
+      html+=`<div class="intel-entry" style="cursor:pointer" onclick="openNano('${p}')">
+<span class="intel-key">${fname}</span>
+<span class="intel-val" style="font-size:9px;color:var(--text3);">${preview}...</span>
+</div>`;
+    });
+    html+=`</div>`;
+  }
+
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════
+// M4 — PROCEDURAL ORG GENERATOR
+// ══════════════════════════════════════════════
+const INDUSTRIES=['FINTECH','PHARMA','LEGAL','LOGISTICS','DEFENSE','MEDIA'];
+const FIRST=['Alex','Jordan','Morgan','Casey','Riley','Drew','Taylor','Sam','Jamie','Chris'];
+const LAST=['Chen','Novak','Osei','Müller','Patel','Rivera','Walsh','Tanaka','Kowalski','Okafor'];
+const ROLES=['CEO','CFO','CTO','IT Admin','DevOps','HR Director','Legal Counsel','Security Analyst'];
+const HOBBIES=['cycling','chess','hiking','photography','cooking','gaming','gardening','running'];
+const PETS=['Max','Luna','Bella','Charlie','Mochi','Socks','Bruno','Nala'];
+const ADJECTIVES=['Secure','Digital','Global','Advanced','Premier','Unified','Core','Apex'];
+const NOUNS=['Systems','Solutions','Group','Corp','Industries','Partners','Labs','Dynamics'];
+
+function seedRandom(seed){
+  let s=seed;
+  return function(){ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; };
+}
+
+function genOrg(seed=Date.now()){
+  const rng=seedRandom(seed);
+  const pick=(arr)=>arr[Math.floor(rng()*arr.length)];
+
+  const industry=pick(INDUSTRIES);
+  const name=`${pick(ADJECTIVES)} ${pick(NOUNS)}`;
+  const domain=name.toLowerCase().replace(/\s+/g,'')+'.corp';
+  const ip=`10.${20+Math.floor(rng()*200)}.${Math.floor(rng()*255)}.1`;
+  const secLevel=pick(['LOW','NOMINAL','HIGH']);
+
+  // Generate 4-5 employees
+  const empCount=4+Math.floor(rng()*2);
+  const employees=[];
+  for(let i=0;i<empCount;i++){
+    const fname=pick(FIRST), lname=pick(LAST);
+    const role=ROLES[i]||pick(ROLES);
+    const hobby=pick(HOBBIES), pet=pick(PETS);
+    const birthYear=1970+Math.floor(rng()*30);
+    // Password seeded from personal data
+    const passPatterns=[
+      `${pet}${birthYear}`,
+      `${fname.toLowerCase()}${Math.floor(rng()*999)}!`,
+      `${lname}${birthYear%100}#`,
+      `${hobby.substring(0,4)}${Math.floor(rng()*9999)}`,
+    ];
+    const password=pick(passPatterns);
+    employees.push({fname,lname,role,email:`${fname.toLowerCase()[0]}${lname.toLowerCase()}@${domain}`,hobby,pet,birthYear,password});
+  }
+
+  // Generate seeded filesystem
+  const ceo=employees[0], it=employees.find(e=>e.role==='IT Admin')||employees[1];
+  const fs={
+    '/':{t:'d'},'/home':{t:'d'},'/etc':{t:'d'},'/var':{t:'d'},'/var/log':{t:'d'},
+    '/etc/network.conf':{t:'f',content:`# ${name.toUpperCase()} NETWORK\nhostname: ${domain}\ngateway: ${ip}\nsecurity: ${secLevel}`},
+    '/var/log/access.log':{t:'f',exfil:'low',content:`[LOG] Session from unknown IP\n[LOG] Auth attempt: ${it.email}\n[LOG] File access: /home/${it.fname.toLowerCase()}/passwords.txt`},
+  };
+  employees.forEach(emp=>{
+    const dir=`/home/${emp.fname.toLowerCase()}`;
+    fs[dir]={t:'d'};
+    fs[`${dir}/notes.txt`]={t:'f',content:`Personal notes — ${emp.fname} ${emp.lname}\nRole: ${emp.role}\n\nTodo:\n- update password (still using ${emp.pet}${emp.birthYear})\n- call ${employees[(employees.indexOf(emp)+1)%employees.length].fname} about the thing\n\nReminder: ${emp.hobby} on Saturday`};
+    fs[`${dir}/.credentials`]={t:'f',exfil:'high',content:`# ${emp.fname} ${emp.lname} — ${emp.role}\nemail: ${emp.email}\npassword: ${emp.password}\nrecovery: ${emp.pet} / ${emp.birthYear}`};
+  });
+  // Add a high-value target file
+  fs[`/home/${ceo.fname.toLowerCase()}/CONFIDENTIAL.txt`]={
+    t:'f',exfil:'high',
+    content:`CONFIDENTIAL — ${name.toUpperCase()}\n\nQ${1+Math.floor(rng()*4)} Financial Summary\n\nRevenue: $${(10+Math.floor(rng()*90))}M\nProjected growth: ${5+Math.floor(rng()*25)}%\n\nStrategic targets:\n- ${pick(ADJECTIVES)} ${pick(NOUNS)} acquisition\n- ${industry} market expansion\n\nThis document is strictly confidential.\n— ${ceo.fname} ${ceo.lname}, ${ceo.role}`
+  };
+
+  return {seed,name,domain,industry,ip,secLevel,employees,fs};
+}
+
+// Generate the procedural org and inject as a second target node
+let proceduralOrg=null;
+
+function initProceduralOrg(){
+  proceduralOrg=genOrg(42);  // seeded for consistency per session
+  const org=proceduralOrg;
+  // Register as a new network node
+  NETWORK[`PROC-ORG`]={
+    label:org.name.substring(0,12).toUpperCase().replace(/\s/g,'-'),
+    ip:org.ip,
+    tier:'public',
+    services:[{port:22,svc:'ssh',ver:'OpenSSH 8.0'},{port:80,svc:'http',ver:'Apache 2.4'},{port:443,svc:'https',ver:'nginx 1.18'}],
+    os:`Ubuntu 20.04 — ${org.industry}`,
+    security:org.secLevel,
+    firewall:false,
+    links:['GATEWAY'],
+    traceRate:0.3,
+    desc:`Procedurally generated org: ${org.name}. Industry: ${org.industry}.`,
+    fs:org.fs,
+  };
+  firewallUnlocked['PROC-ORG']=true;
+  nodeSecState['PROC-ORG']='NOMINAL';
+  nodeSecEvents['PROC-ORG']=[];
+  NODE_POS['PROC-ORG']={x:140,y:340};
+  NETWORK['GATEWAY'].links.push('PROC-ORG');
+
+  // M5a — build trust graph on org generation
+  proceduralOrg.trustGraph = buildTrustGraph(org.employees);
+  // Stamp each employee with awareness level seeded by role
+  org.employees.forEach(e=>{
+    const awarenessMap={
+      'Security Analyst':'HIGH','CTO':'HIGH',
+      'CFO':'MED','CEO':'MED','IT Admin':'MED',
+      'DevOps':'LOW','HR Director':'LOW','Legal Counsel':'LOW',
+    };
+    e.awareness = awarenessMap[e.role] || AWARENESS_LEVELS[Math.floor(Math.random()*3)];
+  });
+
+  // Add intel entries for the org
+  org.employees.forEach(e=>{
+    addIntel('employees',{key:e.email,val:`${e.fname} ${e.lname} — ${e.role}`});
+  });
+
+  // Add M4 contract mail
+  MAILS.push({
+    id:99,from:'NULL-SIGNAL-HANDLER',
+    subj:`NEW CONTRACT: ${org.name} — intel extraction`,
+    time:'00:05',unread:true,
+    body:`Operator,\n\nNew target added to your network map.\n\nOrg: ${org.name}\nIndustry: ${org.industry}\nEntry: ${org.ip} (PROC-ORG)\nSecurity: ${org.secLevel}\n\nObjective:\nLocate and exfiltrate CONFIDENTIAL.txt\nfrom the CEO home directory.\n\nThis org was procedurally generated.\nEmployee passwords are seeded from\npersonal data — read their notes.\n\nPayout: 3,600 cr\n— NULL SIGNAL HANDLER`
+  });
+
+  // M5a — social engineering contract
+  MAILS.push({
+    id:100, from:'NULL-SIGNAL-HANDLER',
+    subj:'CAPABILITY UNLOCKED: Social Engineering',
+    time:'00:06', unread:true,
+    body:`Operator,\n\nYou now have access to the PHISH// app.\n\nSocial engineering lets you bypass technical\ndefenses entirely by targeting humans instead.\n\nEach employee has:\n  - Awareness level (LOW/MED/HIGH)\n  - Role-based trust patterns\n  - Personal data that can personalize lures\n\nHigh-awareness targets will report suspicious\nemails, triggering security escalation.\n\nTips:\n  - Read target emails first to gather intel\n  - Personalised lures need personal data\n  - Match template pretext to target role\n  - Impersonate someone the target trusts\n  - Check success probability before sending\n\nCredentials from successful phishes are\nstored in ~/intel/callbacks/\nand can replace technical exploit paths.\n\n— NULL SIGNAL HANDLER`
+  });
+
+  refreshNetmap();
+  refreshMailList();
+  notify(`New target: ${org.name}`,'info');
+
+  // Add to command palette
+  PALETTE_ITEMS.push({
+    icon:'⬡', name:`Connect: ${org.name.substring(0,16)}`,
+    hint:`${org.ip}`,
+    action:()=>{ openApp('terminal'); focusWin('terminal'); setTimeout(()=>{ const i=document.getElementById(`tinp-${activeTermWin}`); if(i){i.value=`connect PROC-ORG`;i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));} },100); }
+  });
+}
+
+
+// ══════════════════════════════════════════════
+// M5a — SOCIAL ENGINEERING ENGINE
+// ══════════════════════════════════════════════
+
+// ── Susceptibility profiles ──
+// Each employee in the procedural org gets one of these
+const AWARENESS_LEVELS = ['LOW','MED','HIGH'];
+
+// Role-based trust rules — what impersonations each role believes
+const ROLE_TRUST = {
+  'CEO':          ['board','legal','government'],
+  'CFO':          ['ceo','board','auditor','bank'],
+  'CTO':          ['ceo','vendor','cloud-provider'],
+  'IT Admin':     ['ceo','vendor','cloud-provider','security'],
+  'DevOps':       ['it-admin','cto','vendor'],
+  'HR Director':  ['ceo','legal','recruiter'],
+  'Legal Counsel':['ceo','court','regulator'],
+  'Security Analyst':['ciso','vendor','cert'],
+};
+
+// Phishing template definitions
+const PHISH_TEMPLATES = [
+  {
+    id:'it-reset',
+    name:'IT Password Reset',
+    pretextRole:'IT Admin',
+    subject:'[ACTION REQUIRED] Your password expires in 24 hours',
+    body:`Dear {name},
+
+Your account password is scheduled to expire in 24 hours.
+To avoid losing access to company systems, please verify
+your credentials by clicking the link below.
+
+Verification portal: https://axiom-sso.internal/reset/{token}
+
+If you did not request this, contact IT immediately.
+
+— IT Support Team
+{company}`,
+    goodFor:['DevOps','HR Director','Legal Counsel','CEO'],
+    badFor:['IT Admin','Security Analyst'],
+    baseScore:60,
+  },
+  {
+    id:'ceo-wire',
+    name:'CEO Urgent Request',
+    pretextRole:'CEO',
+    subject:'Urgent - Need your help with something sensitive',
+    body:`Hi {firstname},
+
+I'm in a board meeting and can't talk right now.
+I need you to handle something urgent and discreet.
+
+Please don't discuss this with anyone else yet —
+I'll explain everything when I'm out of this meeting.
+
+Can you confirm you received this?
+
+Sent from my iPhone
+{ceo_name}
+{company}`,
+    goodFor:['HR Director','CFO','Legal Counsel'],
+    badFor:['CEO','CTO','Security Analyst'],
+    baseScore:55,
+  },
+  {
+    id:'vendor-invoice',
+    name:'Vendor Invoice',
+    pretextRole:'Accounting',
+    subject:'Invoice #INV-{random} — Payment Required',
+    body:`Hello {name},
+
+Please find attached invoice #INV-{random} for services
+rendered in the previous billing period.
+
+Amount due: ${'{'}amount{'}'}
+Due date: {due_date}
+
+To process payment or query this invoice, please log in
+to the vendor portal using your company credentials:
+https://vendor-pay.net/login?ref={token}
+
+Thank you for your business.
+
+— Accounts Receivable
+{vendor_name}`,
+    goodFor:['CFO','HR Director','DevOps'],
+    badFor:['Security Analyst','CTO'],
+    baseScore:50,
+  },
+  {
+    id:'it-mfa',
+    name:'MFA Enrollment Notice',
+    pretextRole:'IT Admin',
+    subject:'[MANDATORY] Multi-factor authentication setup required',
+    body:`{name},
+
+As part of our security upgrade, all staff must enroll
+in multi-factor authentication by end of week.
+
+Your enrollment code: {token}
+Setup link: https://mfa.{domain}/enroll
+
+This is mandatory. Accounts not enrolled by Friday
+will be suspended pending manual verification.
+
+Questions? Reply to this email.
+
+— {company} IT Security`,
+    goodFor:['CEO','CFO','HR Director','Legal Counsel','DevOps'],
+    badFor:['IT Admin','Security Analyst'],
+    baseScore:65,
+  },
+  {
+    id:'targeted-personal',
+    name:'Personalised Lure',
+    pretextRole:'Peer',
+    subject:'Hey {firstname} — saw this and thought of you',
+    body:`Hey {firstname},
+
+Hope things are going well! I heard you're into {hobby} —
+thought you might find this interesting:
+
+https://events.local/{hobby}-meetup-{city}
+
+Also, I updated my login for the shared drive.
+The new password is {pet}{year} if you need access.
+Let me know if it doesn't work and I'll resend.
+
+Cheers,
+{peer_name}`,
+    goodFor:['DevOps','HR Director','Legal Counsel'],
+    badFor:['Security Analyst','CTO','CEO'],
+    baseScore:70,
+    requiresPersonalData:true,
+  },
+];
+
+// ── Trust graph builder ──
+// Returns a map of email -> {trusts:[], trustedBy:[]}
+function buildTrustGraph(employees){
+  const graph={};
+  employees.forEach(e=>{ graph[e.email]={emp:e,trusts:[],trustedBy:[]}; });
+
+  employees.forEach(e=>{
+    const roleTrusts=ROLE_TRUST[e.role]||[];
+    employees.forEach(other=>{
+      if(other.email===e.email) return;
+      // reports-to trust — lower roles trust higher roles
+      const myIdx=ROLES.indexOf(e.role), theirIdx=ROLES.indexOf(other.role);
+      if(theirIdx<myIdx && theirIdx>=0){
+        graph[e.email].trusts.push({email:other.email,reason:'reports-to',strength:'HIGH'});
+        graph[other.email].trustedBy.push({email:e.email,reason:'reports-to'});
+      }
+      // IT trusts for IT-related pretexts
+      if(e.role==='IT Admin'||other.role==='IT Admin'){
+        if(!graph[e.email].trusts.find(t=>t.email===other.email)){
+          graph[e.email].trusts.push({email:other.email,reason:'it-authority',strength:'MED'});
+        }
+      }
+      // Peers trust each other
+      if(e.role===other.role){
+        graph[e.email].trusts.push({email:other.email,reason:'peer',strength:'LOW'});
+      }
+    });
+  });
+  return graph;
+}
+
+// ── Susceptibility scorer ──
+// Returns 0-100 probability of clicking given template + target + personalization
+function calcSuccessChance(template, target, fromImpersonation, personalTokens){
+  let score = template.baseScore;
+
+  // Awareness penalty
+  const awPenalty={LOW:0, MED:-15, HIGH:-35};
+  score += awPenalty[target.awareness]||0;
+
+  // Role fit bonus/penalty
+  if(template.goodFor.includes(target.role)) score += 15;
+  if(template.badFor.includes(target.role)) score -= 25;
+
+  // Impersonation trust bonus
+  if(fromImpersonation){
+    const graph=proceduralOrg?.trustGraph||{};
+    const targetTrusts=graph[target.email]?.trusts||[];
+    const trustsImpersonation=targetTrusts.find(t=>t.email===fromImpersonation);
+    if(trustsImpersonation){
+      const bonus={HIGH:25,MED:12,LOW:5}[trustsImpersonation.strength]||0;
+      score+=bonus;
+    } else {
+      score-=10; // doesn't know this sender
+    }
+  }
+
+  // Personalisation bonus — each known token adds to credibility
+  const tokenCount=Object.keys(personalTokens).filter(k=>personalTokens[k]).length;
+  score += Math.min(tokenCount*8, 24);
+
+  // Required personal data penalty
+  if(template.requiresPersonalData && tokenCount<2) score-=20;
+
+  return Math.max(5, Math.min(95, score));
+}
+
+// ── Token resolver ──
+// Fills template placeholders with real data from intel + proc org
+function resolveTokens(template, target, fromImpersonation){
+  const org=proceduralOrg;
+  if(!org) return {subject:template.subject, body:template.body, tokens:{}};
+
+  const ceo=org.employees[0];
+  const peer=org.employees.find(e=>e.email!==target.email&&e.role===target.role)||org.employees[1];
+  const random=Math.floor(Math.random()*9000+1000);
+  const dueDate=`${['Jan','Feb','Mar','Apr','May','Jun'][Math.floor(Math.random()*6)]} ${Math.floor(Math.random()*28)+1}`;
+  const amount=`$${(Math.floor(Math.random()*40)+5)*100}.00`;
+  const vendors=['CloudHost Inc','SecureSoft Ltd','NetVision Corp','DataBridge LLC'];
+  const vendor=vendors[Math.floor(Math.random()*vendors.length)];
+  const cities=['Austin','Denver','Portland','Seattle','Nashville'];
+  const city=cities[Math.floor(Math.random()*cities.length)];
+  const token=Math.random().toString(36).substring(2,10);
+
+  const tokenMap={
+    '{name}':           `${target.fname} ${target.lname}`,
+    '{firstname}':      target.fname,
+    '{company}':        org.name,
+    '{domain}':         org.domain,
+    '{ceo_name}':       `${ceo.fname} ${ceo.lname}`,
+    '{peer_name}':      peer?`${peer.fname} ${peer.lname}`:'[colleague]',
+    '{hobby}':          target.hobby||'[hobby]',
+    '{pet}':            target.pet||'[pet]',
+    '{year}':           String(target.birthYear||2000),
+    '{token}':          token,
+    '{random}':         String(random),
+    '{amount}':         amount,
+    '{due_date}':       dueDate,
+    '{vendor_name}':    vendor,
+    '{city}':           city,
+  };
+
+  let subject=template.subject;
+  let body=template.body;
+  const resolvedTokens={};
+
+  Object.entries(tokenMap).forEach(([k,v])=>{
+    const known=isTokenKnown(k,target);
+    if(known){
+      subject=subject.replace(k,v);
+      body=body.replace(new RegExp(k.replace(/[{}]/g,'\\$&'),'g'),v);
+      resolvedTokens[k]=v;
+    } else {
+      // Unknown tokens left as amber placeholders
+      body=body.replace(new RegExp(k.replace(/[{}]/g,'\\$&'),'g'),`[UNKNOWN:${k}]`);
+      resolvedTokens[k]=null;
+    }
+  });
+
+  return {subject,body,tokens:resolvedTokens};
+}
+
+// Check if we have intel on this token for this target
+function isTokenKnown(token, target){
+  // Basic tokens always available
+  if(['{name}','{firstname}','{company}','{domain}'].includes(token)) return true;
+  // Tokens requiring reading their files
+  const exfilNames=exfilVault.map(f=>f.name);
+  const hasReadTarget=exfilNames.some(f=>f.includes(target.fname.toLowerCase())||f.includes('users'));
+  if(['{hobby}','{pet}','{year}'].includes(token)) return hasReadTarget;
+  // CEO name available if we've read org chart or any mail
+  if(token==='{ceo_name}') return intelDB.employees.length>0;
+  // Always resolve utility tokens
+  return true;
+}
+
+// ── Send phish ──
+function sendPhish(templateId, targetEmail, fromImpersonation){
+  if(!proceduralOrg){
+    pline('phish: no active social target. Connect to a live org first.','err');
+    return;
+  }
+  const template=PHISH_TEMPLATES.find(t=>t.id===templateId);
+  const target=proceduralOrg.employees.find(e=>e.email===targetEmail);
+  if(!template||!target){ pline('phish: invalid template or target','err'); return; }
+
+  const {subject,body,tokens}=resolveTokens(template,target,fromImpersonation);
+  const chance=calcSuccessChance(template,target,fromImpersonation,tokens);
+  const roll=Math.random()*100;
+
+  pline('','blank');
+  pline(`[*] Sending phish to ${targetEmail}...`,'info');
+  pline(`[*] Template: ${template.name}  |  Success probability: ${Math.round(chance)}%`,'dim');
+  pline('','blank');
+
+  setTimeout(()=>{
+    if(roll<=chance){
+      // SUCCESS
+      onPhishSuccess(target, template, subject, body);
+    } else if(roll<=chance+20){
+      // DETECTED — target forwards to IT
+      onPhishDetected(target, template);
+    } else {
+      // IGNORED — no click
+      onPhishIgnored(target, template);
+    }
+  },1500);
+}
+
+function onPhishSuccess(target, template, subject, body){
+  pline(`[+] PHISH SUCCESSFUL — ${target.fname} ${target.lname} clicked`,'ok');
+  pline(`[+] Credential callback received`,'ok');
+  pline('','blank');
+
+  // Write captured creds to local fs
+  const cbPath=`/home/${currentUser}/intel/callbacks`;
+  if(!LFS[cbPath]) LFS[cbPath]={t:'d'};
+  const cbFile=`${cbPath}/${target.fname.toLowerCase()}_creds.txt`;
+  LFS[cbFile]={
+    t:'f',
+    content:`PHISH CALLBACK — ${new Date().toISOString()}\nTarget: ${target.fname} ${target.lname}\nEmail: ${target.email}\nRole: ${target.role}\nPassword: ${target.password}\nTemplate: ${template.name}\n\nCaptured credentials are valid.\nUse fw-unlock with these creds.`,
+    exfil:'high'
+  };
+
+  // Add to intel
+  addIntel('credentials',{key:target.email, val:target.password, hot:true});
+
+  // Show outcome toast
+  showPhishOutcome(`✓ CREDENTIAL CAPTURED — ${target.fname} ${target.lname} (${target.role})`, 'success');
+
+  // Inject success mail into their inbox on mail server
+  adminAlerts.push({
+    id:2000+adminAlerts.length,
+    from:target.email,
+    subj:`RE: ${subject}`,
+    time:getCurrentTime(),
+    unread:true,
+    isAlert:false,
+    body:`[PHISH CALLBACK]\nFrom: ${target.email}\nPassword entered: ${target.password}\nIP logged: 10.0.0.47\n\nTarget clicked and submitted credentials.\nStored in ~/intel/callbacks/`
+  });
+  refreshMailList();
+  refreshIntel();
+  refreshAllStickies();
+  scrollT();
+}
+
+function onPhishDetected(target, template){
+  pline(`[!] PHISH DETECTED — ${target.fname} forwarded to IT security`,'err');
+  pline(`[!] Security awareness triggered — org alerting`,'err');
+  pline('','blank');
+  showPhishOutcome(`⚠ DETECTED — ${target.fname} ${target.lname} reported the email`, 'alert');
+
+  // Trigger security escalation on the proc org
+  if(NETWORK['PROC-ORG']){
+    escalateSecurity('PROC-ORG',`Phishing attempt reported by ${target.fname} ${target.lname}`,'SUSPICIOUS');
+  }
+  // Generate alert email from IT
+  adminAlerts.push({
+    id:2000+adminAlerts.length,
+    from:'it-security@'+proceduralOrg.domain,
+    subj:'[SECURITY ALERT] Phishing attempt reported',
+    time:getCurrentTime(),
+    unread:true,
+    isAlert:true,
+    body:`SECURITY ALERT\n\n${target.fname} ${target.lname} (${target.role}) reported\na suspicious email matching template:\n"${template.name}"\n\nAll staff have been notified.\nExternal IP flagged for monitoring.\n\n— IT Security`
+  });
+  refreshMailList();
+  scrollT();
+}
+
+function onPhishIgnored(target, template){
+  pline(`[~] Phish ignored — ${target.fname} did not click`,'warn');
+  pline(`[~] No response. Target may be suspicious but took no action.`,'dim');
+  pline('','blank');
+  showPhishOutcome(`~ IGNORED — ${target.fname} ${target.lname} did not respond`, 'fail');
+  scrollT();
+}
+
+function showPhishOutcome(msg, type){
+  const el=document.getElementById('phish-outcome');
+  el.textContent=msg;
+  el.className=type;
+  el.style.display='block';
+  setTimeout(()=>el.style.display='none', 4000);
+}
+
+function getCurrentTime(){
+  const h=String(Math.floor(ticks/3600)).padStart(2,'0');
+  const m=String(Math.floor((ticks%3600)/60)).padStart(2,'0');
+  return `${h}:${m}`;
+}
+
+// ── PHISH// App ──
+let phishSelectedTarget=null;
+let phishSelectedTemplate=PHISH_TEMPLATES[0].id;
+let phishFromImpersonation=null;
+
+function buildPhish(body){
+  if(!proceduralOrg){
+    body.innerHTML=`<div style="padding:20px;font-size:11px;color:var(--text3);text-align:center;margin-top:40px;">No active social target.<br><br>Connect to a live org to enable social engineering.<br><br><span style="color:var(--text3);font-size:9px;">Procedural org loads on session start.</span></div>`;
+    return;
+  }
+  const org=proceduralOrg;
+  body.innerHTML=`
+<div class="phish-wrap">
+  <div class="phish-sidebar">
+    <div class="phish-sidebar-hdr">SELECT TARGET</div>
+    <div id="phish-target-list"></div>
+  </div>
+  <div class="phish-composer">
+    <div class="phish-chdr">COMPOSE PHISH — ${org.name.toUpperCase()}</div>
+    <div class="phish-field">
+      <span class="phish-flbl">TEMPLATE</span>
+      <select class="phish-sel" id="phish-tmpl-sel" onchange="onPhishTemplateChange()">
+        ${PHISH_TEMPLATES.map(t=>`<option value="${t.id}">${t.name}</option>`).join('')}
+      </select>
+    </div>
+    <div class="phish-field">
+      <span class="phish-flbl">FROM</span>
+      <select class="phish-sel" id="phish-from-sel" onchange="onPhishFromChange()">
+        <option value="">— anonymous —</option>
+        ${org.employees.map(e=>`<option value="${e.email}">${e.fname} ${e.lname} (${e.role})</option>`).join('')}
+      </select>
+    </div>
+    <div class="phish-field">
+      <span class="phish-flbl">TO</span>
+      <span class="phish-fval" id="phish-to-display" style="color:var(--text3);">— select target —</span>
+    </div>
+    <div class="phish-field">
+      <span class="phish-flbl">SUBJECT</span>
+      <span class="phish-fval" id="phish-subj-display" style="font-size:9px;"></span>
+    </div>
+    <div class="phish-preview" id="phish-body-preview">
+      <div style="color:var(--text3);font-size:10px;">Select a target to preview email.</div>
+    </div>
+    <div class="phish-footer">
+      <button class="phish-send-btn" id="phish-send-btn" disabled onclick="onPhishSend()">SEND PHISH ▶</button>
+      <span class="phish-quality" id="phish-quality-display"></span>
+    </div>
+  </div>
+</div>`;
+
+  renderPhishTargets();
+}
+
+function renderPhishTargets(){
+  const list=document.getElementById('phish-target-list'); if(!list)return;
+  const org=proceduralOrg; if(!org)return;
+  list.innerHTML=org.employees.map(e=>`
+<div class="phish-target-item${phishSelectedTarget===e.email?' sel':''}" onclick="selectPhishTarget('${e.email}')">
+  <span class="phish-aw ${e.awareness.toLowerCase()}">${e.awareness}</span>
+  <div class="phish-target-name">${e.fname} ${e.lname}</div>
+  <div class="phish-target-role">${e.role}</div>
+</div>`).join('');
+}
+
+function selectPhishTarget(email){
+  phishSelectedTarget=email;
+  renderPhishTargets();
+  updatePhishPreview();
+  const btn=document.getElementById('phish-send-btn');
+  if(btn) btn.disabled=false;
+  const toDisp=document.getElementById('phish-to-display');
+  if(toDisp) toDisp.textContent=email;
+  toDisp.style.color='var(--cyan)';
+}
+
+function onPhishTemplateChange(){
+  const sel=document.getElementById('phish-tmpl-sel');
+  if(sel) phishSelectedTemplate=sel.value;
+  updatePhishPreview();
+}
+
+function onPhishFromChange(){
+  const sel=document.getElementById('phish-from-sel');
+  if(sel) phishFromImpersonation=sel.value||null;
+  updatePhishPreview();
+}
+
+function updatePhishPreview(){
+  if(!phishSelectedTarget||!proceduralOrg) return;
+  const template=PHISH_TEMPLATES.find(t=>t.id===phishSelectedTemplate);
+  const target=proceduralOrg.employees.find(e=>e.email===phishSelectedTarget);
+  if(!template||!target) return;
+
+  const {subject,body:emailBody,tokens}=resolveTokens(template,target,phishFromImpersonation);
+  const chance=calcSuccessChance(template,target,phishFromImpersonation,tokens);
+  const knownCount=Object.values(tokens).filter(Boolean).length;
+  const totalCount=Object.keys(tokens).length;
+
+  // Update subject display
+  const subjEl=document.getElementById('phish-subj-display');
+  if(subjEl) subjEl.textContent=subject;
+
+  // Render body with token highlighting
+  const preview=document.getElementById('phish-body-preview');
+  if(preview){
+    const highlighted=emailBody
+      .replace(/\[UNKNOWN:[^\]]+\]/g, m=>`<span class="phish-token">${m}</span>`);
+    preview.innerHTML=`
+<div class="phish-preview-subj">${subject}</div>
+<div class="phish-preview-body">${highlighted}</div>`;
+  }
+
+  // Quality indicator
+  const qual=document.getElementById('phish-quality-display');
+  if(qual){
+    const qualLabel=chance>=70?'HIGH':chance>=45?'MEDIUM':'LOW';
+    const qualColor=chance>=70?'var(--green)':chance>=45?'var(--amber)':'var(--red)';
+    qual.innerHTML=`Success probability: <span style="color:${qualColor}">${Math.round(chance)}% (${qualLabel})</span> &nbsp;|&nbsp; Tokens: ${knownCount}/${totalCount} known`;
+  }
+}
+
+function onPhishSend(){
+  if(!phishSelectedTarget||!phishSelectedTemplate) return;
+  sendPhish(phishSelectedTemplate, phishSelectedTarget, phishFromImpersonation);
+}
+
+// ── Wire trust graph into proc org on generation ──
+// (called at end of initProceduralOrg — patched below)
 
 // ══════════════════════════════════════════════
 // COMMANDS
@@ -857,13 +2065,59 @@ function runCmd(raw){
     help,clear,pwd,ls,cd,cat,mkdir,touch,rm,whoami,status,ifconfig,
     scan,connect,disconnect,crack,exfil:cmdExfil,'rm-logs':rmLogs,'fw-unlock':fwUnlock,
     secstate:cmdSecstate,
-    echo:()=>pline(args.join(' ')),
-    history:()=>termHistory.forEach((h,i)=>pline(`  ${i+1}  ${h}`,'dim')),
-    nodes:()=>listNodes(),
-    date:()=>pline(new Date().toISOString()),
-    uname:()=>pline('phantom-3.8 NULL//TRACE-OS x86_64'),
-    man:()=>pline('No man pages. Use help.','warn'),
-    sudo:()=>pline('Already operator-level. No escalation needed.','warn'),
+    nano:(args)=>{ if(!args[0]){pline('Usage: nano [file]','err');return;} openNano(args[0]); },
+    note:(args)=>{ if(!args[0]){pline('Usage: note [file]','err');return;} const p=resolvePath(args[0]); if(!LFS[p]){pline(`note: ${args[0]} not found — create with nano first`,'err');return;} openStickyNote(args[0].split('/').pop(),p); },
+    open:(args)=>{ if(!args[0]){pline('Usage: open [app]  e.g. open mail','err');return;} const appMap={mail:'mail',map:'netmap',netmap:'netmap',mission:'mission',exfil:'exfil',intel:'intel',sec:'secmon',secmon:'secmon',sys:'sysmon',sysmon:'sysmon',term:'terminal',terminal:'terminal',phish:'phish'}; const target=appMap[args[0].toLowerCase()]; if(target){openApp(target);pline(`Opening ${target}...`,'ok');}else{pline(`open: unknown app '${args[0]}'. Try: mail, netmap, mission, exfil, intel, secmon, phish`,'err');} },
+    phish:(args)=>{
+      // Usage: phish [email] --template [id] --from [email]
+      if(!args[0]){ pline('Usage: phish [target-email] [--template id] [--from impersonator-email]','err'); pline('       phish list-targets','dim'); pline('       phish list-templates','dim'); return; }
+      if(args[0]==='list-targets'){
+        if(!proceduralOrg){pline('phish: no active org','err');return;}
+        plines([{t:'',c:'blank'},{t:'  PHISHING TARGETS',c:'cyan'}]);
+        proceduralOrg.employees.forEach(e=>pline(`  ${e.email.padEnd(36)} ${e.role.padEnd(18)} awareness:${e.awareness}`,e.awareness==='LOW'?'ok':e.awareness==='MED'?'warn':'err'));
+        pline('','blank'); return;
+      }
+      if(args[0]==='list-templates'){
+        plines([{t:'',c:'blank'},{t:'  PHISH TEMPLATES',c:'cyan'}]);
+        PHISH_TEMPLATES.forEach(t=>pline(`  ${t.id.padEnd(22)} ${t.name}`,'out'));
+        pline('','blank'); return;
+      }
+      // Parse flags
+      const email=args[0];
+      const tmplIdx=args.indexOf('--template');
+      const fromIdx=args.indexOf('--from');
+      const tmplId=tmplIdx>=0?args[tmplIdx+1]:PHISH_TEMPLATES[0].id;
+      const fromEmail=fromIdx>=0?args[fromIdx+1]:null;
+      if(!proceduralOrg){pline('phish: no active social target. Open PHISH// app first.','err');return;}
+      const target=proceduralOrg.employees.find(e=>e.email===email);
+      if(!target){pline(`phish: unknown target ${email}. Try: phish list-targets`,'err');return;}
+      const tmpl=PHISH_TEMPLATES.find(t=>t.id===tmplId);
+      if(!tmpl){pline(`phish: unknown template '${tmplId}'. Try: phish list-templates`,'err');return;}
+      sendPhish(tmplId, email, fromEmail);
+    },
+    impersonate:(args)=>{
+      if(!args[0]){pline('Usage: impersonate [email]  — sets FROM for next phish','err');return;}
+      if(args[0]==='clear'){
+        phishFromImpersonation=null;
+        pline('[+] Impersonation cleared — phishes will use anonymous sender','ok');
+        return;
+      }
+      if(!proceduralOrg){pline('impersonate: no active org','err');return;}
+      const emp=proceduralOrg.employees.find(e=>e.email===args[0]);
+      if(!emp){pline(`impersonate: ${args[0]} not found in org`,'err');return;}
+      phishFromImpersonation=args[0];
+      pline(`[+] Impersonating: ${emp.fname} ${emp.lname} <${args[0]}>`,'ok');
+      pline(`[*] All phish until 'impersonate clear' will use this identity`,'dim');
+    },
+    echo:(args)=>pline(args.join(' ')),
+    history:(args)=>termHistory.forEach((h,i)=>pline(`  ${i+1}  ${h}`,'dim')),
+    nodes:(args)=>listNodes(),
+    date:(args)=>pline(new Date().toISOString()),
+    uname:(args)=>pline('phantom-3.8 NULL//TRACE-OS x86_64'),
+    man:(args)=>pline('Manual pages not installed. Use \'help\'.','warn'),
+    sudo:(args)=>pline('Permission denied. Operator already has full access.','err'),
+    exit:(args)=>pline('Cannot exit — operator session is persistent.','warn'),
+    reboot:(args)=>pline('Reboot disabled in stealth mode.','warn'),
   };
   if(MAP[cmd])MAP[cmd](args);
   else{pline(`command not found: ${cmd}`,'err');pline(`Type 'help' for commands`,'dim');}
@@ -874,31 +2128,58 @@ function help(){
   plines([
     {t:'',c:'blank'},
     {t:'  FILESYSTEM',c:'cyan'},
-    {t:'  ls [path]             list directory',c:'out'},
-    {t:'  cd [path]             change directory',c:'out'},
-    {t:'  cat [file]            read file',c:'out'},
-    {t:'  mkdir / touch / rm    create/delete',c:'out'},
-    {t:'  pwd / whoami / clear  info / clear',c:'out'},
+    {t:'  ls [path]                list directory contents',c:'out'},
+    {t:'  cd [path]                change directory (.. to go up)',c:'out'},
+    {t:'  cat [file]               read file contents',c:'out'},
+    {t:'  mkdir [name]             create directory',c:'out'},
+    {t:'  touch [name]             create file',c:'out'},
+    {t:'  rm [name]                remove file or empty directory',c:'out'},
+    {t:'  pwd                      print working directory',c:'out'},
+    {t:'  nano [file]              open text editor (^S save, ^N sticky)',c:'out'},
+    {t:'  note [file]              pin file as sticky note on desktop',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  SYSTEM',c:'cyan'},
+    {t:'  whoami                   current identity',c:'out'},
+    {t:'  ifconfig                 network interfaces',c:'out'},
+    {t:'  status                   connection & system status',c:'out'},
+    {t:'  uname                    kernel info',c:'out'},
+    {t:'  history                  command history',c:'out'},
+    {t:'  clear                    clear terminal',c:'out'},
     {t:'',c:'blank'},
     {t:'  NETWORK',c:'cyan'},
-    {t:'  nodes                 list known network nodes',c:'out'},
-    {t:'  scan [node/ip]        probe a node for services',c:'out'},
-    {t:'  connect [node/ip]     connect to a node',c:'out'},
-    {t:'  fw-unlock [node] [u] [p]  bypass firewall with creds',c:'out'},
-    {t:'  disconnect            close active connection',c:'out'},
-    {t:'  secstate              show security state of all nodes',c:'out'},
+    {t:'  nodes                    list all known network nodes',c:'out'},
+    {t:'  scan [node/ip]           probe a target host for open services',c:'out'},
+    {t:'  connect [node/ip]        connect to a remote host',c:'out'},
+    {t:'  disconnect               close active connection',c:'out'},
+    {t:'  fw-unlock [node] [u] [p] bypass firewall with credentials',c:'out'},
+    {t:'  secstate                 show security state of all nodes',c:'out'},
     {t:'',c:'blank'},
     {t:'  OPERATIONS',c:'cyan'},
-    {t:'  crack [file]          run password cracker on hash file',c:'out'},
-    {t:'  exfil [file]          exfiltrate file to local vault',c:'out'},
-    {t:'  rm-logs               delete session logs on current node',c:'out'},
-    {t:'  status                system & connection status',c:'out'},
+    {t:'  crack [file]             run password cracker on file',c:'out'},
+    {t:'  exfil [file]             exfiltrate file to local vault',c:'out'},
+    {t:'  rm-logs                  delete session logs on current node',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  SOCIAL ENGINEERING',c:'cyan'},
+    {t:'  phish list-targets       show all phishable employees + awareness',c:'out'},
+    {t:'  phish list-templates     show available phish templates',c:'out'},
+    {t:'  phish [email]            send phish with default template',c:'out'},
+    {t:'  phish [email] --template [id] --from [email]',c:'out'},
+    {t:'  impersonate [email]      set FROM identity for all phishes',c:'out'},
+    {t:'  impersonate clear        reset impersonation',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  SHORTCUTS',c:'cyan'},
+    {t:'  open [app]               open app (mail, netmap, intel, phish...)',c:'out'},
+    {t:'  Ctrl+Space               command palette',c:'out'},
+    {t:'  Ctrl+T                   new terminal window',c:'out'},
+    {t:'  Tab                      autocomplete command or filename',c:'out'},
     {t:'',c:'blank'},
   ]);
 }
 
-function clear(){const out=document.getElementById('tout');if(out)out.innerHTML='';}
-function pwd(){pline(cwd);}
+function clear(){
+  const out=document.getElementById(`tout-${activeTermWin}`);
+  if(out)out.innerHTML='';
+}function pwd(){pline(cwd);}
 function whoami(){pline(currentUser);pline('Clearance: OPERATOR','dim');pline('Faction: NULL SIGNAL','dim');}
 
 function getCFS(){
@@ -906,10 +2187,12 @@ function getCFS(){
   return LFS;
 }
 function resolvePath(p){
-  if(p==='..'){ const pts=cwd.split('/').filter(Boolean);pts.pop();return '/'+pts.join('/')||'/'; }
-  if(p.startsWith('/'))return p.replace(/\/+$/,'')||'/';
+  // Strip trailing slashes first (tab-complete adds them for dirs)
+  const clean = p.replace(/\/+$/, '') || p;
+  if(clean==='..'){ const pts=cwd.split('/').filter(Boolean);pts.pop();return '/'+pts.join('/')||'/'; }
+  if(clean.startsWith('/')) return clean.replace(/\/+$/,'')||'/';
   const base=cwd==='/'?'':cwd;
-  return `${base}/${p}`.replace(/\/+/g,'/');
+  return `${base}/${clean}`.replace(/\/+/g,'/').replace(/\/+$/,'')||'/';
 }
 
 function ls(args){
@@ -949,8 +2232,9 @@ function cat(args){
   // Intelligence trigger — check for creds/tokens
   const c=fs[target].content;
   if(c.includes('AX-EXEC-'))notify('Intel extracted — exec token found in file','info');
-  if(c.includes('Sull1van#2024'))notify('Credential found: ksullivan password extracted','info');
-  if(c.includes('Ax10m_W3b!2024'))notify('Credential found: webapp DB password extracted','info');
+  if(c.includes('Sull1van#2024')){ notify('Credential found: ksullivan','info'); addIntel('credentials',{key:'ksullivan@axiom.corp',val:'Sull1van#2024',hot:true}); }
+  if(c.includes('Ax10m_W3b!2024')){ notify('Credential found: webapp','info'); addIntel('credentials',{key:'webapp@axiom-db',val:'Ax10m_W3b!2024',hot:true}); }
+  if(c.includes('AX-EXEC-7f3a9b2c1d')){ addIntel('credentials',{key:'rchen exec token',val:'AX-EXEC-7f3a9b2c1d',hot:true}); }
   // M3 — inline objective check for exec token
   if(connectedNode && c.includes('AX-EXEC-7f3a9b2c1d')) markObjective('creds');
 }
@@ -1043,6 +2327,8 @@ function scan(args){
     // Save scan intel
     LFS[`/home/${currentUser}/intel/${id}.scan`]={t:'f',content:`SCAN:${id}\nIP:${n.ip}\nOS:${n.os}\nSECURITY:${n.security}`};
     pline(`[*] Scan saved → ~/intel/${id}.scan`,'dim');
+    // M4 — add to intel DB
+    addIntel('nodes',{key:n.ip,val:`${n.label} — ${n.os} (${n.security})`});
     scrollT();
     refreshNetmap();
   },900);
@@ -1157,7 +2443,7 @@ function crack(args){
 
   // Simulate cracking progress
   let prog=0;
-  const out=document.getElementById('tout');
+  const out=document.getElementById(`tout-${activeTermWin}`);
   const barEl=document.createElement('div');
   barEl.className='tl out crack-bar-wrap';
   barEl.innerHTML=`<span style="color:var(--text3)">  [</span><span id="crack-prog" style="color:var(--amber)">░░░░░░░░░░░░░░░░░░░░</span><span style="color:var(--text3)">] </span><span id="crack-pct" style="color:var(--text2)">0%</span>`;
@@ -1221,6 +2507,8 @@ function cmdExfil(args){
       {t:'',c:'blank'},
     ]);
     notify(`Exfil: ${fname} (${(fdata.exfil||'low').toUpperCase()})`,fdata.exfil==='high'?'ok':'info');
+    // M4 — add to intel DB
+    addIntel('files',{key:fname,val:`${node.label} — ${(fdata.exfil||'low').toUpperCase()}`});
 
     // Bump trace a bit — exfil is noisy
     if(traceActive)traceLevel=Math.min(100,traceLevel+6);
@@ -1335,7 +2623,7 @@ const NODE_POS={
 };
 
 function buildNetmap(body){
-  body.innerHTML=`<div class="netmap-wrap"><svg id="netmap-svg" viewBox="0 0 560 420" xmlns="http://www.w3.org/2000/svg"></svg></div>`;
+  body.innerHTML=`<div class="netmap-wrap"><svg id="netmap-svg" viewBox="0 0 560 460" xmlns="http://www.w3.org/2000/svg"></svg></div>`;
   renderNetmap();
 }
 
@@ -1428,7 +2716,7 @@ function renderNetmap(){
 
   // Legend
   const lg=document.createElementNS('http://www.w3.org/2000/svg','g');
-  lg.setAttribute('transform','translate(10,380)');
+  lg.setAttribute('transform','translate(10,430)');
   [{t:'PUBLIC',c:'#0077a8'},{t:'INTERNAL',c:'#9e6a03'},{t:'EXEC',c:'#da3633'}].forEach(({t,c},i)=>{
     const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
     r.setAttribute('x',String(i*90)); r.setAttribute('y','0');
