@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NULL//TRACE — OS v0.2</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+:root {
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2333;--bg4:#21262d;--bg5:#2d333b;
+  --border:#30363d;--border2:#3d444d;--border3:#484f58;
+  --cyan:#00b4d8;--cyan2:#0096b4;--cyan3:#007a94;--cglow:rgba(0,180,216,0.12);
+  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;--text4:#30363d;
+  --green:#3fb950;--gdim:#238636;--gbg:rgba(63,185,80,0.1);
+  --red:#f85149;--rdim:#da3633;--rbg:rgba(248,81,73,0.1);
+  --amber:#d29922;--adim:#9e6a03;--abg:rgba(210,153,34,0.1);
+  --purple:#a371f7;--pbg:rgba(163,113,247,0.1);
+  --blue:#58a6ff;--bbg:rgba(88,166,255,0.1);
+  --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);width:100vw;height:100vh;overflow:hidden;user-select:none;}
+input,textarea{user-select:text;pointer-events:all;-webkit-user-select:text;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999;}
+
+/* BOOT */
+#boot{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px;z-index:1000;font-size:13px;}
+.bl{color:var(--text2);line-height:1.6;opacity:0;white-space:pre;}
+.bl.ok{color:var(--green);}.bl.warn{color:var(--amber);}.bl.cyan{color:var(--cyan);}.bl.dim{color:var(--text3);}.bl.show{opacity:1;}
+#bbar{margin-top:28px;width:380px;display:none;}
+#bbar-lbl{color:var(--text3);font-size:11px;letter-spacing:2px;margin-bottom:6px;}
+#bbar-t{width:100%;height:2px;background:var(--bg3);}
+#bbar-f{height:100%;width:0%;background:var(--cyan);transition:width .04s linear;}
+
+/* LOGIN */
+#login{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:900;}
+.ll{font-size:44px;font-weight:700;color:var(--cyan);letter-spacing:6px;margin-bottom:4px;}
+.lv{font-size:11px;color:var(--text3);letter-spacing:4px;margin-bottom:44px;}
+.lbox{background:var(--bg2);border:1px solid var(--border);padding:30px 38px;width:360px;}
+.lf{margin-bottom:14px;}
+.llbl{font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:5px;display:block;}
+.li{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:9px 11px;outline:none;transition:border-color .15s;}
+.li:focus{border-color:var(--cyan3);}
+.lb{width:100%;background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;margin-top:6px;transition:background .15s;}
+.lb:hover{background:var(--cyan);}
+.le{font-size:11px;color:var(--red);margin-top:10px;min-height:15px;}
+.lh{font-size:10px;color:var(--text3);margin-top:20px;text-align:center;letter-spacing:1px;}
+
+/* DESKTOP */
+#desktop{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;}
+
+/* TASKBAR */
+#tb{height:30px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;flex-shrink:0;z-index:100;}
+#tb-l{display:flex;align-items:center;gap:14px;}
+.tb-logo{font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;}
+.tb-apps{display:flex;gap:3px;}
+.tab{background:transparent;border:1px solid transparent;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 7px;cursor:pointer;letter-spacing:1px;transition:all .1s;}
+.tab:hover{color:var(--cyan);border-color:var(--border);background:var(--bg3);}
+.tab.active{color:var(--cyan);border-color:var(--cyan3);background:var(--cglow);}
+.tab.minimized{opacity:0.5;}
+#tb-r{display:flex;align-items:center;gap:12px;}
+.tbs{font-size:9px;color:var(--text3);}
+.tbs span{color:var(--text2);}
+.tbs.warn span{color:var(--amber);}
+.tbs.danger span{color:var(--red);}
+.tbs.ok span{color:var(--green);}
+#tb-clk{font-size:10px;color:var(--text2);}
+
+/* WORKSPACE */
+#ws{flex:1;position:relative;overflow:hidden;}
+
+/* DESKTOP ICONS */
+#dicons{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:1;}
+.dico{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px;width:68px;cursor:pointer;border:1px solid transparent;transition:all .1s;}
+.dico:hover{background:var(--cglow);border-color:var(--cyan3);}
+.dico-g{font-size:18px;color:var(--cyan);}
+.dico-l{font-size:8px;color:var(--text2);letter-spacing:1px;text-align:center;}
+
+/* WINDOWS */
+.win{position:absolute;background:var(--bg2);border:1px solid var(--border);display:flex;flex-direction:column;min-width:280px;min-height:180px;box-shadow:0 8px 32px rgba(0,0,0,0.6);}
+.win.focused{border-color:var(--border2);box-shadow:0 8px 32px rgba(0,0,0,0.8),0 0 0 1px rgba(0,180,216,0.08);}
+.wtb{height:28px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 8px;cursor:move;flex-shrink:0;gap:7px;}
+.wbtns{display:flex;gap:4px;}
+.wb{width:9px;height:9px;border-radius:50%;border:none;cursor:pointer;transition:opacity .1s;}
+.wb.cl{background:var(--rdim);}.wb.mn{background:var(--adim);}.wb.mx{background:var(--gdim);}
+.wb:hover{opacity:.75;}
+.wt{flex:1;font-size:9px;letter-spacing:2px;color:var(--text3);text-align:center;}
+.wbody{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.rh{position:absolute;bottom:0;right:0;width:14px;height:14px;cursor:se-resize;}
+.rh::after{content:'';position:absolute;bottom:3px;right:3px;width:6px;height:6px;border-right:1px solid var(--border3);border-bottom:1px solid var(--border3);}
+
+/* STATUS BAR */
+#sbar{height:20px;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 10px;gap:14px;flex-shrink:0;}
+.sbi{font-size:8px;letter-spacing:1px;color:var(--text3);}
+.sbi span{color:var(--text2);}
+.sbi.ok span{color:var(--green);}
+.sbi.warn span{color:var(--amber);}
+.sbi.danger span{color:var(--red);}
+
+/* TERMINAL */
+#tout{flex:1;overflow-y:auto;padding:10px 12px;font-size:11.5px;line-height:1.7;scroll-behavior:smooth;}
+#tout::-webkit-scrollbar{width:3px;}
+#tout::-webkit-scrollbar-thumb{background:var(--border2);}
+.tl{white-space:pre-wrap;word-break:break-all;}
+.tl.cmd{color:var(--cyan);}.tl.out{color:var(--text2);}.tl.ok{color:var(--green);}.tl.err{color:var(--red);}.tl.warn{color:var(--amber);}.tl.info{color:var(--purple);}.tl.data{color:var(--text);}.tl.dim{color:var(--text3);}.tl.cyan{color:var(--cyan);}.tl.blank{height:6px;display:block;}.tl.blue{color:var(--blue);}
+.tpr{display:flex;align-items:center;padding:3px 12px 7px;gap:0;flex-shrink:0;border-top:1px solid var(--border);}
+.tprl{font-size:11.5px;color:var(--cyan);white-space:nowrap;flex-shrink:0;}
+#tinp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:11.5px;outline:none;caret-color:var(--cyan);}
+
+/* CRACKER PROGRESS */
+.crack-bar{height:3px;background:var(--bg4);margin:4px 0;}
+.crack-fill{height:100%;background:var(--amber);transition:width .1s;}
+
+/* NET MAP */
+.netmap-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);}
+#netmap-svg{width:100%;height:100%;}
+.node-group{cursor:pointer;}
+.node-group:hover .node-rect{filter:brightness(1.3);}
+.node-label{font-family:var(--mono);font-size:9px;fill:var(--text2);text-anchor:middle;}
+.node-sublabel{font-family:var(--mono);font-size:8px;fill:var(--text3);text-anchor:middle;}
+.conn-line{stroke:var(--border2);stroke-width:1;stroke-dasharray:4 3;}
+.conn-line.active{stroke:var(--cyan);stroke-width:1.5;stroke-dasharray:none;animation:dash .8s linear infinite;}
+@keyframes dash{to{stroke-dashoffset:-20;}}
+.node-status{font-family:var(--mono);font-size:7px;text-anchor:middle;}
+
+/* MAIL */
+.ml-wrap{display:flex;height:100%;}
+.ml-list{width:200px;border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;}
+.ml-list::-webkit-scrollbar{width:3px;}
+.ml-list::-webkit-scrollbar-thumb{background:var(--border2);}
+.ml-hdr{font-size:8px;letter-spacing:2px;color:var(--text3);padding:8px 10px 5px;border-bottom:1px solid var(--border);}
+.mi{padding:9px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
+.mi:hover{background:var(--bg3);}
+.mi.sel{background:var(--cglow);border-left:2px solid var(--cyan);}
+.mi.unread .mifrom{color:var(--text);font-weight:700;}
+.mifrom{font-size:10px;color:var(--text2);margin-bottom:2px;}
+.misubj{font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mitime{font-size:8px;color:var(--text3);float:right;}
+.mv{flex:1;padding:14px;overflow-y:auto;font-size:11px;}
+.mv::-webkit-scrollbar{width:3px;}
+.mv::-webkit-scrollbar-thumb{background:var(--border2);}
+.mv-subj{font-size:13px;color:var(--text);margin-bottom:6px;font-weight:500;}
+.mv-meta{font-size:9px;color:var(--text3);line-height:1.9;}
+.mv-meta span{color:var(--text2);}
+.mv-body{color:var(--text2);line-height:1.9;font-size:10.5px;white-space:pre-wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.mv-empty{flex:1;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);letter-spacing:2px;}
+
+/* SYSMON */
+.sm-body{padding:10px;font-size:10px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.sm-stitle{font-size:8px;letter-spacing:3px;color:var(--text3);margin-bottom:6px;}
+.sm-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.sm-k{color:var(--text3);}.sm-v{color:var(--text2);}
+.sm-v.ok{color:var(--green);}.sm-v.warn{color:var(--amber);}.sm-v.danger{color:var(--red);}
+.btr{height:3px;background:var(--bg4);margin-top:3px;margin-bottom:8px;}
+.bfill{height:100%;background:var(--cyan);transition:width .5s;}
+.bfill.ok{background:var(--green);}.bfill.warn{background:var(--amber);}.bfill.danger{background:var(--red);}
+.smdiv{border:none;border-top:1px solid var(--border);margin:2px 0;}
+
+/* EXFIL PANEL */
+.exfil-wrap{padding:10px;font-size:10px;overflow-y:auto;}
+.exfil-hdr{font-size:8px;letter-spacing:3px;color:var(--text3);margin-bottom:8px;}
+.exfil-item{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border:1px solid var(--border);margin-bottom:4px;background:var(--bg3);}
+.exfil-name{color:var(--text2);font-size:10px;}
+.exfil-tag{font-size:8px;padding:2px 5px;letter-spacing:1px;}
+.exfil-tag.high{background:var(--rbg);color:var(--red);}
+.exfil-tag.med{background:var(--abg);color:var(--amber);}
+.exfil-tag.low{background:var(--gbg);color:var(--green);}
+.exfil-empty{color:var(--text3);font-size:10px;padding:8px;letter-spacing:1px;}
+
+/* MISSION PANEL */
+.mission-wrap{padding:12px;font-size:10px;overflow-y:auto;}
+.mission-title{font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:4px;letter-spacing:1px;}
+.mission-sub{font-size:9px;color:var(--text3);margin-bottom:12px;letter-spacing:1px;}
+.obj-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
+.obj-check{width:12px;height:12px;border:1px solid var(--border3);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.obj-check.done{background:var(--gbg);border-color:var(--gdim);color:var(--green);}
+.obj-check.fail{background:var(--rbg);border-color:var(--rdim);color:var(--red);}
+.obj-text{color:var(--text2);line-height:1.5;}
+.obj-text.done{color:var(--text3);text-decoration:line-through;}
+.obj-hint{font-size:9px;color:var(--text3);margin-top:2px;}
+.mission-reward{margin-top:10px;padding:8px;background:var(--bg3);border:1px solid var(--border);}
+.mission-reward-lbl{font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:4px;}
+.mission-reward-val{color:var(--amber);font-size:11px;}
+
+/* TRACE WIDGET */
+#trace-ind{position:fixed;bottom:28px;right:14px;width:190px;background:var(--bg2);border:1px solid var(--border);padding:8px 10px;z-index:500;display:none;pointer-events:none;}
+.tr-lbl{font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:5px;display:flex;justify-content:space-between;}
+#tr-pct{color:var(--red);}
+.tr-t{height:3px;background:var(--bg4);}
+#tr-f{height:100%;width:0%;background:var(--green);transition:width .25s,background .25s;}
+
+/* NOTIFICATION */
+#notif{position:fixed;top:40px;right:14px;background:var(--bg3);border:1px solid var(--border);padding:8px 12px;z-index:800;display:none;font-size:10px;max-width:260px;animation:slideIn .2s ease;}
+#notif.ok{border-color:var(--gdim);background:var(--gbg);}
+#notif.warn{border-color:var(--adim);background:var(--abg);}
+#notif.err{border-color:var(--rdim);background:var(--rbg);}
+#notif.info{border-color:var(--cyan3);background:var(--cglow);}
+#notif-txt{color:var(--text2);}
+@keyframes slideIn{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:none;}}
+
+.fade-in{animation:fi .25s ease forwards;}
+@keyframes fi{from{opacity:0;}to{opacity:1;}}
+.blink{animation:blk 1s step-end infinite;}
+@keyframes blk{50%{opacity:0;}}
+</style>
+</head>
+<body>
+
+<!-- BOOT -->
+<div id="boot"><div id="blines"></div><div id="bbar"><div id="bbar-lbl">LOADING NULL//TRACE OS v0.2...</div><div id="bbar-t"><div id="bbar-f"></div></div></div></div>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="ll">NULL//TRACE</div>
+  <div class="lv">OS v0.2.0 — M2 BUILD</div>
+  <div class="lbox">
+    <div class="lf"><label class="llbl">ALIAS</label><input class="li" id="lu" type="text" value="ghost_0x1" autocomplete="off" spellcheck="false"></div>
+    <div class="lf"><label class="llbl">PASSPHRASE</label><input class="li" id="lp" type="password" autocomplete="off"></div>
+    <button class="lb" id="lbtn">AUTHENTICATE ›</button>
+    <div class="le" id="le"></div>
+  </div>
+  <div class="lh">ghost_0x1 / null1234</div>
+</div>
+
+<!-- DESKTOP -->
+<div id="desktop">
+  <div id="tb">
+    <div id="tb-l">
+      <div class="tb-logo">N//T</div>
+      <div class="tb-apps" id="tb-apps">
+        <button class="tab" onclick="openApp('terminal')">TERM//</button>
+        <button class="tab" onclick="openApp('netmap')">NET//MAP</button>
+        <button class="tab" onclick="openApp('mail')">MAIL//</button>
+        <button class="tab" onclick="openApp('exfil')">EXFIL//</button>
+        <button class="tab" onclick="openApp('mission')">MISSION//</button>
+        <button class="tab" onclick="openApp('sysmon')">SYS//</button>
+      </div>
+    </div>
+    <div id="tb-r">
+      <div class="tbs" id="tb-proxy">PROXY:<span>NONE</span></div>
+      <div class="tbs" id="tb-conn">CONN:<span>OFFLINE</span></div>
+      <div class="tbs" id="tb-rep">REP:<span>0</span></div>
+      <div id="tb-clk">00:00:00</div>
+    </div>
+  </div>
+  <div id="ws">
+    <div id="dicons">
+      <div class="dico" ondblclick="openApp('terminal')"><div class="dico-g">❯_</div><div class="dico-l">TERM//</div></div>
+      <div class="dico" ondblclick="openApp('netmap')"><div class="dico-g">⬡</div><div class="dico-l">NET//MAP</div></div>
+      <div class="dico" ondblclick="openApp('mail')"><div class="dico-g">@</div><div class="dico-l">MAIL//</div></div>
+      <div class="dico" ondblclick="openApp('mission')"><div class="dico-g">◎</div><div class="dico-l">MISSION//</div></div>
+    </div>
+  </div>
+  <div id="sbar">
+    <div class="sbi ok" id="sb-status">STATUS:<span>SECURE</span></div>
+    <div class="sbi" id="sb-alias">ALIAS:<span>ghost_0x1</span></div>
+    <div class="sbi" id="sb-node">NODE:<span>—</span></div>
+    <div class="sbi" id="sb-path">PATH:<span>—</span></div>
+    <div class="sbi" id="sb-obj" style="margin-left:auto">OBJ:<span>0/4</span></div>
+    <div class="sbi" id="sb-trace">TRACE:<span>—</span></div>
+  </div>
+</div>
+
+<div id="trace-ind"><div class="tr-lbl">TRACE DETECTION<span id="tr-pct">0%</span></div><div class="tr-t"><div id="tr-f"></div></div></div>
+<div id="notif"><div id="notif-txt"></div></div>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let currentUser = 'ghost_0x1';
+let cwd = '/home/ghost_0x1';
+let connectedNode = null;   // current node id
+let traceLevel = 0;
+let traceActive = false;
+let traceTimer = null;
+let traceRate = 0.35;
+let sessionStart = 0;
+let rep = 0;
+let termHistory = [], histIdx = -1;
+let exfilVault = [];        // banked stolen files
+let logsDeleted = {};       // nodeId -> bool
+let crackedPasswords = {};  // filename -> plaintext
+let objectivesDone = {};
+
+// ══════════════════════════════════════════════
+// NETWORK DEFINITION — 5 nodes
+// ══════════════════════════════════════════════
+const NETWORK = {
+  'GATEWAY': {
+    label: 'AXIOM-GATE', ip: '192.168.1.1', tier: 'public',
+    services: [{port:22,svc:'ssh',ver:'OpenSSH 8.2'},{port:80,svc:'http',ver:'nginx 1.18'},{port:443,svc:'https',ver:'nginx 1.18'}],
+    os: 'Ubuntu 20.04', security: 'LOW', firewall: false,
+    links: ['WEB-SRV','MAIL-SRV'],
+    traceRate: 0.25,
+    desc: 'Public-facing gateway. Entry point to the Axiom Corp internal network.',
+    fs: {
+      '/':{t:'d'},'/var':{t:'d'},'/var/log':{t:'d'},
+      '/var/log/access.log':{t:'f',exfil:'low',content:`[GATE-LOG] Session 1042: 10.0.0.47 → GATEWAY — anonymous auth\n[GATE-LOG] Session 1043: 10.0.0.47 → GATEWAY — directory traversal\n[GATE-LOG] Session 1044: 10.0.0.47 → WEB-SRV — forwarded`},
+      '/etc':{t:'d'},
+      '/etc/network.conf':{t:'f',content:`# AXIOM CORP NETWORK CONFIG\ngateway: 192.168.1.1\ndns: 192.168.1.5\nsubnets:\n  public:  192.168.1.0/24\n  internal: 10.10.0.0/24\n  exec:    10.10.1.0/24  [RESTRICTED]`},
+      '/etc/routes.conf':{t:'f',content:`# Internal routing table\nWEB-SRV   192.168.1.10  public\nMAIL-SRV  10.10.0.5     internal  [FW: requires auth]\nDB-SRV    10.10.0.20    internal  [FW: requires auth]\nEXEC-TERM 10.10.1.1     exec      [FW: hardened]`},
+    }
+  },
+  'WEB-SRV': {
+    label: 'AXIOM-WEB', ip: '192.168.1.10', tier: 'public',
+    services: [{port:22,svc:'ssh',ver:'OpenSSH 7.9'},{port:80,svc:'http',ver:'Apache 2.4.41'},{port:8080,svc:'http-alt',ver:'Tomcat 9.0.37'}],
+    os: 'Debian 10', security: 'NOMINAL', firewall: false,
+    links: ['GATEWAY','MAIL-SRV','DB-SRV'],
+    traceRate: 0.35,
+    desc: 'Axiom Corp public web server. Hosts internal dev notes and staging configs.',
+    fs: {
+      '/':{t:'d'},'/var':{t:'d'},'/var/www':{t:'d'},'/var/log':{t:'d'},
+      '/var/log/apache.log':{t:'f',exfil:'low',content:`[WEB] GET /index.html 200\n[WEB] GET /admin/config.bak 403\n[WEB] POST /api/auth — user: jmartin@axiom.corp\n[WEB] POST /api/auth — user: ksullivan@axiom.corp`},
+      '/var/www/config.bak':{t:'f',exfil:'med',content:`# STAGING CONFIG BACKUP — DO NOT COMMIT\n# Generated: 2024-03-01\nDB_HOST=10.10.0.20\nDB_PORT=3306\nDB_USER=webapp\nDB_PASS=Ax10m_W3b!2024\nDB_NAME=axiom_prod\nADMIN_TOKEN=eyJhbGci...REDACTED\nSMTP_HOST=10.10.0.5\nSMTP_USER=noreply@axiom.corp\nSMTP_PASS=smtp_n0reply!`},
+      '/var/www/notes.txt':{t:'f',content:`Dev notes - Jeff Martin\n\n- DB_SRV creds are in config.bak (DON'T LEAVE THIS HERE)\n- Kate's MAIL-SRV admin pass: Sull1van#2024 (she told me over slack, bad idea)\n- Exec terminal only accessible after DB auth token — ask R. Chen\n- TODO: rotate all service passwords before Q2 audit`},
+      '/home':{t:'d'},'/home/jmartin':{t:'d'},
+      '/home/jmartin/.ssh':{t:'d'},
+      '/home/jmartin/.ssh/id_rsa.pub':{t:'f',content:`ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB...jmartin@axiom-web`},
+      '/home/jmartin/todo.txt':{t:'f',content:`[ ] rotate DB password (overdue)\n[ ] tell Kate about the config.bak situation\n[x] set up staging env\n[x] forward mail server logs to SIEM\n\nPersonal reminder: kid's bday Sat — cake from Rosie's`},
+    }
+  },
+  'MAIL-SRV': {
+    label: 'AXIOM-MAIL', ip: '10.10.0.5', tier: 'internal',
+    services: [{port:22,svc:'ssh',ver:'OpenSSH 8.0'},{port:25,svc:'smtp',ver:'Postfix 3.4'},{port:143,svc:'imap',ver:'Dovecot 2.3'},{port:443,svc:'https',ver:'RoundCube 1.4'}],
+    os: 'Ubuntu 18.04', security: 'NOMINAL', firewall: true,
+    firewallCred: {user:'ksullivan', pass:'Sull1van#2024', hint:'Stolen from /var/www/notes.txt on WEB-SRV'},
+    links: ['GATEWAY','WEB-SRV','DB-SRV'],
+    traceRate: 0.45,
+    desc: 'Internal mail server. Holds all Axiom Corp employee communications. FIREWALL ACTIVE.',
+    fs: {
+      '/':{t:'d'},'/var':{t:'d'},'/var/mail':{t:'d'},'/var/log':{t:'d'},
+      '/var/log/mail.log':{t:'f',exfil:'low',content:`[MAIL] Delivered: rchen@axiom.corp → all-staff@axiom.corp (subj: Q2 Security Reminder)\n[MAIL] Delivered: jmartin@axiom.corp → ksullivan@axiom.corp (subj: config backup issue)\n[MAIL] ALERT: Failed login attempt — user: admin (3x)`},
+      '/var/mail/rchen':{t:'d'},
+      '/var/mail/rchen/sent':{t:'f',exfil:'high',content:`FROM: rchen@axiom.corp\nTO: exec-board@axiom.corp\nSUBJ: CONFIDENTIAL — Q1 Financial Summary\n\nBoard,\n\nQ1 results are attached. Key figures:\n  Revenue: $14.2M (+18% YoY)\n  EBITDA: $3.1M\n  Projected acquisition target: VORTEX DYNAMICS\n  Acquisition budget: $40M approved\n\nThis information is strictly confidential.\nDo not forward.\n\n— R. Chen, CFO`},
+      '/var/mail/jmartin':{t:'d'},
+      '/var/mail/jmartin/inbox':{t:'f',content:`FROM: ksullivan@axiom.corp\nTO: jmartin@axiom.corp\nSUBJ: RE: config backup\n\nJeff,\n\nPlease delete that backup file from the web server.\nAnd YES I know you have my mail server password.\nChange yours too — I saw it in the apache log.\n\n- Kate\n\n---\nFROM: jmartin@axiom.corp\nSUBJ: config backup\n\nKate, I left config.bak on the web server.\nI put your MAIL-SRV creds in notes.txt.\nI know, I know. Will clean up.\n- Jeff`},
+      '/var/mail/ksullivan':{t:'d'},
+      '/var/mail/ksullivan/drafts':{t:'f',exfil:'med',content:`DRAFT — unsent\nFROM: ksullivan@axiom.corp\nTO: hr@axiom.corp\nSUBJ: Hostile Work Environment Report\n\nHR,\n\nI need to formally report a pattern of behavior\nfrom R. Chen (CFO) that I believe constitutes\nprofessional misconduct...\n\n[DRAFT INCOMPLETE]`},
+      '/etc':{t:'d'},
+      '/etc/postfix':{t:'d'},
+      '/etc/postfix/main.cf':{t:'f',content:`# Postfix config — AXIOM MAIL\nmyhostname = mail.axiom.corp\nrelay_domains = axiom.corp\ntls_cert_file = /etc/ssl/axiom.cert\n# Auth token for exec-tier access:\n# EXEC_AUTH_TOKEN = AX-EXEC-7f3a9b2c1d`},
+    }
+  },
+  'DB-SRV': {
+    label: 'AXIOM-DB', ip: '10.10.0.20', tier: 'internal',
+    services: [{port:22,svc:'ssh',ver:'OpenSSH 7.9'},{port:3306,svc:'mysql',ver:'MySQL 8.0.26'},{port:5432,svc:'postgres',ver:'PostgreSQL 13'}],
+    os: 'CentOS 7', security: 'HIGH', firewall: true,
+    firewallCred: {user:'webapp', pass:'Ax10m_W3b!2024', hint:'Found in /var/www/config.bak on WEB-SRV'},
+    links: ['WEB-SRV','MAIL-SRV','EXEC-TERM'],
+    traceRate: 0.6,
+    desc: 'Core database server. Contains customer records, financial data, and exec access tokens.',
+    fs: {
+      '/':{t:'d'},'/var':{t:'d'},'/var/lib':{t:'d'},'/var/log':{t:'d'},
+      '/var/log/mysql.log':{t:'f',exfil:'low',content:`[DB] Connection from 192.168.1.10 — user: webapp\n[DB] Query: SELECT * FROM users LIMIT 10\n[DB] Connection from 10.10.1.1 — user: rchen\n[DB] Query: SELECT token FROM exec_access WHERE user='rchen'`},
+      '/var/lib/axiom_prod':{t:'d'},
+      '/var/lib/axiom_prod/users.csv':{t:'f',exfil:'high',content:`id,email,name,role,created\n1,rchen@axiom.corp,Raymond Chen,CFO,2019-03-01\n2,jmartin@axiom.corp,Jeff Martin,DevOps,2020-07-15\n3,ksullivan@axiom.corp,Kate Sullivan,IT Admin,2020-09-01\n4,alopez@axiom.corp,Ana Lopez,HR Director,2021-01-10\n5,bwong@axiom.corp,Brian Wong,Security,2021-06-20`},
+      '/var/lib/axiom_prod/financial.db.enc':{t:'f',exfil:'high',content:`[ENCRYPTED — AES-256]\nFile: financial.db\nSize: 4.2MB\nLast modified: 2024-03-14\nEncryption key: stored in exec-tier HSM\n\nContains: Q1-Q4 financials, acquisition targets,\nboard communications, investor data.\n\nAccess requires exec auth token.`},
+      '/root':{t:'d'},
+      '/root/.mysql_history':{t:'f',content:`SELECT token FROM exec_access WHERE user='rchen';\n-- result: AX-EXEC-7f3a9b2c1d\nUPDATE exec_access SET last_login=NOW() WHERE user='rchen';\nSELECT * FROM users WHERE role='admin';`},
+      '/etc':{t:'d'},
+      '/etc/cron.d':{t:'d'},
+      '/etc/cron.d/backup.sh':{t:'f',content:`#!/bin/bash\n# Daily backup — runs as root\n# Backs up to EXEC-TERM:/backups/\n# Auth: AX-EXEC-7f3a9b2c1d\nscp -i /root/.ssh/exec_key axiom_prod.dump rchen@10.10.1.1:/backups/`},
+    }
+  },
+  'EXEC-TERM': {
+    label: 'AXIOM-EXEC', ip: '10.10.1.1', tier: 'exec',
+    services: [{port:22,svc:'ssh',ver:'OpenSSH 8.4'},{port:443,svc:'https',ver:'Nginx 1.20 + HSM'}],
+    os: 'Ubuntu 22.04 (hardened)', security: 'CRITICAL', firewall: true,
+    firewallCred: {user:'rchen', pass:'AX-EXEC-7f3a9b2c1d', hint:'Token found in /root/.mysql_history on DB-SRV or /etc/postfix/main.cf on MAIL-SRV'},
+    links: ['DB-SRV'],
+    traceRate: 1.1,
+    desc: 'CFO executive terminal. Highest-security node. Primary mission objective.',
+    fs: {
+      '/':{t:'d'},'/home':{t:'d'},'/home/rchen':{t:'d'},
+      '/home/rchen/acquisition_plan.pdf.txt':{t:'f',exfil:'high',content:`AXIOM INDUSTRIES — STRICTLY CONFIDENTIAL\nACQUISITION STRATEGY: VORTEX DYNAMICS\n\nPrepared by: R. Chen, CFO\nBoard approval: PENDING\n\nEXECUTIVE SUMMARY:\nAxiom Industries intends to acquire Vortex Dynamics\nfor an estimated $38-42M. Vortex holds 3 pending\npatents in quantum sensor arrays that would give\nAxiom a 5-year competitive advantage in defense\ncontracting markets.\n\nTimeline:\n  Q2 2024: Due diligence\n  Q3 2024: LOI signed\n  Q4 2024: Close\n\nThis document must not leave executive systems.\nUnauthorized access will be prosecuted.`},
+      '/home/rchen/personal_finances.csv':{t:'f',exfil:'high',content:`Date,Payee,Amount,Category\n2024-01-15,SHELL COMPANY LTD,45000,Transfer\n2024-02-01,SHELL COMPANY LTD,45000,Transfer\n2024-02-20,CAYMAN ACCT #7723,120000,Investment\n2024-03-01,SHELL COMPANY LTD,45000,Transfer\n\n[Approx $255k in undisclosed transfers - Q1 2024]`},
+      '/home/rchen/.bash_history':{t:'f',content:`ssh webapp@10.10.0.20\nmysql -u root -p axiom_prod\nSELECT * FROM financial_summary;\nencrypt_file financial_report_Q1.pdf\nscp financial_report_Q1.pdf.enc board@secure-drop.axiom.corp:/inbox/\nclear`},
+      '/var':{t:'d'},'/var/log':{t:'d'},
+      '/var/log/exec.log':{t:'f',exfil:'low',content:`[EXEC] rchen authenticated — 08:42:11\n[EXEC] File accessed: acquisition_plan.pdf\n[EXEC] File accessed: personal_finances.csv\n[EXEC] ALERT: Unknown session detected — LOGGING`},
+      '/backups':{t:'d'},
+      '/backups/axiom_prod.dump':{t:'f',exfil:'high',content:`[DATABASE DUMP — 847MB]\nHost: axiom-db.internal\nDate: 2024-03-14 02:00:01\nTables: users, transactions, clients,\n        financial_summary, exec_access\n\n[Full dump — contains all production data]\n[Mission target file — OBJECTIVE COMPLETE if exfiltrated]`},
+    }
+  }
+};
+
+// Firewall state — which nodes are unlocked
+const firewallUnlocked = { 'GATEWAY':true, 'WEB-SRV':false, 'MAIL-SRV':false, 'DB-SRV':false, 'EXEC-TERM':false };
+
+// ══════════════════════════════════════════════
+// LOCAL FILESYSTEM
+// ══════════════════════════════════════════════
+const LFS = {
+  '/':{t:'d'},'/home':{t:'d'},'/home/ghost_0x1':{t:'d'},
+  '/home/ghost_0x1/tools':{t:'d'},
+  '/home/ghost_0x1/tools/crack.sh':{t:'f',content:`#!/bin/bash\n# NULL//TRACE Password Cracker v0.1\n# Usage: crack [hashfile]\n# Attempts: dictionary + personal data patterns\n# Speed: depends on hash complexity`},
+  '/home/ghost_0x1/intel':{t:'d'},
+  '/home/ghost_0x1/intel/exfil':{t:'d'},
+  '/home/ghost_0x1/logs':{t:'d'},
+  '/home/ghost_0x1/logs/ops.log':{t:'f',content:`[00:00:01] OS initialized — ghost_0x1\n[00:00:02] Contract received: OP-VORTEX\n[00:00:03] Target network: Axiom Corp\n[00:00:04] Awaiting operator action`},
+  '/home/ghost_0x1/README.md':{t:'f',content:`NULL//TRACE v0.2 — OPERATOR REFERENCE\n\nCOMMANDS:\n  help            all commands\n  ls / cd / cat   filesystem navigation\n  pwd / whoami    info\n  scan [node]     probe a network node\n  connect [node]  connect to node\n  disconnect      leave current node\n  crack [file]    run password cracker\n  exfil [file]    exfiltrate file to vault\n  rm-logs         delete session logs on node\n  status          system status\n  clear           clear terminal\n\nNETWORK:\n  Type node names or IPs.\n  Firewalled nodes need credentials.\n  Use 'fw-unlock [node] [user] [pass]'\n  to bypass a firewall manually.\n\nMISSION: Open MISSION// for objectives.`},
+};
+
+// ══════════════════════════════════════════════
+// MAIL DATA
+// ══════════════════════════════════════════════
+const MAILS = [
+  {id:0,from:'NULL-SIGNAL-HANDLER',subj:'CONTRACT: OP-VORTEX',time:'00:00',unread:true,body:`Operator,\n\nContract designated: OP-VORTEX\nClient: ANONYMOUS\nTarget: Axiom Industries Corp Network\nObjective: Corporate intelligence extraction\n\nPRIMARY OBJECTIVES:\n 1. Locate exec auth token\n 2. Access EXEC-TERM (10.10.1.1)\n 3. Exfiltrate acquisition plan from rchen home dir\n 4. Exit without trace completion\n\nBonus: Exfil the full DB dump from /backups/\n\nEntry: GATEWAY (192.168.1.1) — no auth required\nNote: Internal nodes are firewalled.\nCred hunting required. Start at WEB-SRV.\n\nPayout: 4,200 cr on completion\nBonus: +800 cr for clean exit\n\n— NULL SIGNAL HANDLER`},
+  {id:1,from:'AUTOSYS',subj:'[WARN] No proxy configured',time:'00:01',unread:true,body:`SYSTEM ALERT\n\nNo proxy chain detected.\nAll connections expose your real IP: 10.0.0.47\n\nIf traced on any node, your identity burns.\nProxy management: coming in v0.3.\n\nRisk level: HIGH\n— AutoSys`},
+  {id:2,from:'NULL-SIGNAL-HANDLER',subj:'INTEL: Target org overview',time:'00:02',unread:false,body:`Operator,\n\nPre-operation intelligence on Axiom Corp:\n\nORG: Axiom Industries\nSIZE: ~200 employees\nSECURITY: Mixed — some hardened, some negligent\n\nKEY PERSONNEL:\n  R. Chen    CFO — executive terminal access\n  J. Martin  DevOps — web/db server admin\n  K. Sullivan IT Admin — mail server admin\n  B. Wong    Security — SIEM monitoring\n\nNote: Jeff Martin is known to leave credentials\nin plaintext. Start there.\n\nGood luck.\n— NSH`},
+];
+
+let selMail = null;
+
+// ══════════════════════════════════════════════
+// MISSION OBJECTIVES
+// ══════════════════════════════════════════════
+const OBJECTIVES = [
+  {id:'creds',  text:'Locate exec auth token (AX-EXEC-*)',       hint:'Hunt credentials across web, mail, and DB nodes',          done:false},
+  {id:'access', text:'Gain access to EXEC-TERM (10.10.1.1)',      hint:'Use exec token with fw-unlock exec-term rchen <token>',     done:false},
+  {id:'exfil',  text:'Exfiltrate acquisition_plan.pdf.txt',       hint:'Use exfil command while on EXEC-TERM',                     done:false},
+  {id:'clean',  text:'Delete session logs on at least 2 nodes',   hint:'Use rm-logs command before disconnecting from each node',   done:false},
+];
+
+// ══════════════════════════════════════════════
+// BOOT
+// ══════════════════════════════════════════════
+const BOOTLINES = [
+  {t:'PHANTOM KERNEL v3.8 — NULL//TRACE OS v0.2',c:'cyan',d:0},
+  {t:'',c:'',d:80},
+  {t:'[  OK  ] Memory subsystems initialized',c:'ok',d:140},
+  {t:'[  OK  ] Phantom filesystem mounted',c:'ok',d:240},
+  {t:'[  OK  ] Network stack ready',c:'ok',d:360},
+  {t:'[  OK  ] eth0 :: 10.0.0.47 bound',c:'ok',d:460},
+  {t:'[ WARN ] Proxy chain: NONE — IP unprotected',c:'warn',d:580},
+  {t:'[  OK  ] Loading M2 target network definitions',c:'ok',d:700},
+  {t:'[  OK  ] 5 nodes registered :: AXIOM CORP',c:'ok',d:820},
+  {t:'[  OK  ] Mission system online :: OP-VORTEX',c:'ok',d:940},
+  {t:'[  OK  ] Cracker toolchain ready',c:'ok',d:1060},
+  {t:'[  OK  ] Exfil vault initialized',c:'ok',d:1160},
+  {t:'',c:'',d:1260},
+  {t:'NULL//TRACE v0.2 :: ALL SYSTEMS NOMINAL',c:'cyan',d:1340},
+];
+
+function runBoot(){
+  const el=document.getElementById('blines');
+  let max=0;
+  BOOTLINES.forEach(({t,c,d})=>{
+    max=Math.max(max,d);
+    setTimeout(()=>{
+      const div=document.createElement('div');
+      div.className=`bl ${c} show`;
+      div.textContent=t||' ';
+      el.appendChild(div);
+    },d);
+  });
+  setTimeout(()=>{
+    const bbar=document.getElementById('bbar');
+    bbar.style.display='block';
+    const fill=document.getElementById('bbar-f');
+    let p=0;
+    const iv=setInterval(()=>{
+      p+=2; fill.style.width=p+'%';
+      if(p>=100){clearInterval(iv);setTimeout(()=>{document.getElementById('boot').style.display='none';showLogin();},300);}
+    },22);
+  },max+200);
+}
+
+// ══════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════
+function showLogin(){
+  const l=document.getElementById('login');
+  l.style.display='flex'; l.classList.add('fade-in');
+  setTimeout(()=>document.getElementById('lp').focus(),100);
+}
+document.getElementById('lbtn').onclick=doLogin;
+document.getElementById('lp').onkeydown=e=>e.key==='Enter'&&doLogin();
+document.getElementById('lu').onkeydown=e=>e.key==='Enter'&&document.getElementById('lp').focus();
+function doLogin(){
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  const err=document.getElementById('le');
+  if(u==='ghost_0x1'&&p==='null1234'){
+    currentUser=u; cwd=`/home/${u}`;
+    err.textContent='AUTHENTICATING...'; err.style.color='var(--cyan)';
+    setTimeout(()=>{document.getElementById('login').style.display='none'; launchDesktop();},700);
+  } else {
+    err.textContent='✗ AUTHENTICATION FAILED';
+    err.style.color='var(--red)';
+    document.getElementById('lp').value='';
+    document.getElementById('lp').focus();
+  }
+}
+
+// ══════════════════════════════════════════════
+// DESKTOP
+// ══════════════════════════════════════════════
+function launchDesktop(){
+  const d=document.getElementById('desktop');
+  d.style.display='flex'; d.classList.add('fade-in');
+  document.getElementById('sb-alias').querySelector('span').textContent=currentUser;
+  startClock();
+  setTimeout(()=>{openApp('terminal'); openApp('mission');},400);
+  setTimeout(()=>openApp('netmap'),700);
+}
+let ticks=0;
+function startClock(){
+  setInterval(()=>{
+    ticks++;
+    const h=String(Math.floor(ticks/3600)).padStart(2,'0');
+    const m=String(Math.floor((ticks%3600)/60)).padStart(2,'0');
+    const s=String(ticks%60).padStart(2,'0');
+    document.getElementById('tb-clk').textContent=`${h}:${m}:${s}`;
+  },1000);
+}
+
+// ══════════════════════════════════════════════
+// WINDOW MANAGER
+// ══════════════════════════════════════════════
+const WINS={};
+let zCnt=10, focusedWin=null;
+const WDEFS={
+  terminal:{title:'TERM// — NULL//TRACE',w:680,h:440,x:100,y:50},
+  netmap:  {title:'NET//MAP — AXIOM CORP',w:560,h:420,x:340,y:60},
+  mail:    {title:'MAIL// — INBOX',       w:580,h:400,x:160,y:110},
+  exfil:   {title:'EXFIL// — VAULT',      w:360,h:320,x:280,y:140},
+  mission: {title:'MISSION// — OP-VORTEX',w:380,h:380,x:420,y:70},
+  sysmon:  {title:'SYS// — MONITOR',      w:300,h:360,x:300,y:90},
+};
+
+function openApp(id){
+  if(WINS[id]){
+    if(WINS[id].minimized){WINS[id].el.style.display='flex';WINS[id].minimized=false;}
+    focusWin(id); return;
+  }
+  const def=WDEFS[id];
+  const win=document.createElement('div');
+  win.className='win'; win.id=`win-${id}`;
+  win.style.cssText=`width:${def.w}px;height:${def.h}px;left:${def.x}px;top:${def.y}px;z-index:${++zCnt};`;
+  win.classList.add('fade-in');
+  win.innerHTML=`<div class="wtb" id="wtb-${id}"><div class="wbtns"><button class="wb cl" onclick="closeApp('${id}')"></button><button class="wb mn" onclick="minApp('${id}')"></button><button class="wb mx" onclick="maxApp('${id}')"></button></div><div class="wt">${def.title}</div><div style="width:22px"></div></div><div class="wbody" id="wbody-${id}"></div><div class="rh" id="rh-${id}"></div>`;
+  document.getElementById('ws').appendChild(win);
+  WINS[id]={el:win,minimized:false,maximized:false,orig:null};
+  makeDrag(win,document.getElementById(`wtb-${id}`));
+  makeResize(win,document.getElementById(`rh-${id}`));
+  win.addEventListener('mousedown',()=>focusWin(id));
+  buildApp(id);
+  focusWin(id);
+  syncTabs();
+}
+
+function focusWin(id){
+  if(focusedWin&&WINS[focusedWin])WINS[focusedWin].el.classList.remove('focused');
+  focusedWin=id;
+  if(WINS[id]){WINS[id].el.classList.add('focused');WINS[id].el.style.zIndex=++zCnt;}
+  if(id==='terminal')setTimeout(()=>document.getElementById('tinp')?.focus(),50);
+}
+function closeApp(id){
+  if(!WINS[id])return;
+  WINS[id].el.remove(); delete WINS[id];
+  if(focusedWin===id)focusedWin=null;
+  syncTabs();
+}
+function minApp(id){
+  if(!WINS[id])return;
+  WINS[id].minimized=!WINS[id].minimized;
+  WINS[id].el.style.display=WINS[id].minimized?'none':'flex';
+  syncTabs();
+}
+function maxApp(id){
+  if(!WINS[id])return;
+  const w=WINS[id],ws=document.getElementById('ws');
+  if(!w.maximized){
+    w.orig={left:w.el.style.left,top:w.el.style.top,width:w.el.style.width,height:w.el.style.height};
+    w.el.style.left='0';w.el.style.top='0';
+    w.el.style.width=ws.clientWidth+'px';w.el.style.height=ws.clientHeight+'px';
+    w.maximized=true;
+  } else {
+    Object.assign(w.el.style,w.orig); w.maximized=false;
+  }
+}
+function syncTabs(){
+  document.querySelectorAll('.tab').forEach(btn=>{
+    const m=btn.getAttribute('onclick')?.match(/'(\w+)'/);
+    if(!m)return;
+    const id=m[1];
+    btn.classList.remove('active','minimized');
+    if(WINS[id]){btn.classList.add('active');if(WINS[id].minimized)btn.classList.add('minimized');}
+  });
+}
+function makeDrag(win,handle){
+  let ox,oy,sl,st;
+  handle.addEventListener('mousedown',e=>{
+    if(e.target.classList.contains('wb'))return;
+    ox=e.clientX;oy=e.clientY;sl=parseInt(win.style.left)||0;st=parseInt(win.style.top)||0;
+    const mv=ev=>{win.style.left=Math.max(0,sl+ev.clientX-ox)+'px';win.style.top=Math.max(0,st+ev.clientY-oy)+'px';};
+    const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();
+  });
+}
+function makeResize(win,handle){
+  handle.addEventListener('mousedown',e=>{
+    const sw=parseInt(win.style.width),sh=parseInt(win.style.height),sx=e.clientX,sy=e.clientY;
+    const mv=ev=>{win.style.width=Math.max(280,sw+ev.clientX-sx)+'px';win.style.height=Math.max(180,sh+ev.clientY-sy)+'px';};
+    const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();
+  });
+}
+
+// ══════════════════════════════════════════════
+// APP BUILDER
+// ══════════════════════════════════════════════
+function buildApp(id){
+  const body=document.getElementById(`wbody-${id}`);
+  if(id==='terminal')buildTerminal(body);
+  else if(id==='netmap')buildNetmap(body);
+  else if(id==='mail')buildMail(body);
+  else if(id==='exfil')buildExfil(body);
+  else if(id==='mission')buildMission(body);
+  else if(id==='sysmon')buildSysmon(body);
+}
+
+// ══════════════════════════════════════════════
+// TERMINAL
+// ══════════════════════════════════════════════
+function buildTerminal(body){
+  body.innerHTML=`<div id="tout"></div><div class="tpr"><span class="tprl" id="tprl">${getPrompt()}</span><input id="tinp" spellcheck="false" autocomplete="off"></div>`;
+  plines([
+    {t:'╔═══════════════════════════════════════════╗',c:'cyan'},
+    {t:'║   NULL//TRACE OS v0.2  —  M2 BUILD        ║',c:'cyan'},
+    {t:'║   Contract: OP-VORTEX  |  Target: AXIOM   ║',c:'cyan'},
+    {t:'╚═══════════════════════════════════════════╝',c:'cyan'},
+    {t:'',c:'blank'},
+    {t:`Identity: ${currentUser}  |  Check MISSION// for objectives`,c:'ok'},
+    {t:`Type 'help' or open NET//MAP to begin`,c:'dim'},
+    {t:'',c:'blank'},
+  ]);
+  document.getElementById('tinp').addEventListener('keydown',onTermKey);
+  document.getElementById('tinp').focus();
+}
+function getPrompt(){
+  const h=connectedNode?`@${NETWORK[connectedNode]?.label||connectedNode}`:'';
+  const p=cwd.replace(`/home/${currentUser}`,'~');
+  return `${currentUser}${h}:${p}$ `;
+}
+function onTermKey(e){
+  if(e.key==='Enter'){
+    const cmd=e.target.value.trim(); e.target.value='';
+    if(cmd){termHistory.unshift(cmd);histIdx=-1;}
+    pline(`${getPrompt()}${cmd}`,'cmd');
+    if(cmd)runCmd(cmd);
+    scrollT();
+  } else if(e.key==='ArrowUp'){
+    histIdx=Math.min(histIdx+1,termHistory.length-1);
+    e.target.value=termHistory[histIdx]||''; e.preventDefault();
+  } else if(e.key==='ArrowDown'){
+    histIdx=Math.max(histIdx-1,-1);
+    e.target.value=histIdx>=0?termHistory[histIdx]:''; e.preventDefault();
+  }
+}
+function pline(txt,cls='out'){
+  const out=document.getElementById('tout'); if(!out)return;
+  const el=document.createElement('div');
+  el.className=`tl ${cls}`; el.textContent=txt||' '; out.appendChild(el);
+}
+function plines(arr){arr.forEach(({t,c})=>pline(t,c));scrollT();}
+function scrollT(){const out=document.getElementById('tout');if(out)out.scrollTop=out.scrollHeight;}
+function updatePrompt(){const l=document.getElementById('tprl');if(l)l.textContent=getPrompt();}
+
+// ══════════════════════════════════════════════
+// COMMANDS
+// ══════════════════════════════════════════════
+function runCmd(raw){
+  const parts=raw.trim().split(/\s+/);
+  const cmd=parts[0].toLowerCase(); const args=parts.slice(1);
+  const MAP={
+    help,clear,pwd,ls,cd,cat,mkdir,touch,rm,whoami,status,ifconfig,
+    scan,connect,disconnect,crack,exfil:cmdExfil,'rm-logs':rmLogs,'fw-unlock':fwUnlock,
+    echo:()=>pline(args.join(' ')),
+    history:()=>termHistory.forEach((h,i)=>pline(`  ${i+1}  ${h}`,'dim')),
+    nodes:()=>listNodes(),
+    date:()=>pline(new Date().toISOString()),
+    uname:()=>pline('phantom-3.8 NULL//TRACE-OS x86_64'),
+    man:()=>pline('No man pages. Use help.','warn'),
+    sudo:()=>pline('Already operator-level. No escalation needed.','warn'),
+  };
+  if(MAP[cmd])MAP[cmd](args);
+  else{pline(`command not found: ${cmd}`,'err');pline(`Type 'help' for commands`,'dim');}
+  updatePrompt(); scrollT();
+}
+
+function help(){
+  plines([
+    {t:'',c:'blank'},
+    {t:'  FILESYSTEM',c:'cyan'},
+    {t:'  ls [path]             list directory',c:'out'},
+    {t:'  cd [path]             change directory',c:'out'},
+    {t:'  cat [file]            read file',c:'out'},
+    {t:'  mkdir / touch / rm    create/delete',c:'out'},
+    {t:'  pwd / whoami / clear  info / clear',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  NETWORK',c:'cyan'},
+    {t:'  nodes                 list known network nodes',c:'out'},
+    {t:'  scan [node/ip]        probe a node for services',c:'out'},
+    {t:'  connect [node/ip]     connect to a node',c:'out'},
+    {t:'  fw-unlock [node] [u] [p]  bypass firewall with creds',c:'out'},
+    {t:'  disconnect            close active connection',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  OPERATIONS',c:'cyan'},
+    {t:'  crack [file]          run password cracker on hash file',c:'out'},
+    {t:'  exfil [file]          exfiltrate file to local vault',c:'out'},
+    {t:'  rm-logs               delete session logs on current node',c:'out'},
+    {t:'  status                system & connection status',c:'out'},
+    {t:'',c:'blank'},
+  ]);
+}
+
+function clear(){const out=document.getElementById('tout');if(out)out.innerHTML='';}
+function pwd(){pline(cwd);}
+function whoami(){pline(currentUser);pline('Clearance: OPERATOR','dim');pline('Faction: NULL SIGNAL','dim');}
+
+function getCFS(){
+  if(connectedNode){const n=NETWORK[connectedNode];return n?n.fs:LFS;}
+  return LFS;
+}
+function resolvePath(p){
+  if(p==='..'){ const pts=cwd.split('/').filter(Boolean);pts.pop();return '/'+pts.join('/')||'/'; }
+  if(p.startsWith('/'))return p.replace(/\/+$/,'')||'/';
+  const base=cwd==='/'?'':cwd;
+  return `${base}/${p}`.replace(/\/+/g,'/');
+}
+
+function ls(args){
+  const fs=getCFS(); const target=args[0]?resolvePath(args[0]):cwd;
+  const entries=Object.keys(fs).filter(p=>{const par=p.substring(0,p.lastIndexOf('/'))||'/';return par===target&&p!==target;});
+  if(!fs[target]){pline(`ls: no such directory: ${target}`,'err');return;}
+  if(fs[target].t!=='d'){pline(`ls: not a directory: ${target}`,'err');return;}
+  if(!entries.length){pline('  (empty)','dim');return;}
+  pline('','blank');
+  entries.forEach(p=>{
+    const name=p.split('/').pop();const node=fs[p];
+    if(node.t==='d')pline(`  ${name}/`,'cyan');
+    else{
+      let extra='';
+      if(node.exfil==='high')extra=' [HIGH VALUE]';
+      else if(node.exfil==='med')extra=' [SENSITIVE]';
+      pline(`  ${name}${extra}`,name.startsWith('.')?'dim':node.exfil?'warn':'out');
+    }
+  });
+  pline('','blank');
+}
+function cd(args){
+  if(!args[0]||args[0]==='~'){cwd=connectedNode?'/':'/home/'+currentUser;return;}
+  const fs=getCFS();const target=resolvePath(args[0]);
+  if(!fs[target]){pline(`cd: no such directory: ${args[0]}`,'err');return;}
+  if(fs[target].t!=='d'){pline(`cd: not a directory: ${args[0]}`,'err');return;}
+  cwd=target;
+}
+function cat(args){
+  if(!args[0]){pline('cat: missing operand','err');return;}
+  const fs=getCFS();const target=resolvePath(args[0]);
+  if(!fs[target]){pline(`cat: no such file: ${args[0]}`,'err');return;}
+  if(fs[target].t==='d'){pline(`cat: is a directory: ${args[0]}`,'err');return;}
+  pline('','blank');
+  fs[target].content.split('\n').forEach(l=>pline(l||' ','data'));
+  pline('','blank');
+  // Intelligence trigger — check for creds/tokens
+  const c=fs[target].content;
+  if(c.includes('AX-EXEC-'))notify('Intel extracted — exec token found in file','info');
+  if(c.includes('Sull1van#2024'))notify('Credential found: ksullivan password extracted','info');
+  if(c.includes('Ax10m_W3b!2024'))notify('Credential found: webapp DB password extracted','info');
+}
+function mkdir(args){
+  if(!args[0]){pline('mkdir: missing operand','err');return;}
+  const target=resolvePath(args[0]);
+  if(LFS[target]){pline(`mkdir: already exists`,'err');return;}
+  LFS[target]={t:'d'};pline(`Directory created: ${args[0]}`,'ok');
+}
+function touch(args){
+  if(!args[0]){pline('touch: missing operand','err');return;}
+  const target=resolvePath(args[0]);
+  if(!LFS[target])LFS[target]={t:'f',content:''};
+  pline(`File created: ${args[0]}`,'ok');
+}
+function rm(args){
+  if(!args[0]){pline('rm: missing operand','err');return;}
+  const target=resolvePath(args[0]);
+  if(!LFS[target]){pline(`rm: no such file: ${args[0]}`,'err');return;}
+  delete LFS[target];pline(`Removed: ${args[0]}`,'ok');
+}
+
+function listNodes(){
+  plines([{t:'',c:'blank'},{t:'  AXIOM CORP NETWORK',c:'cyan'}]);
+  Object.entries(NETWORK).forEach(([id,n])=>{
+    const fw=n.firewall?(!firewallUnlocked[id]?'[FW:LOCKED]':'[FW:OPEN]'):'[NO FW]';
+    const conn=connectedNode===id?'◉ CONNECTED':'○';
+    pline(`  ${conn} ${n.label.padEnd(14)} ${n.ip.padEnd(14)} ${fw}`,'out');
+  });
+  pline('','blank');
+}
+
+function ifconfig(){
+  plines([
+    {t:'',c:'blank'},
+    {t:'lo0   127.0.0.1',c:'data'},
+    {t:'eth0  10.0.0.47  (UNPROTECTED — no proxy)',c:'warn'},
+    {t:'',c:'blank'},
+  ]);
+}
+
+function status(){
+  plines([
+    {t:'',c:'blank'},
+    {t:'  IDENTITY',c:'cyan'},
+    {t:`  Alias    ${currentUser}`,c:'out'},
+    {t:`  Rep      ${rep} credits`,c:'out'},
+    {t:'',c:'blank'},
+    {t:'  CONNECTION',c:'cyan'},
+    {t:`  Node     ${connectedNode||'OFFLINE'}`,c:connectedNode?'warn':'out'},
+    {t:`  Host     ${connectedNode?NETWORK[connectedNode]?.ip:'—'}`,c:'out'},
+    {t:`  Path     ${cwd}`,c:'out'},
+    {t:'',c:'blank'},
+    {t:'  TRACE',c:'cyan'},
+    {t:`  Level    ${traceLevel.toFixed(1)}%`,c:traceLevel>70?'err':traceLevel>40?'warn':'ok'},
+    {t:`  Active   ${traceActive?'YES — DANGER':'no'}`,c:traceActive?'err':'out'},
+    {t:'',c:'blank'},
+    {t:'  MISSION',c:'cyan'},
+    {t:`  Objectives  ${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}`,c:'out'},
+    {t:`  Exfil vault ${exfilVault.length} file(s)`,c:'out'},
+    {t:'',c:'blank'},
+  ]);
+}
+
+// ── SCAN ──
+function scan(args){
+  const id=resolveNode(args[0]);
+  if(!id){pline(`scan: unknown target: ${args[0]||'(none)'}. Try node name or IP.`,'err');return;}
+  const n=NETWORK[id];
+  plines([{t:'',c:'blank'},{t:`[*] Scanning ${n.ip} (${n.label})...`,c:'info'},{t:`[*] Probing ${n.services.length} services...`,c:'dim'}]);
+  setTimeout(()=>{
+    plines([
+      {t:'',c:'blank'},
+      {t:`SCAN :: ${n.label} (${n.ip})`,c:'cyan'},
+      {t:'─────────────────────────────────────',c:'dim'},
+      {t:`OS         ${n.os}`,c:'data'},
+      {t:`Tier       ${n.tier.toUpperCase()}`,c:'data'},
+      {t:`Security   ${n.security}`,c:n.security==='LOW'?'ok':n.security==='NOMINAL'?'warn':n.security==='HIGH'?'err':'err'},
+      {t:`Firewall   ${n.firewall?(firewallUnlocked[id]?'BYPASSED':'ACTIVE — requires credentials'):'none'}`,c:n.firewall&&!firewallUnlocked[id]?'err':'ok'},
+      {t:'',c:'blank'},
+      {t:'PORT     SERVICE   VERSION                  STATE',c:'cyan'},
+    ]);
+    n.services.forEach(s=>pline(`${String(s.port).padEnd(8)} ${s.svc.padEnd(9)} ${s.ver.padEnd(24)} open`,'ok'));
+    pline('','blank');
+    if(n.firewall&&!firewallUnlocked[id])
+      plines([{t:`[!] Firewall active. Hint: ${n.firewallCred.hint}`,c:'warn'},{t:`[*] Use: fw-unlock ${id} <user> <pass>`,c:'dim'}]);
+    else
+      pline(`[+] Use: connect ${id}`,'ok');
+    pline('','blank');
+    // Save scan intel
+    LFS[`/home/${currentUser}/intel/${id}.scan`]={t:'f',content:`SCAN:${id}\nIP:${n.ip}\nOS:${n.os}\nSECURITY:${n.security}`};
+    pline(`[*] Scan saved → ~/intel/${id}.scan`,'dim');
+    scrollT();
+    refreshNetmap();
+  },900);
+}
+
+// ── FIREWALL UNLOCK ──
+function fwUnlock(args){
+  // fw-unlock [node] [user] [pass]
+  const [nodeArg,user,...passParts]=args;
+  const pass=passParts.join(' ');
+  const id=resolveNode(nodeArg);
+  if(!id){pline(`fw-unlock: unknown node: ${nodeArg}`,'err');return;}
+  const n=NETWORK[id];
+  if(!n.firewall||firewallUnlocked[id]){pline(`${id}: no active firewall`,'warn');return;}
+  if(user===n.firewallCred.user&&pass===n.firewallCred.pass){
+    firewallUnlocked[id]=true;
+    plines([
+      {t:'',c:'blank'},
+      {t:`[+] FIREWALL BYPASSED — ${n.label}`,c:'ok'},
+      {t:`[+] Credentials accepted: ${user}`,c:'ok'},
+      {t:`[*] Use: connect ${id}`,c:'dim'},
+      {t:'',c:'blank'},
+    ]);
+    notify(`Firewall bypassed: ${n.label}`,'ok');
+    refreshNetmap();
+  } else {
+    plines([{t:'[!] FIREWALL: credentials rejected',c:'err'},{t:'[!] ALERT: Failed auth attempt logged',c:'err'},{t:'',c:'blank'}]);
+    if(traceActive)traceLevel=Math.min(100,traceLevel+8);
+  }
+}
+
+// ── CONNECT ──
+function connect(args){
+  const id=resolveNode(args[0]);
+  if(!id){pline(`connect: unknown target: ${args[0]||'(none)'}`,'err');return;}
+  if(connectedNode){pline(`Already connected to ${connectedNode}. Disconnect first.`,'warn');return;}
+  const n=NETWORK[id];
+  if(n.firewall&&!firewallUnlocked[id]){
+    plines([
+      {t:`[!] FIREWALL ACTIVE — ${n.label}`,c:'err'},
+      {t:`[!] Hint: ${n.firewallCred.hint}`,c:'warn'},
+      {t:`[*] Use: fw-unlock ${id} <user> <pass>`,c:'dim'},
+    ]);
+    return;
+  }
+  plines([{t:'',c:'blank'},{t:`[*] Connecting to ${n.label} (${n.ip})...`,c:'info'},{t:`[*] Negotiating session...`,c:'dim'}]);
+  setTimeout(()=>{
+    connectedNode=id; cwd='/'; traceRate=n.traceRate;
+    updatePrompt();
+    plines([
+      {t:'',c:'blank'},
+      {t:`[+] SESSION ESTABLISHED — ${n.label}`,c:'ok'},
+      {t:`[+] IP: ${n.ip}  |  OS: ${n.os}`,c:'data'},
+      {t:`[!] TRACE ACTIVE — rate: ${(n.traceRate*3.3).toFixed(1)}%/sec`,c:'err'},
+      {t:`[!] Security level: ${n.security}`,c:n.security==='LOW'?'ok':n.security==='HIGH'||n.security==='CRITICAL'?'err':'warn'},
+      {t:'',c:'blank'},
+    ]);
+    document.getElementById('tb-conn').querySelector('span').textContent=n.label;
+    document.getElementById('tb-conn').className='tbs warn';
+    document.getElementById('sb-node').querySelector('span').textContent=n.label;
+    document.getElementById('sb-path').querySelector('span').textContent=n.ip;
+    startTrace();
+    refreshNetmap();
+    scrollT();
+  },800);
+}
+
+// ── DISCONNECT ──
+function disconnect(){
+  if(!connectedNode){pline('Not connected.','warn');return;}
+  const old=NETWORK[connectedNode];
+  const wasLogged=!logsDeleted[connectedNode];
+  connectedNode=null; cwd=`/home/${currentUser}`;
+  stopTrace(); updatePrompt();
+  document.getElementById('tb-conn').querySelector('span').textContent='OFFLINE';
+  document.getElementById('tb-conn').className='tbs';
+  document.getElementById('sb-node').querySelector('span').textContent='—';
+  document.getElementById('sb-path').querySelector('span').textContent='—';
+  plines([
+    {t:'',c:'blank'},
+    {t:`[+] Disconnected from ${old.label}`,c:'ok'},
+    {t:wasLogged?`[!] Session logs remain on ${old.label} — traces left behind`:`[+] Logs deleted — clean exit`,c:wasLogged?'warn':'ok'},
+    {t:'',c:'blank'},
+  ]);
+  checkCleanObjective();
+  refreshNetmap();
+}
+
+// ── CRACK ──
+function crack(args){
+  if(!args[0]){pline('Usage: crack [file]','err');return;}
+  const fs=getCFS(); const target=resolvePath(args[0]);
+  if(!fs[target]){pline(`crack: file not found: ${args[0]}`,'err');return;}
+  const fname=args[0].split('/').pop();
+  if(crackedPasswords[fname]){pline(`[*] Already cracked: ${crackedPasswords[fname]}`,'ok');return;}
+
+  plines([{t:'',c:'blank'},{t:`[*] Loading cracker — target: ${fname}`,c:'info'},{t:`[*] Running dictionary + pattern analysis...`,c:'dim'}]);
+
+  // Simulate cracking progress
+  let prog=0;
+  const out=document.getElementById('tout');
+  const barEl=document.createElement('div');
+  barEl.className='tl out crack-bar-wrap';
+  barEl.innerHTML=`<span style="color:var(--text3)">  [</span><span id="crack-prog" style="color:var(--amber)">░░░░░░░░░░░░░░░░░░░░</span><span style="color:var(--text3)">] </span><span id="crack-pct" style="color:var(--text2)">0%</span>`;
+  if(out)out.appendChild(barEl);
+
+  // Pick a password to "crack" based on file content
+  let result=null;
+  const content=fs[target].content||'';
+  if(content.includes('Sull1van'))result='Sull1van#2024';
+  else if(content.includes('Ax10m'))result='Ax10m_W3b!2024';
+  else if(content.includes('AX-EXEC'))result='AX-EXEC-7f3a9b2c1d';
+  else result='axiom2024';  // fallback generic
+
+  const total=40+Math.floor(Math.random()*30);
+  const iv=setInterval(()=>{
+    prog+=2;
+    const pct=Math.min(100,Math.floor(prog/total*100));
+    const filled=Math.floor(pct/5);
+    const bar='█'.repeat(filled)+'░'.repeat(20-filled);
+    document.getElementById('crack-prog').textContent=bar;
+    document.getElementById('crack-pct').textContent=pct+'%';
+    if(prog>=total){
+      clearInterval(iv);
+      crackedPasswords[fname]=result;
+      plines([
+        {t:'',c:'blank'},
+        {t:`[+] CRACKED — ${fname}`,c:'ok'},
+        {t:`[+] Plaintext: ${result}`,c:'green'},
+        {t:'',c:'blank'},
+      ]);
+      notify(`Password cracked: ${result}`,'ok');
+      scrollT();
+    }
+  },120);
+  scrollT();
+}
+
+// ── EXFIL ──
+function cmdExfil(args){
+  if(!connectedNode){pline('exfil: not connected to a remote node','err');return;}
+  if(!args[0]){pline('Usage: exfil [file]','err');return;}
+  const fs=getCFS(); const target=resolvePath(args[0]);
+  if(!fs[target]){pline(`exfil: file not found: ${args[0]}`,'err');return;}
+  if(fs[target].t==='d'){pline('exfil: cannot exfil a directory','err');return;}
+
+  const fname=args[0].split('/').pop();
+  if(exfilVault.find(f=>f.name===fname)){pline(`[*] ${fname} already in vault`,'warn');return;}
+
+  const node=NETWORK[connectedNode];
+  const fdata=fs[target];
+  plines([{t:'',c:'blank'},{t:`[*] Exfiltrating: ${fname}`,c:'info'},{t:`[*] Routing through local tunnel...`,c:'dim'}]);
+
+  setTimeout(()=>{
+    const entry={name:fname,from:node.label,ip:node.ip,value:fdata.exfil||'low',content:fdata.content,time:ticks};
+    exfilVault.push(entry);
+    LFS[`/home/${currentUser}/intel/exfil/${fname}`]={t:'f',content:fdata.content};
+
+    plines([
+      {t:`[+] EXFILTRATED: ${fname}`,c:'ok'},
+      {t:`[+] Value: ${(fdata.exfil||'low').toUpperCase()}  |  Banked to ~/intel/exfil/`,c:'ok'},
+      {t:'',c:'blank'},
+    ]);
+    notify(`Exfil: ${fname} (${(fdata.exfil||'low').toUpperCase()})`,fdata.exfil==='high'?'ok':'info');
+
+    // Bump trace a bit — exfil is noisy
+    if(traceActive)traceLevel=Math.min(100,traceLevel+6);
+
+    // Check mission objectives
+    if(fname==='acquisition_plan.pdf.txt'){ markObjective('exfil'); }
+    refreshExfil();
+    scrollT();
+  },1100);
+}
+
+// ── RM-LOGS ──
+function rmLogs(){
+  if(!connectedNode){pline('rm-logs: not connected to a remote node','err');return;}
+  const n=NETWORK[connectedNode];
+  if(logsDeleted[connectedNode]){pline('[*] Logs already deleted on this node','warn');return;}
+
+  plines([{t:'',c:'blank'},{t:`[*] Locating session logs on ${n.label}...`,c:'info'}]);
+  setTimeout(()=>{
+    logsDeleted[connectedNode]=true;
+    plines([
+      {t:`[+] Session logs purged — ${n.label}`,c:'ok'},
+      {t:`[+] Access entries deleted`,c:'ok'},
+      {t:`[+] Bash history cleared`,c:'ok'},
+      {t:`[*] Clean exit will be possible`,c:'dim'},
+      {t:'',c:'blank'},
+    ]);
+    notify(`Logs deleted: ${n.label}`,'ok');
+    checkCleanObjective();
+    scrollT();
+  },600);
+}
+
+// ══════════════════════════════════════════════
+// OBJECTIVES
+// ══════════════════════════════════════════════
+function markObjective(id){
+  const obj=OBJECTIVES.find(o=>o.id===id);
+  if(obj&&!obj.done){
+    obj.done=true;
+    notify(`OBJECTIVE COMPLETE: ${obj.text.substring(0,40)}...`,'ok');
+    rep+=800;
+    document.getElementById('tb-rep').querySelector('span').textContent=rep;
+    document.getElementById('sb-obj').querySelector('span').textContent=`${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}`;
+    refreshMission();
+  }
+}
+function checkCleanObjective(){
+  const cleaned=Object.keys(logsDeleted).filter(k=>logsDeleted[k]);
+  if(cleaned.length>=2)markObjective('clean');
+}
+
+// Detect exec token access
+const _origCat=cat;
+function cat(args){
+  _origCat(args);
+  if(connectedNode){
+    const fs=getCFS();const target=resolvePath(args[0]);
+    if(fs[target]&&fs[target].content?.includes('AX-EXEC-7f3a9b2c1d')){
+      markObjective('creds');
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+// TRACE
+// ══════════════════════════════════════════════
+function startTrace(){
+  traceActive=true; traceLevel=0;
+  document.getElementById('trace-ind').style.display='block';
+  updateTraceUI();
+  traceTimer=setInterval(()=>{
+    traceLevel=Math.min(100,traceLevel+traceRate);
+    updateTraceUI();
+    if(traceLevel>=100){stopTrace();onTraceComplete();}
+  },300);
+}
+function stopTrace(){
+  traceActive=false; clearInterval(traceTimer); traceTimer=null;
+  document.getElementById('trace-ind').style.display='none';
+  document.getElementById('sb-trace').querySelector('span').textContent='—';
+  document.getElementById('sb-trace').className='sbi';
+}
+function updateTraceUI(){
+  const p=Math.floor(traceLevel);
+  const fill=document.getElementById('tr-f');
+  const pct=document.getElementById('tr-pct');
+  const sb=document.getElementById('sb-trace');
+  fill.style.width=p+'%';
+  pct.textContent=p+'%';
+  sb.querySelector('span').textContent=p+'%';
+  if(p<40){fill.style.background='var(--green)';sb.className='sbi ok';}
+  else if(p<70){fill.style.background='var(--amber)';sb.className='sbi warn';}
+  else{fill.style.background='var(--red)';sb.className='sbi danger';}
+}
+function onTraceComplete(){
+  const old=connectedNode;
+  disconnect();
+  plines([
+    {t:'',c:'blank'},
+    {t:'████████████████████████████████████████',c:'err'},
+    {t:'█                                      █',c:'err'},
+    {t:'█   TRACE COMPLETE — SESSION BURNED    █',c:'err'},
+    {t:'█   Your activity was logged           █',c:'err'},
+    {t:'████████████████████████████████████████',c:'err'},
+    {t:'',c:'blank'},
+    {t:'[!] Return and cover your tracks next time.',c:'warn'},
+    {t:'',c:'blank'},
+  ]);
+}
+
+// ══════════════════════════════════════════════
+// NET//MAP
+// ══════════════════════════════════════════════
+const NODE_POS={
+  'GATEWAY':  {x:280,y:60},
+  'WEB-SRV':  {x:120,y:200},
+  'MAIL-SRV': {x:280,y:200},
+  'DB-SRV':   {x:440,y:200},
+  'EXEC-TERM':{x:440,y:340},
+};
+
+function buildNetmap(body){
+  body.innerHTML=`<div class="netmap-wrap"><svg id="netmap-svg" viewBox="0 0 560 420" xmlns="http://www.w3.org/2000/svg"></svg></div>`;
+  renderNetmap();
+}
+
+function renderNetmap(){
+  const svg=document.getElementById('netmap-svg'); if(!svg)return;
+  svg.innerHTML='';
+
+  // Draw connections
+  const drawn=new Set();
+  Object.entries(NETWORK).forEach(([id,n])=>{
+    n.links.forEach(lid=>{
+      const key=[id,lid].sort().join('--');
+      if(drawn.has(key))return; drawn.add(key);
+      const a=NODE_POS[id],b=NODE_POS[lid]; if(!a||!b)return;
+      const isActive=connectedNode===id||connectedNode===lid;
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',a.x); line.setAttribute('y1',a.y+18);
+      line.setAttribute('x2',b.x); line.setAttribute('y2',b.y+18);
+      line.setAttribute('class',`conn-line ${isActive?'active':''}`);
+      svg.appendChild(line);
+    });
+  });
+
+  // Draw nodes
+  Object.entries(NETWORK).forEach(([id,n])=>{
+    const pos=NODE_POS[id]; if(!pos)return;
+    const isConn=connectedNode===id;
+    const isFW=n.firewall&&!firewallUnlocked[id];
+    const isUnlocked=!n.firewall||firewallUnlocked[id];
+    const tierCol={public:'#0077a8',internal:'#9e6a03',exec:'#da3633'}[n.tier]||'#30363d';
+    const borderCol=isConn?'#00b4d8':isFW?'#da3633':isUnlocked?'#238636':'#30363d';
+    const bgCol=isConn?'rgba(0,180,216,0.15)':isFW?'rgba(218,54,51,0.1)':'rgba(28,35,51,0.9)';
+
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','node-group');
+    g.setAttribute('transform',`translate(${pos.x-48},${pos.y})`);
+    g.onclick=()=>onNodeClick(id);
+
+    // BG rect
+    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('class','node-rect');
+    rect.setAttribute('width','96'); rect.setAttribute('height','52');
+    rect.setAttribute('rx','2');
+    rect.setAttribute('fill',bgCol);
+    rect.setAttribute('stroke',borderCol);
+    rect.setAttribute('stroke-width','1');
+    g.appendChild(rect);
+
+    // Tier stripe
+    const stripe=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    stripe.setAttribute('width','96'); stripe.setAttribute('height','3');
+    stripe.setAttribute('fill',tierCol); stripe.setAttribute('rx','2');
+    g.appendChild(stripe);
+
+    // Label
+    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x','48'); lbl.setAttribute('y','20');
+    lbl.setAttribute('class','node-label');
+    lbl.setAttribute('fill',isConn?'#00b4d8':'#8b949e');
+    lbl.setAttribute('font-weight',isConn?'700':'400');
+    lbl.textContent=n.label;
+    g.appendChild(lbl);
+
+    // IP
+    const ip=document.createElementNS('http://www.w3.org/2000/svg','text');
+    ip.setAttribute('x','48'); ip.setAttribute('y','32');
+    ip.setAttribute('class','node-sublabel');
+    ip.setAttribute('fill','#484f58');
+    ip.textContent=n.ip;
+    g.appendChild(ip);
+
+    // Status badge
+    const badge=document.createElementNS('http://www.w3.org/2000/svg','text');
+    badge.setAttribute('x','48'); badge.setAttribute('y','46');
+    badge.setAttribute('class','node-status');
+    const st=isConn?{t:'● ACTIVE',f:'#00b4d8'}:
+      isFW?{t:'⊘ FIREWALL',f:'#f85149'}:
+      isUnlocked?{t:'○ UNLOCKED',f:'#3fb950'}:
+      {t:'○ REACHABLE',f:'#484f58'};
+    badge.setAttribute('fill',st.f);
+    badge.textContent=st.t;
+    g.appendChild(badge);
+
+    svg.appendChild(g);
+  });
+
+  // Legend
+  const lg=document.createElementNS('http://www.w3.org/2000/svg','g');
+  lg.setAttribute('transform','translate(10,380)');
+  [{t:'PUBLIC',c:'#0077a8'},{t:'INTERNAL',c:'#9e6a03'},{t:'EXEC',c:'#da3633'}].forEach(({t,c},i)=>{
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x',String(i*90)); r.setAttribute('y','0');
+    r.setAttribute('width','8'); r.setAttribute('height','8');
+    r.setAttribute('fill',c);
+    const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+    tx.setAttribute('x',String(i*90+11)); tx.setAttribute('y','8');
+    tx.setAttribute('font-family','JetBrains Mono,monospace');
+    tx.setAttribute('font-size','7');
+    tx.setAttribute('fill','#484f58');
+    tx.textContent=t;
+    lg.appendChild(r); lg.appendChild(tx);
+  });
+  svg.appendChild(lg);
+}
+
+function onNodeClick(id){
+  openApp('terminal');
+  focusWin('terminal');
+  const n=NETWORK[id];
+  if(connectedNode===id){
+    pline(`Already connected to ${n.label}`,'warn');
+  } else if(connectedNode){
+    pline(`[NET//MAP] ${n.label} — disconnect first`,'warn');
+  } else {
+    pline(`[NET//MAP] Selected: ${n.label} (${n.ip})  |  Type: connect ${id}`,'info');
+  }
+}
+
+function refreshNetmap(){
+  if(WINS['netmap']&&!WINS['netmap'].minimized)renderNetmap();
+}
+
+// ══════════════════════════════════════════════
+// MAIL
+// ══════════════════════════════════════════════
+function buildMail(body){
+  body.innerHTML=`<div class="ml-wrap"><div class="ml-list" id="ml-list"></div><div id="ml-view" class="mv-empty">SELECT A MESSAGE</div></div>`;
+  renderMailList();
+}
+function renderMailList(){
+  const p=document.getElementById('ml-list'); if(!p)return;
+  p.innerHTML=`<div class="ml-hdr">INBOX (${MAILS.filter(m=>m.unread).length} UNREAD)</div>`;
+  MAILS.forEach(m=>{
+    const el=document.createElement('div');
+    el.className=`mi ${m.unread?'unread':''} ${selMail===m.id?'sel':''}`;
+    el.innerHTML=`<div class="mitime">${m.time}</div><div class="mifrom">${m.from}</div><div class="misubj">${m.subj}</div>`;
+    el.onclick=()=>openMail(m.id);
+    p.appendChild(el);
+  });
+}
+function openMail(id){
+  selMail=id;
+  const m=MAILS.find(x=>x.id===id); if(!m)return;
+  m.unread=false; renderMailList();
+  const v=document.getElementById('ml-view'); if(!v)return;
+  v.className='mv';
+  v.innerHTML=`<div class="mv-subj">${m.subj}</div><div class="mv-meta">FROM: <span>${m.from}</span><br>TO: <span>${currentUser}</span><br>TIME: <span>${m.time}</span></div><div class="mv-body">${m.body.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>`;
+}
+
+// ══════════════════════════════════════════════
+// EXFIL VAULT
+// ══════════════════════════════════════════════
+function buildExfil(body){
+  body.innerHTML=`<div class="exfil-wrap" id="exfil-inner"></div>`;
+  refreshExfil();
+}
+function refreshExfil(){
+  const el=document.getElementById('exfil-inner'); if(!el)return;
+  if(!exfilVault.length){
+    el.innerHTML=`<div class="exfil-hdr">EXFIL// VAULT</div><div class="exfil-empty">No files exfiltrated yet.<br>Use: exfil [file] while connected to a node.</div>`;
+    return;
+  }
+  let html=`<div class="exfil-hdr">EXFIL// VAULT — ${exfilVault.length} FILE(S)</div>`;
+  exfilVault.forEach(f=>{
+    html+=`<div class="exfil-item"><div><div class="exfil-name">${f.name}</div><div style="font-size:8px;color:var(--text3);margin-top:2px;">FROM: ${f.from} (${f.ip})</div></div><div class="exfil-tag ${f.value}">${f.value.toUpperCase()}</div></div>`;
+  });
+  const total=exfilVault.filter(f=>f.value==='high').length;
+  html+=`<div style="margin-top:10px;padding:8px;background:var(--bg3);border:1px solid var(--border);font-size:9px;color:var(--text3);">HIGH-VALUE FILES: <span style="color:var(--amber)">${total}</span>  |  EST. VALUE: <span style="color:var(--green)">${exfilVault.length*400 + total*800} cr</span></div>`;
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════
+// MISSION
+// ══════════════════════════════════════════════
+function buildMission(body){
+  body.innerHTML=`<div class="mission-wrap" id="mission-inner"></div>`;
+  refreshMission();
+}
+function refreshMission(){
+  const el=document.getElementById('mission-inner'); if(!el)return;
+  const done=OBJECTIVES.filter(o=>o.done).length;
+  let html=`<div class="mission-title">OP-VORTEX</div>
+<div class="mission-sub">TARGET: AXIOM INDUSTRIES CORP  |  ${done}/${OBJECTIVES.length} OBJECTIVES</div>`;
+
+  OBJECTIVES.forEach(o=>{
+    html+=`<div class="obj-item">
+<div class="obj-check ${o.done?'done':''}">${o.done?'✓':''}</div>
+<div><div class="obj-text ${o.done?'done':''}">${o.text}</div>
+<div class="obj-hint">${o.hint}</div></div></div>`;
+  });
+
+  html+=`<div class="mission-reward">
+<div class="mission-reward-lbl">PAYOUT</div>
+<div class="mission-reward-val">4,200 cr base  +  800 cr clean exit bonus</div>
+</div>
+<div style="margin-top:8px;padding:8px;background:var(--bg3);border:1px solid var(--border);font-size:9px;color:var(--text3);">
+NETWORK PATH: GATEWAY → WEB-SRV → MAIL-SRV or DB-SRV → EXEC-TERM<br><br>
+HINT: Credentials are hidden across the network.<br>
+Read everything. The path reveals itself.
+</div>`;
+
+  if(done===OBJECTIVES.length){
+    html+=`<div style="margin-top:10px;padding:10px;background:var(--gbg);border:1px solid var(--gdim);font-size:11px;color:var(--green);letter-spacing:1px;">✓ ALL OBJECTIVES COMPLETE — OP-VORTEX SUCCESS</div>`;
+  }
+  el.innerHTML=html;
+}
+
+// ══════════════════════════════════════════════
+// SYSMON
+// ══════════════════════════════════════════════
+function buildSysmon(body){
+  body.innerHTML=`<div class="sm-body" id="sm-inner"></div>`;
+  refreshSysmon();
+  setInterval(refreshSysmon,2000);
+}
+function refreshSysmon(){
+  const el=document.getElementById('sm-inner'); if(!el)return;
+  const cpu=12+Math.floor(Math.random()*18);
+  const mem=40+Math.floor(Math.random()*10);
+  const net=connectedNode?25+Math.floor(Math.random()*35):0;
+  el.innerHTML=`
+<div><div class="sm-stitle">RESOURCES</div>
+<div class="sm-row"><span class="sm-k">CPU</span><span class="sm-v ${cpu>80?'warn':'ok'}">${cpu}%</span></div>
+<div class="btr"><div class="bfill ok" style="width:${cpu}%"></div></div>
+<div class="sm-row"><span class="sm-k">MEM</span><span class="sm-v">${mem}%</span></div>
+<div class="btr"><div class="bfill ok" style="width:${mem}%"></div></div>
+<div class="sm-row"><span class="sm-k">NET</span><span class="sm-v ${connectedNode?'warn':''}">${net} KB/s</span></div>
+<div class="btr"><div class="bfill ${connectedNode?'warn':'ok'}" style="width:${net}%"></div></div></div>
+<hr class="smdiv">
+<div><div class="sm-stitle">IDENTITY</div>
+<div class="sm-row"><span class="sm-k">ALIAS</span><span class="sm-v">${currentUser}</span></div>
+<div class="sm-row"><span class="sm-k">FACTION</span><span class="sm-v" style="color:var(--purple)">NULL SIGNAL</span></div>
+<div class="sm-row"><span class="sm-k">REP</span><span class="sm-v" style="color:var(--amber)">${rep} cr</span></div></div>
+<hr class="smdiv">
+<div><div class="sm-stitle">CONNECTION</div>
+<div class="sm-row"><span class="sm-k">NODE</span><span class="sm-v ${connectedNode?'warn':''}">${connectedNode?NETWORK[connectedNode].label:'—'}</span></div>
+<div class="sm-row"><span class="sm-k">PROXY</span><span class="sm-v warn">NONE</span></div></div>
+<hr class="smdiv">
+<div><div class="sm-stitle">TRACE</div>
+<div class="sm-row"><span class="sm-k">LEVEL</span><span class="sm-v ${traceLevel>70?'danger':traceLevel>40?'warn':'ok'}">${traceLevel.toFixed(1)}%</span></div>
+<div class="sm-row"><span class="sm-k">ACTIVE</span><span class="sm-v ${traceActive?'danger':'ok'}">${traceActive?'YES':'no'}</span></div>
+<div class="sm-row"><span class="sm-k">RISK</span><span class="sm-v ${traceLevel>70?'danger':traceLevel>40?'warn':'ok'}">${traceLevel>70?'CRITICAL':traceLevel>40?'ELEVATED':'LOW'}</span></div></div>
+<hr class="smdiv">
+<div><div class="sm-stitle">MISSION</div>
+<div class="sm-row"><span class="sm-k">OBJECTIVES</span><span class="sm-v ok">${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}</span></div>
+<div class="sm-row"><span class="sm-k">EXFIL</span><span class="sm-v">${exfilVault.length} file(s)</span></div></div>`;
+}
+
+// ══════════════════════════════════════════════
+// NOTIFICATION
+// ══════════════════════════════════════════════
+let notifTimeout=null;
+function notify(msg,type='info'){
+  const el=document.getElementById('notif');
+  document.getElementById('notif-txt').textContent=msg;
+  el.className=type; el.style.display='block';
+  if(notifTimeout)clearTimeout(notifTimeout);
+  notifTimeout=setTimeout(()=>{el.style.display='none';},3500);
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function resolveNode(arg){
+  if(!arg)return null;
+  const a=arg.toUpperCase();
+  // Direct ID match
+  if(NETWORK[a])return a;
+  // IP match
+  const byIP=Object.entries(NETWORK).find(([,n])=>n.ip===arg);
+  if(byIP)return byIP[0];
+  // Partial label match
+  const byLabel=Object.entries(NETWORK).find(([id,n])=>
+    id.toLowerCase().includes(arg.toLowerCase())||
+    n.label.toLowerCase().includes(arg.toLowerCase())
+  );
+  return byLabel?byLabel[0]:null;
+}
+
+// Objective: accessing EXEC-TERM counts as access objective
+const _origConnect=connect;
+function connect(args){
+  const id=resolveNode(args[0]);
+  _origConnect(args);
+  if(id==='EXEC-TERM'){
+    setTimeout(()=>{if(connectedNode==='EXEC-TERM')markObjective('access');},900);
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+window.onload=()=>runBoot();
+</script>
+</body>
+</html>
