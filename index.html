@@ -951,6 +951,8 @@ function cat(args){
   if(c.includes('AX-EXEC-'))notify('Intel extracted — exec token found in file','info');
   if(c.includes('Sull1van#2024'))notify('Credential found: ksullivan password extracted','info');
   if(c.includes('Ax10m_W3b!2024'))notify('Credential found: webapp DB password extracted','info');
+  // M3 — inline objective check for exec token
+  if(connectedNode && c.includes('AX-EXEC-7f3a9b2c1d')) markObjective('creds');
 }
 function mkdir(args){
   if(!args[0]){pline('mkdir: missing operand','err');return;}
@@ -1115,6 +1117,8 @@ function connect(args){
     document.getElementById('sb-path').querySelector('span').textContent=n.ip;
     startTrace();
     checkSecOnConnect(id);
+    // M3 — inline objective check for EXEC-TERM access
+    if(id==='EXEC-TERM') setTimeout(()=>{ if(connectedNode==='EXEC-TERM') markObjective('access'); },900);
     refreshNetmap();
     scrollT();
   },800);
@@ -1269,18 +1273,6 @@ function markObjective(id){
 function checkCleanObjective(){
   const cleaned=Object.keys(logsDeleted).filter(k=>logsDeleted[k]);
   if(cleaned.length>=2)markObjective('clean');
-}
-
-// Detect exec token access
-const _origCat=cat;
-function cat(args){
-  _origCat(args);
-  if(connectedNode){
-    const fs=getCFS();const target=resolvePath(args[0]);
-    if(fs[target]&&fs[target].content?.includes('AX-EXEC-7f3a9b2c1d')){
-      markObjective('creds');
-    }
-  }
 }
 
 // ══════════════════════════════════════════════
@@ -1631,16 +1623,6 @@ function resolveNode(arg){
     n.label.toLowerCase().includes(arg.toLowerCase())
   );
   return byLabel?byLabel[0]:null;
-}
-
-// Objective: accessing EXEC-TERM counts as access objective
-const _origConnect=connect;
-function connect(args){
-  const id=resolveNode(args[0]);
-  _origConnect(args);
-  if(id==='EXEC-TERM'){
-    setTimeout(()=>{if(connectedNode==='EXEC-TERM')markObjective('access');},900);
-  }
 }
 
 // ══════════════════════════════════════════════
