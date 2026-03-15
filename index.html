@@ -202,6 +202,100 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 /* ── NANO EDITOR ── */
 .nano-wrap{display:flex;flex-direction:column;height:100%;}
 .nano-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:4px 12px;font-size:9px;color:var(--text3);letter-spacing:2px;display:flex;justify-content:space-between;flex-shrink:0;}
+
+/* ── M7 TOOL ECOSYSTEM ── */
+.forge-wrap{display:flex;flex-direction:column;height:100%;}
+.forge-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+.forge-tab{padding:5px 12px;font-size:9px;letter-spacing:2px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;}
+.forge-tab:hover{color:var(--text2);}
+.forge-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.forge-body{flex:1;overflow-y:auto;padding:10px;}
+/* Tool card */
+.tool-card{border:1px solid var(--border);background:var(--bg3);padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:all .1s;position:relative;}
+.tool-card:hover{border-color:var(--border2);background:var(--bg4);}
+.tool-card.selected{border-color:var(--cyan);background:var(--cglow);}
+.tool-card.equipped{border-color:var(--green);background:var(--gbg);}
+.tool-card.locked{opacity:.4;cursor:not-allowed;}
+.tool-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.tool-name{font-size:11px;color:var(--text);font-weight:500;}
+.tool-tier{font-size:8px;padding:1px 5px;letter-spacing:1px;}
+.tool-tier.t1{color:var(--text3);background:var(--bg4);}
+.tool-tier.t2{color:var(--cyan);background:var(--cglow);}
+.tool-tier.t3{color:var(--purple);background:var(--pbg);}
+.tool-tier.t4{color:var(--amber);background:var(--abg);}
+.tool-cat{font-size:8px;color:var(--text3);margin-left:auto;}
+.tool-desc{font-size:9px;color:var(--text3);line-height:1.5;margin-bottom:4px;}
+.tool-effect{font-size:9px;color:var(--cyan);font-family:var(--mono);}
+.tool-cost{font-size:9px;color:var(--amber);position:absolute;top:8px;right:10px;}
+.tool-owned{font-size:9px;color:var(--green);position:absolute;top:8px;right:10px;}
+/* Loadout slots */
+.loadout-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;}
+.loadout-slot{border:1px dashed var(--border2);padding:8px;min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;transition:all .1s;position:relative;}
+.loadout-slot:hover{border-color:var(--cyan3);background:var(--cglow);}
+.loadout-slot.filled{border-style:solid;border-color:var(--green);background:var(--gbg);}
+.loadout-slot.filled:hover{border-color:var(--red);background:var(--rbg);}
+.slot-label{font-size:8px;color:var(--text3);letter-spacing:1px;margin-bottom:3px;}
+.slot-tool-name{font-size:9px;color:var(--green);text-align:center;}
+.slot-empty{font-size:8px;color:var(--text3);letter-spacing:1px;}
+.slot-remove{font-size:8px;color:var(--red);position:absolute;top:3px;right:5px;cursor:pointer;}
+/* Synergy badge */
+.synergy-banner{padding:6px 8px;background:var(--pbg);border:1px solid rgba(163,113,247,.4);margin-bottom:8px;font-size:9px;color:var(--purple);letter-spacing:1px;}
+.synergy-banner strong{color:var(--purple);}
+/* Credits display */
+.credits-display{font-size:11px;color:var(--amber);font-family:var(--mono);margin-bottom:10px;padding:6px 8px;background:var(--abg);border:1px solid var(--adim);}
+/* Market */
+.market-refresh{font-size:8px;color:var(--text3);margin-bottom:8px;letter-spacing:1px;}
+.market-refresh span{color:var(--cyan);cursor:pointer;}
+.market-refresh span:hover{color:var(--text2);}
+
+/* Death screen */
+#death-screen{position:fixed;inset:0;background:#000;z-index:5000;display:none;flex-direction:column;justify-content:center;align-items:center;padding:60px;}
+#death-screen.show{display:flex;animation:fadeIn .8s ease;}
+.death-title{font-size:48px;font-weight:700;color:var(--red);letter-spacing:8px;font-family:var(--mono);margin-bottom:8px;}
+.death-sub{font-size:13px;color:var(--text3);letter-spacing:4px;margin-bottom:48px;}
+.death-cause{font-size:12px;color:var(--amber);background:var(--abg);border:1px solid var(--adim);padding:8px 20px;margin-bottom:32px;letter-spacing:2px;}
+.death-stats{width:500px;margin-bottom:40px;}
+.death-stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.death-stat-key{color:var(--text3);}
+.death-stat-val{color:var(--text2);}
+.death-stat-val.good{color:var(--green);}
+.death-stat-val.bad{color:var(--red);}
+.death-alias-new{font-size:11px;color:var(--text3);margin-bottom:24px;letter-spacing:2px;}
+.death-alias-new span{color:var(--cyan);}
+.death-btn{background:transparent;border:1px solid var(--cyan3);color:var(--cyan);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:4px;padding:12px 32px;cursor:pointer;transition:all .15s;}
+.death-btn:hover{background:var(--cglow);border-color:var(--cyan);}
+/* Run complete screen */
+#run-complete{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:4500;display:none;flex-direction:column;justify-content:center;align-items:center;padding:60px;}
+#run-complete.show{display:flex;animation:fadeIn .5s ease;}
+.rc-title{font-size:32px;font-weight:700;color:var(--green);letter-spacing:6px;font-family:var(--mono);margin-bottom:8px;}
+.rc-sub{font-size:11px;color:var(--text3);letter-spacing:3px;margin-bottom:40px;}
+.rc-stats{width:480px;margin-bottom:32px;}
+.rc-stat-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.rc-btn{background:var(--gdim);border:none;color:var(--text);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:3px;padding:10px 28px;cursor:pointer;margin:4px;transition:background .15s;}
+.rc-btn:hover{background:var(--green);}
+.rc-btn.secondary{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.rc-btn.secondary:hover{border-color:var(--cyan);color:var(--cyan);}
+/* META// app */
+.meta-wrap{padding:12px;font-size:10px;overflow-y:auto;}
+.meta-section{margin-bottom:14px;}
+.meta-section-hdr{font-size:8px;letter-spacing:3px;color:var(--text3);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.meta-row{display:flex;justify-content:space-between;padding:4px 0;}
+.meta-key{color:var(--text3);}
+.meta-val{color:var(--text2);}
+.meta-val.highlight{color:var(--cyan);}
+.meta-val.good{color:var(--green);}
+.meta-val.warn{color:var(--amber);}
+.alias-history-item{padding:4px 6px;border-left:2px solid var(--border);margin-bottom:3px;font-size:9px;color:var(--text3);}
+.alias-history-item.current{border-color:var(--cyan);color:var(--text2);}
+.alias-history-item.burned{border-color:var(--red);}
+/* Run number badge in taskbar */
+#tb-run{font-size:9px;color:var(--text3);}
+#tb-run span{color:var(--amber);}
+/* Contract difficulty badges */
+.contract-easy{color:var(--green);font-size:8px;padding:1px 4px;background:var(--gbg);}
+.contract-med{color:var(--amber);font-size:8px;padding:1px 4px;background:var(--abg);}
+.contract-hard{color:var(--red);font-size:8px;padding:1px 4px;background:var(--rbg);}
+
 .nano-header span{color:var(--cyan);}
 .nano-body{flex:1;position:relative;}
 #nano-ta{width:100%;height:100%;background:var(--bg);border:none;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;resize:none;line-height:1.7;caret-color:var(--cyan);}
@@ -336,6 +430,27 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 </head>
 <body>
 
+<!-- M6 DEATH SCREEN -->
+<div id="death-screen">
+  <div class="death-title">IDENTITY BURNED</div>
+  <div class="death-sub">YOUR ALIAS HAS BEEN COMPROMISED</div>
+  <div class="death-cause" id="death-cause">CAUSE: TRACE COMPLETE</div>
+  <div class="death-stats" id="death-stats"></div>
+  <div class="death-alias-new">NEW ALIAS ASSIGNED: <span id="death-new-alias">—</span></div>
+  <button class="death-btn" onclick="startNewRun()">BEGIN NEW RUN ›</button>
+</div>
+
+<!-- M6 RUN COMPLETE -->
+<div id="run-complete">
+  <div class="rc-title">RUN COMPLETE</div>
+  <div class="rc-sub" id="rc-sub">OP-VORTEX SUCCESSFUL</div>
+  <div class="rc-stats" id="rc-stats"></div>
+  <div>
+    <button class="rc-btn" onclick="startNewRun()">NEW RUN ›</button>
+    <button class="rc-btn secondary" onclick="closeRunComplete()">CONTINUE EXPLORING</button>
+  </div>
+</div>
+
 <div id="phish-outcome"></div>
 <div id="impersonate-bar"><span>IMPERSONATING:</span><span id="impersonate-name">—</span><span style="margin-left:auto;opacity:.6;">all outbound mail sent as this identity</span></div>
 
@@ -353,12 +468,12 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 <div id="scanlines"></div>
 
 <!-- BOOT -->
-<div id="boot"><div id="blines"></div><div id="bbar"><div id="bbar-lbl">LOADING NULL//TRACE OS v0.5...</div><div id="bbar-t"><div id="bbar-f"></div></div></div></div>
+<div id="boot"><div id="blines"></div><div id="bbar"><div id="bbar-lbl">LOADING NULL//TRACE OS v0.7...</div><div id="bbar-t"><div id="bbar-f"></div></div></div></div>
 
 <!-- LOGIN -->
 <div id="login">
   <div class="ll">NULL//TRACE</div>
-  <div class="lv">OS v0.5.0 — M5 BUILD</div>
+  <div class="lv">OS v0.7.0 — M7 BUILD</div>
   <div class="lbox">
     <div class="lf"><label class="llbl">ALIAS</label><input class="li" id="lu" type="text" value="ghost_0x1" autocomplete="off" spellcheck="false" tabindex="1"></div>
     <div class="lf"><label class="llbl">PASSPHRASE</label><input class="li" id="lp" type="password" autocomplete="off" tabindex="2"></div>
@@ -378,9 +493,11 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
         <button class="tab" onclick="openApp('netmap')">NET//MAP</button>
         <button class="tab" onclick="openApp('mail')">MAIL//</button>
         <button class="tab" onclick="openApp('phish')">PHISH//</button>
+        <button class="tab" onclick="openApp('forge')">FORGE//</button>
         <button class="tab" onclick="openApp('exfil')">EXFIL//</button>
         <button class="tab" onclick="openApp('intel')">INTEL//</button>
         <button class="tab" onclick="openApp('mission')">MISSION//</button>
+        <button class="tab" onclick="openApp('meta')">META//</button>
         <button class="tab" onclick="openApp('secmon')">SEC//MON</button>
         <button class="tab" onclick="openApp('sysmon')">SYS//</button>
       </div>
@@ -389,6 +506,7 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
       <div class="tbs" id="tb-proxy">PROXY:<span>NONE</span></div>
       <div class="tbs" id="tb-conn">CONN:<span>OFFLINE</span></div>
       <div class="tbs" id="tb-rep">REP:<span>0</span></div>
+      <div id="tb-run">RUN:<span>1</span></div>
       <div id="tb-clk">00:00:00</div>
     </div>
   </div>
@@ -728,7 +846,7 @@ const LFS = {
   '/home/ghost_0x1/intel/exfil':{t:'d'},
   '/home/ghost_0x1/logs':{t:'d'},
   '/home/ghost_0x1/logs/ops.log':{t:'f',content:`[00:00:01] OS initialized — ghost_0x1\n[00:00:02] Contract received: OP-VORTEX\n[00:00:03] Target network: Axiom Corp\n[00:00:04] Awaiting operator action`},
-  '/home/ghost_0x1/README.md':{t:'f',content:`NULL//TRACE v0.5 — OPERATOR REFERENCE\n\nFILESYSTEM:\n  ls [path]         list directory contents\n  cd [path]         change directory (.. to go up)\n  cat [file]        read file contents\n  mkdir [name]      create directory\n  touch [name]      create file\n  rm [name]         remove file or empty directory\n  pwd               print working directory\n  nano [file]       open text editor (^S save, ^N sticky)\n  note [file]       pin file as sticky note\n\nSYSTEM:\n  whoami            current identity\n  ifconfig          network interfaces\n  status            connection & system status\n  uname             kernel info\n  history           command history\n  clear             clear terminal\n\nNETWORK:\n  nodes             list all network nodes\n  scan [host]       probe target for open services\n  connect [host]    connect to remote host\n  disconnect        close active connection\n  fw-unlock [node] [user] [pass]\n  secstate          security state of all nodes\n\nOPERATIONS:\n  crack [file]      run password cracker\n  exfil [file]      exfiltrate file to vault\n  rm-logs           delete session logs on node\n\nSHORTCUTS:\n  open [app]        open any app (mail, netmap, intel...)\n  Ctrl+Space        command palette\n  Ctrl+T            new terminal window\n  Tab               autocomplete command or filename`},
+  '/home/ghost_0x1/README.md':{t:'f',content:`NULL//TRACE v0.7 — OPERATOR REFERENCE\n\nFILESYSTEM:\n  ls [path]         list directory contents\n  cd [path]         change directory (.. to go up)\n  cat [file]        read file contents\n  mkdir [name]      create directory\n  touch [name]      create file\n  rm [name]         remove file or empty directory\n  pwd               print working directory\n  nano [file]       open text editor (^S save, ^N sticky)\n  note [file]       pin file as sticky note\n\nSYSTEM:\n  whoami            current identity\n  ifconfig          network interfaces\n  status            connection & system status\n  uname             kernel info\n  history           command history\n  clear             clear terminal\n\nNETWORK:\n  nodes             list all network nodes\n  scan [host]       probe target for open services\n  connect [host]    connect to remote host\n  disconnect        close active connection\n  fw-unlock [node] [user] [pass]\n  secstate          security state of all nodes\n\nOPERATIONS:\n  crack [file]      run password cracker\n  exfil [file]      exfiltrate file to vault\n  rm-logs           delete session logs on node\n\nSHORTCUTS:\n  open [app]        open any app (mail, netmap, intel...)\n  Ctrl+Space        command palette\n  Ctrl+T            new terminal window\n  Tab               autocomplete command or filename`},
 };
 
 // ══════════════════════════════════════════════
@@ -777,7 +895,7 @@ const BOOTLINES = [
   {t:'[  OK  ] Admin alert system online',c:'ok',d:1060},
   {t:'[  OK  ] Exfil vault initialized',c:'ok',d:1160},
   {t:'',c:'',d:1260},
-  {t:'NULL//TRACE v0.5 :: ALL SYSTEMS NOMINAL',c:'cyan',d:1340},
+  {t:'NULL//TRACE v0.7 :: ALL SYSTEMS NOMINAL',c:'cyan',d:1340},
 ];
 
 function runBoot(){
@@ -875,6 +993,8 @@ const WDEFS={
   secmon:  {title:'SEC//MON — SECURITY',  w:340,h:420,x:460,y:90},
   sysmon:  {title:'SYS// — MONITOR',      w:300,h:360,x:300,y:90},
   phish:   {title:'PHISH// — SOCIAL ENGINEERING', w:620,h:460,x:130,y:65},
+  forge:   {title:'FORGE// — TOOL ECOSYSTEM',     w:560,h:480,x:145,y:60},
+  meta:    {title:'META// — PERSISTENT PROGRESS',  w:380,h:460,x:150,y:70},
   intel:   {title:'INTEL// — DATABASE',   w:400,h:440,x:120,y:80},
 };
 
@@ -993,6 +1113,8 @@ function buildApp(id){
   else if(id==='secmon')buildSecmon(body);
   else if(id==='sysmon')buildSysmon(body);
   else if(id==='intel')buildIntel(body);
+  else if(id==='meta')buildMeta(body);
+  else if(id==='forge')buildForge(body);
   else if(id.startsWith('nano-'))buildNano(body,id);
   else if(id.startsWith('note-'))buildNote(body,id);
 }
@@ -1012,13 +1134,13 @@ function buildTerminal(body, winId='terminal'){
   const isFirst=winId==='terminal';
   tPrintTo(winId,[
     {t:'╔═══════════════════════════════════════════╗',c:'cyan'},
-    {t:'║   NULL//TRACE OS v0.5  —  M5b BUILD       ║',c:'cyan'},
-    {t:'║   Social Engineering + Impersonation      ║',c:'cyan'},
+    {t:'║   NULL//TRACE OS v0.7  —  M7 BUILD        ║',c:'cyan'},
+    {t:'║   Tool Ecosystem ONLINE                   ║',c:'cyan'},
     {t:'╚═══════════════════════════════════════════╝',c:'cyan'},
     {t:'',c:'blank'},
     {t:`Identity: ${currentUser}`,c:'ok'},
     {t:`Ctrl+Space: command palette  |  Ctrl+T: new terminal`,c:'info'},
-    {t:`NEW: login [user] [pass]  |  logout  |  MAIL// compose tab`,c:'info'},
+    {t:`NEW: FORGE// — buy tools, build loadout, activate synergies`,c:'info'},
     {t:`Type 'help' for all commands`,c:'dim'},
     {t:'',c:'blank'},
   ]);
@@ -1181,6 +1303,8 @@ const PALETTE_ITEMS=[
   {icon:'@',  name:'MAIL//',             hint:'inbox',        action:()=>openApp('mail')},
   {icon:'✉',  name:'PHISH//',            hint:'social eng',   action:()=>openApp('phish')},
   {icon:'◈',  name:'SEC//MON',           hint:'security',     action:()=>openApp('secmon')},
+  {icon:'⚒',  name:'FORGE//',            hint:'tool ecosystem', action:()=>openApp('forge')},
+  {icon:'≋',  name:'META//',             hint:'persistent progress', action:()=>openApp('meta')},
   {icon:'◎',  name:'MISSION//',          hint:'objectives',   action:()=>openApp('mission')},
   {icon:'↑',  name:'EXFIL// Vault',      hint:'stolen files', action:()=>openApp('exfil')},
   {icon:'i',  name:'INTEL//',            hint:'intelligence', action:()=>openApp('intel')},
@@ -1509,7 +1633,7 @@ function genOrg(seed=Date.now()){
 let proceduralOrg=null;
 
 function initProceduralOrg(){
-  proceduralOrg=genOrg(42);  // seeded for consistency per session
+  proceduralOrg=genOrg(runSeed);  // seeded for consistency per session
   const org=proceduralOrg;
   // Register as a new network node
   NETWORK[`PROC-ORG`]={
@@ -1778,6 +1902,10 @@ function calcSuccessChance(template, target, fromImpersonation, personalTokens){
 
   // Required personal data penalty
   if(template.requiresPersonalData && tokenCount<2) score-=20;
+
+  // M7 — apply active phish tool bonus
+  const toolPhishBonus = getActiveStats().phishBonus;
+  score = score * toolPhishBonus;
 
   return Math.max(5, Math.min(95, score));
 }
@@ -2098,6 +2226,698 @@ function onPhishSend(){
 
 // ── Wire trust graph into proc org on generation ──
 // (called at end of initProceduralOrg — patched below)
+
+// ══════════════════════════════════════════════
+// M7 — TOOL CATALOG
+// ══════════════════════════════════════════════
+
+const TOOL_CATALOG = [
+  // ── SCANNER ──
+  { id:'scan_basic',    name:'PortScan Basic',    cat:'SCANNER', tier:1, cost:0,    owned:true,
+    desc:'Default port scanner. Identifies open services on target nodes.',
+    effect:'Scan speed: standard', stat:{scanSpeed:1.0} },
+  { id:'scan_stealth',  name:'GhostScan',         cat:'SCANNER', tier:2, cost:600,  owned:false,
+    desc:'Low-noise scanner. Reduces trace bump on scan by 50%.',
+    effect:'Scan trace: -50%', stat:{scanTrace:0.5} },
+  { id:'scan_deep',     name:'DeepProbe v2',       cat:'SCANNER', tier:3, cost:1400, owned:false,
+    desc:'Reveals hidden services, internal IPs, and OS fingerprints missed by basic scan.',
+    effect:'Reveals hidden services + OS detail', stat:{scanDepth:2} },
+
+  // ── CRACKER ──
+  { id:'crack_basic',   name:'PassCrack v1',       cat:'CRACKER', tier:1, cost:0,    owned:true,
+    desc:'Basic dictionary cracker. Slow but reliable on weak passwords.',
+    effect:'Crack speed: 1x', stat:{crackSpeed:1.0} },
+  { id:'crack_v2',      name:'PassCrack v2',        cat:'CRACKER', tier:2, cost:800,  owned:false,
+    desc:'Improved cracker with pattern analysis. 60% faster on personal-data passwords.',
+    effect:'Crack speed: 1.6x', stat:{crackSpeed:1.6} },
+  { id:'crack_gpu',     name:'GPUForce',            cat:'CRACKER', tier:3, cost:1800, owned:false,
+    desc:'GPU-accelerated. Near-instant on weak passwords. Very noisy.',
+    effect:'Crack speed: 4x  |  +15% trace on use', stat:{crackSpeed:4.0, crackTrace:1.15} },
+  { id:'passwd_dict',   name:'PersonaDict',         cat:'CRACKER', tier:2, cost:700,  owned:false,
+    desc:'Custom wordlist seeded from gathered personal data. Synergises with PassCrack v2.',
+    effect:'+30% crack success on personal passwords', stat:{crackBonus:1.3} },
+
+  // ── EXFIL ──
+  { id:'exfil_basic',   name:'DataPull v1',         cat:'EXFIL',   tier:1, cost:0,    owned:true,
+    desc:'Basic file exfiltration. Noisy — adds +6% trace per file.',
+    effect:'Exfil trace bump: +6%', stat:{exfilTrace:6} },
+  { id:'exfil_quiet',   name:'QuietPull',            cat:'EXFIL',   tier:2, cost:900,  owned:false,
+    desc:'Throttled transfer. Much quieter — reduces trace bump to +2% per file.',
+    effect:'Exfil trace bump: +2%', stat:{exfilTrace:2} },
+  { id:'exfil_burst',   name:'BurstPull',            cat:'EXFIL',   tier:3, cost:1600, owned:false,
+    desc:'Bulk exfil in one burst. Steal multiple files instantly. Very noisy.',
+    effect:'Multi-file exfil  |  trace bump: +15% flat', stat:{exfilTrace:15, exfilBurst:true} },
+  { id:'exfil_encrypt', name:'CryptoPull',           cat:'EXFIL',   tier:3, cost:2000, owned:false,
+    desc:'Encrypted exfil channel. Stolen files unreadable to network defenders.',
+    effect:'Exfil undetectable  |  trace bump: +1%', stat:{exfilTrace:1, exfilStealth:true} },
+
+  // ── STEALTH ──
+  { id:'proxy_basic',   name:'ProxyChain v1',        cat:'STEALTH', tier:1, cost:0,    owned:true,
+    desc:'Single-hop proxy. Buys time but one layer is trivial to burn through.',
+    effect:'Trace rate: -10%', stat:{traceRate:0.9} },
+  { id:'proxy_v2',      name:'ProxyChain v2',         cat:'STEALTH', tier:2, cost:700,  owned:false,
+    desc:'Three-hop chain. Significantly slows trace rate.',
+    effect:'Trace rate: -25%', stat:{traceRate:0.75} },
+  { id:'logscrub',      name:'LogScrub Auto',         cat:'STEALTH', tier:2, cost:1000, owned:false,
+    desc:'Auto-deletes session logs on disconnect. No need to manually rm-logs.',
+    effect:'Auto rm-logs on disconnect', stat:{autoLogScrub:true} },
+  { id:'tracekill',     name:'TraceKill',             cat:'STEALTH', tier:3, cost:2200, owned:false,
+    desc:'Emergency trace reset. One-use per run. Resets trace to 0 instantly.',
+    effect:'One-use: reset trace to 0', stat:{traceKill:true}, uses:1 },
+  { id:'ghostmode',     name:'GhostMode',             cat:'STEALTH', tier:4, cost:3500, owned:false,
+    desc:'Total trace suppression for 30 seconds. Rare and expensive.',
+    effect:'30s zero trace window', stat:{ghostMode:30} },
+
+  // ── SOCIAL ──
+  { id:'phish_kit_v1',  name:'PhishKit Basic',        cat:'SOCIAL',  tier:1, cost:0,    owned:true,
+    desc:'Default phishing templates. Standard success rates.',
+    effect:'Phish success: base rate', stat:{phishBonus:1.0} },
+  { id:'phish_kit_v2',  name:'PhishKit Pro',           cat:'SOCIAL',  tier:2, cost:800,  owned:false,
+    desc:'Polished templates with better visual design. +15% success on all phish.',
+    effect:'+15% phish success rate', stat:{phishBonus:1.15} },
+  { id:'persona_gen',   name:'PersonaForge',           cat:'SOCIAL',  tier:3, cost:1800, owned:false,
+    desc:'Generates convincing fake personas. Makes impersonation attempts much harder to detect.',
+    effect:'+25% impersonation success', stat:{impersonateBonus:1.25} },
+  { id:'osint_pack',    name:'OSINT Pack',             cat:'SOCIAL',  tier:2, cost:900,  owned:false,
+    desc:'Deep personal data harvesting. Fills in unknown tokens automatically.',
+    effect:'All persona tokens auto-resolved', stat:{osintAuto:true} },
+];
+
+// Synergy definitions — which tool combos trigger bonuses
+const TOOL_SYNERGIES = [
+  { tools:['crack_v2','passwd_dict'],        name:'Targeted Cracker', desc:'+20% crack speed on personal-data passwords', bonus:{crackSpeed:0.2} },
+  { tools:['exfil_quiet','logscrub'],        name:'Ghost Exfil',      desc:'Exfil leaves zero trace in logs', bonus:{exfilStealth:true} },
+  { tools:['proxy_v2','tracekill'],          name:'Double Cover',     desc:'TraceKill recharges once per run instead of once total', bonus:{traceKillRecharge:true} },
+  { tools:['phish_kit_v2','osint_pack'],     name:'Precision Lure',   desc:'+35% phish success on all targets', bonus:{phishBonus:0.35} },
+  { tools:['scan_stealth','proxy_v2'],       name:'Shadow Recon',     desc:'Scanning never triggers security state change', bonus:{silentScan:true} },
+  { tools:['crack_gpu','exfil_burst'],       name:'Smash and Grab',   desc:'Loud but fast — crack+exfil in one action', bonus:{smashGrab:true} },
+  { tools:['persona_gen','phish_kit_v2','osint_pack'], name:'Master Manipulator', desc:'All social engineering success rates capped at 90%', bonus:{socialCap:0.9} },
+];
+
+// ── Loadout state ──
+const MAX_LOADOUT = 6;
+let loadout = ['scan_basic','crack_basic','exfil_basic','proxy_basic','phish_kit_v1',null];
+let ownedTools = TOOL_CATALOG.filter(t=>t.owned).map(t=>t.id);
+let marketInventory = [];  // refreshed each run
+let credits = 0;           // spendable credits (subset of rep)
+
+// ── Computed active stats from loadout ──
+function getActiveStats(){
+  const stats = {
+    crackSpeed:   1.0,
+    crackBonus:   1.0,
+    crackTrace:   1.0,
+    traceRate:    1.0,
+    exfilTrace:   6,
+    exfilBurst:   false,
+    exfilStealth: false,
+    scanTrace:    1.0,
+    scanDepth:    1,
+    phishBonus:   1.0,
+    impersonateBonus: 1.0,
+    autoLogScrub: false,
+    traceKill:    false,
+    traceKillUsed:false,
+    ghostMode:    0,
+    ghostActive:  false,
+    silentScan:   false,
+    osintAuto:    false,
+    smashGrab:    false,
+  };
+  loadout.filter(Boolean).forEach(id=>{
+    const t = TOOL_CATALOG.find(t=>t.id===id);
+    if(!t||!t.stat) return;
+    if(t.stat.crackSpeed)   stats.crackSpeed   = Math.max(stats.crackSpeed,  t.stat.crackSpeed);
+    if(t.stat.crackBonus)   stats.crackBonus  *= t.stat.crackBonus;
+    if(t.stat.crackTrace)   stats.crackTrace   = Math.max(stats.crackTrace,  t.stat.crackTrace);
+    if(t.stat.traceRate)    stats.traceRate    = Math.min(stats.traceRate,   t.stat.traceRate);
+    if(t.stat.exfilTrace!==undefined) stats.exfilTrace = Math.min(stats.exfilTrace, t.stat.exfilTrace);
+    if(t.stat.exfilBurst)   stats.exfilBurst   = true;
+    if(t.stat.exfilStealth) stats.exfilStealth = true;
+    if(t.stat.scanTrace)    stats.scanTrace    = Math.min(stats.scanTrace,   t.stat.scanTrace);
+    if(t.stat.scanDepth)    stats.scanDepth    = Math.max(stats.scanDepth,   t.stat.scanDepth);
+    if(t.stat.phishBonus)   stats.phishBonus   = Math.max(stats.phishBonus,  t.stat.phishBonus);
+    if(t.stat.impersonateBonus) stats.impersonateBonus = Math.max(stats.impersonateBonus, t.stat.impersonateBonus);
+    if(t.stat.autoLogScrub) stats.autoLogScrub = true;
+    if(t.stat.traceKill)    stats.traceKill    = true;
+    if(t.stat.ghostMode)    stats.ghostMode    = Math.max(stats.ghostMode, t.stat.ghostMode);
+    if(t.stat.osintAuto)    stats.osintAuto    = true;
+  });
+  // Apply synergy bonuses
+  getActiveSynergies().forEach(syn=>{
+    if(syn.bonus.crackSpeed)  stats.crackSpeed  += syn.bonus.crackSpeed;
+    if(syn.bonus.phishBonus)  stats.phishBonus  += syn.bonus.phishBonus;
+    if(syn.bonus.exfilStealth) stats.exfilStealth = true;
+    if(syn.bonus.silentScan)  stats.silentScan  = true;
+    if(syn.bonus.smashGrab)   stats.smashGrab   = true;
+    if(syn.bonus.traceKillRecharge) stats.traceKillRecharge = true;
+  });
+  return stats;
+}
+
+function getActiveSynergies(){
+  return TOOL_SYNERGIES.filter(syn =>
+    syn.tools.every(id => loadout.includes(id))
+  );
+}
+
+// ── Market generation ──
+function generateMarket(){
+  // Pick 5 random unowned tools, weighted toward lower tiers
+  const available = TOOL_CATALOG.filter(t=>
+    !ownedTools.includes(t.id) &&
+    t.cost > 0
+  );
+  // Shuffle with tier weighting
+  const weighted = [];
+  available.forEach(t=>{
+    const weight = 5 - t.tier; // tier1=4, tier2=3, tier3=2, tier4=1
+    for(let i=0;i<weight;i++) weighted.push(t);
+  });
+  // Pick 5 unique
+  const seen = new Set();
+  marketInventory = [];
+  for(let i=0;i<weighted.length && marketInventory.length<5;i++){
+    const idx = Math.floor(Math.random()*weighted.length);
+    const tool = weighted[idx];
+    if(!seen.has(tool.id)){ seen.add(tool.id); marketInventory.push(tool); }
+  }
+}
+
+// ── Buy tool ──
+function buyTool(toolId){
+  const tool = TOOL_CATALOG.find(t=>t.id===toolId);
+  if(!tool){ notify('Unknown tool','err'); return; }
+  if(ownedTools.includes(toolId)){ notify('Already owned','warn'); return; }
+  if(credits < tool.cost){ notify(`Need ${tool.cost} cr — have ${credits} cr`,'warn'); return; }
+  credits -= tool.cost;
+  rep = Math.max(0, rep - tool.cost);
+  ownedTools.push(toolId);
+  tool.owned = true;
+  // Update rep display
+  document.getElementById('tb-rep')?.querySelector('span') &&
+    (document.getElementById('tb-rep').querySelector('span').textContent = rep);
+  notify(`Purchased: ${tool.name}`,'ok');
+  refreshForge();
+  addIntel('files', {key:tool.name, val:`Tool acquired — ${tool.cat} T${tool.tier}`});
+}
+
+// ── Equip/unequip tool ──
+function equipTool(toolId){
+  if(loadout.includes(toolId)){
+    // Unequip
+    const idx = loadout.indexOf(toolId);
+    loadout[idx] = null;
+    notify(`Unequipped: ${TOOL_CATALOG.find(t=>t.id===toolId)?.name}`,'info');
+  } else {
+    // Find first empty slot
+    const emptyIdx = loadout.indexOf(null);
+    if(emptyIdx === -1){ notify('Loadout full — unequip a tool first','warn'); return; }
+    loadout[emptyIdx] = toolId;
+    notify(`Equipped: ${TOOL_CATALOG.find(t=>t.id===toolId)?.name}`,'ok');
+  }
+  refreshForge();
+}
+
+// ── TraceKill active tool ──
+function useTraceKill(){
+  const stats = getActiveStats();
+  if(!stats.traceKill){ pline('traceKill: no TraceKill tool equipped','err'); return; }
+  if(stats.traceKillUsed){ pline('traceKill: already used this run','err'); return; }
+  // Mark used
+  const tk = TOOL_CATALOG.find(t=>t.id==='tracekill');
+  if(tk) tk.uses = (tk.uses||1) - 1;
+  // Find the stat tracker
+  getActiveStats().traceKillUsed = true;
+  traceLevel = 0;
+  updateTraceUI();
+  plines([{t:'',c:'blank'},{t:'[+] TRACEKILL ACTIVATED — trace reset to 0%',c:'ok'},{t:'',c:'blank'}]);
+  notify('TraceKill used — trace reset','ok');
+  refreshForge();
+}
+
+// ══════════════════════════════════════════════
+// M7 — FORGE// APP
+// ══════════════════════════════════════════════
+
+let forgeTab = 'loadout';
+
+function buildForge(body){
+  body.innerHTML=`
+<div class="forge-wrap">
+  <div class="forge-tabs">
+    <div class="forge-tab active" id="ftab-loadout"  onclick="switchForgeTab('loadout')">LOADOUT</div>
+    <div class="forge-tab"        id="ftab-inventory" onclick="switchForgeTab('inventory')">INVENTORY</div>
+    <div class="forge-tab"        id="ftab-market"   onclick="switchForgeTab('market')">MARKET</div>
+  </div>
+  <div class="forge-body" id="forge-body"></div>
+</div>`;
+  generateMarket();
+  renderForgeTab();
+}
+
+function switchForgeTab(tab){
+  forgeTab = tab;
+  ['loadout','inventory','market'].forEach(t=>{
+    document.getElementById(`ftab-${t}`)?.classList.toggle('active', t===tab);
+  });
+  renderForgeTab();
+}
+
+function renderForgeTab(){
+  const body = document.getElementById('forge-body'); if(!body) return;
+  if(forgeTab==='loadout')   renderLoadout(body);
+  else if(forgeTab==='inventory') renderInventory(body);
+  else if(forgeTab==='market')    renderMarket(body);
+}
+
+function renderLoadout(body){
+  const stats = getActiveStats();
+  const synergies = getActiveSynergies();
+
+  let html = `<div style="font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:8px;">ACTIVE LOADOUT — ${loadout.filter(Boolean).length}/${MAX_LOADOUT} SLOTS</div>`;
+
+  // Synergy banners
+  synergies.forEach(syn=>{
+    html+=`<div class="synergy-banner">⚡ <strong>${syn.name}</strong> — ${syn.desc}</div>`;
+  });
+
+  // Loadout grid
+  html += `<div class="loadout-grid">`;
+  loadout.forEach((toolId, idx)=>{
+    const tool = toolId ? TOOL_CATALOG.find(t=>t.id===toolId) : null;
+    if(tool){
+      html+=`<div class="loadout-slot filled" onclick="equipTool('${toolId}')">
+<span class="slot-remove" onclick="event.stopPropagation();equipTool('${toolId}')">✕</span>
+<span class="slot-label">${tool.cat}</span>
+<span class="slot-tool-name">${tool.name}</span>
+<span class="tool-effect" style="font-size:8px;">${tool.effect}</span>
+</div>`;
+    } else {
+      html+=`<div class="loadout-slot" onclick="switchForgeTab('inventory')">
+<span class="slot-empty">+ EMPTY</span>
+</div>`;
+    }
+  });
+  html += `</div>`;
+
+  // Active stats summary
+  html += `<div style="font-size:8px;letter-spacing:2px;color:var(--text3);margin:10px 0 6px;">ACTIVE STATS</div>
+<div style="font-size:9px;font-family:var(--mono);color:var(--text2);line-height:2;">
+  Crack speed: <span style="color:var(--cyan)">${stats.crackSpeed.toFixed(1)}x</span> &nbsp;
+  Trace rate: <span style="color:${stats.traceRate<1?'var(--green)':'var(--text2)'}">${Math.round(stats.traceRate*100)}%</span> &nbsp;
+  Exfil trace: <span style="color:${stats.exfilTrace<6?'var(--green)':'var(--text2)'}">+${stats.exfilTrace}%</span><br>
+  Phish bonus: <span style="color:var(--cyan)">${Math.round(stats.phishBonus*100)}%</span> &nbsp;
+  Auto log-scrub: <span style="color:${stats.autoLogScrub?'var(--green)':'var(--text3)'}">${stats.autoLogScrub?'ON':'off'}</span> &nbsp;
+  TraceKill: <span style="color:${stats.traceKill?'var(--amber)':'var(--text3)'}">${stats.traceKill?'READY':'—'}</span>
+</div>`;
+
+  if(stats.traceKill){
+    html+=`<div style="margin-top:8px;"><button onclick="useTraceKill()" style="background:var(--rbg);border:1px solid var(--rdim);color:var(--red);font-family:var(--mono);font-size:9px;padding:4px 10px;cursor:pointer;letter-spacing:1px;">⚡ ACTIVATE TRACEKILL</button></div>`;
+  }
+
+  body.innerHTML = html;
+}
+
+function renderInventory(body){
+  const cats = ['SCANNER','CRACKER','EXFIL','STEALTH','SOCIAL'];
+  let html = `<div style="font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:8px;">OWNED TOOLS — click to equip/unequip</div>`;
+
+  cats.forEach(cat=>{
+    const tools = TOOL_CATALOG.filter(t=>t.cat===cat && ownedTools.includes(t.id));
+    if(!tools.length) return;
+    html += `<div style="font-size:8px;letter-spacing:2px;color:var(--text3);margin:8px 0 4px;">${cat}</div>`;
+    tools.forEach(t=>{
+      const equipped = loadout.includes(t.id);
+      html+=`<div class="tool-card ${equipped?'equipped':''}" onclick="equipTool('${t.id}')">
+<div class="tool-card-hdr">
+  <span class="tool-name">${t.name}</span>
+  <span class="tool-tier t${t.tier}">T${t.tier}</span>
+  <span class="tool-cat">${t.cat}</span>
+</div>
+<div class="tool-desc">${t.desc}</div>
+<div class="tool-effect">${t.effect}</div>
+<div class="tool-owned">${equipped?'● EQUIPPED':'○ unequipped'}</div>
+</div>`;
+    });
+  });
+
+  body.innerHTML = html || `<div style="color:var(--text3);font-size:10px;">No tools owned yet. Visit the MARKET tab.</div>`;
+}
+
+function renderMarket(body){
+  let html = `<div class="credits-display">CREDITS: ${credits} cr &nbsp;·&nbsp; REP: ${rep} cr</div>`;
+  html += `<div class="market-refresh">Market refreshes each run. <span onclick="generateMarket();renderForgeTab()">Refresh ↻</span></div>`;
+  html += `<div style="font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:8px;">AVAILABLE TOOLS</div>`;
+
+  if(!marketInventory.length){
+    html += `<div style="color:var(--text3);font-size:10px;">Market empty. Earn credits by exfiltrating files and completing objectives.</div>`;
+  } else {
+    marketInventory.forEach(t=>{
+      const canAfford = credits >= t.cost;
+      const owned = ownedTools.includes(t.id);
+      html+=`<div class="tool-card ${owned?'equipped':''} ${!canAfford&&!owned?'locked':''}">
+<div class="tool-card-hdr">
+  <span class="tool-name">${t.name}</span>
+  <span class="tool-tier t${t.tier}">T${t.tier}</span>
+  <span class="tool-cat">${t.cat}</span>
+  ${owned
+    ? `<span class="tool-owned">OWNED</span>`
+    : `<span class="tool-cost">${t.cost} cr</span>`}
+</div>
+<div class="tool-desc">${t.desc}</div>
+<div class="tool-effect">${t.effect}</div>
+${!owned ? `<button onclick="buyTool('${t.id}')" style="margin-top:6px;background:${canAfford?'var(--cyan3)':'var(--bg4)'};border:none;color:${canAfford?'var(--text)':'var(--text3)'};font-family:var(--mono);font-size:9px;padding:3px 10px;cursor:${canAfford?'pointer':'not-allowed'};letter-spacing:1px;">${canAfford?'BUY →':'INSUFFICIENT CREDITS'}</button>` : ''}
+</div>`;
+    });
+  }
+  body.innerHTML = html;
+}
+
+function refreshForge(){
+  if(WINS['forge'] && !WINS['forge'].minimized) renderForgeTab();
+}
+
+// ══════════════════════════════════════════════
+// M6 — META PERSISTENCE (localStorage)
+// ══════════════════════════════════════════════
+
+const META_KEY = 'nulltrace_meta_v1';
+
+const META_DEFAULTS = {
+  runCount: 0,
+  totalRep: 0,
+  bestRep: 0,
+  bestRunNodes: 0,
+  bestRunExfil: 0,
+  aliasHistory: [],        // [{alias, outcome, rep, cause, runNum}]
+  factionRep: { 'NULL SIGNAL': 0, 'GHOST PROTOCOL': 0, 'BAZAAR': 0 },
+  unlockedTools: ['basic_scanner','basic_cracker','basic_exfil'],
+  unlockedAliasCount: 0,
+  totalDeaths: 0,
+  totalCompletions: 0,
+};
+
+function loadMeta(){
+  try {
+    const raw = localStorage.getItem(META_KEY);
+    if(raw) return {...META_DEFAULTS, ...JSON.parse(raw)};
+  } catch(e) {}
+  return {...META_DEFAULTS};
+}
+
+function saveMeta(meta){
+  try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch(e) {}
+}
+
+function resetMeta(){
+  localStorage.removeItem(META_KEY);
+  notify('Meta progress reset','warn');
+}
+
+// ══════════════════════════════════════════════
+// M6 — RUN STATE
+// ══════════════════════════════════════════════
+
+let META = loadMeta();
+let runSeed = Date.now();
+let runStartTime = 0;
+let runNumber = META.runCount + 1;
+let runNodesHit = new Set();
+let runExfilCount = 0;
+let runRepEarned = 0;
+let currentAlias = '';
+
+// Alias generator — cyberpunk handles
+const ALIAS_PREFIXES = ['ghost','null','zero','phantom','vector','cipher','dark','void','static','neon','binary','rogue'];
+const ALIAS_SUFFIXES = ['0x1','_3r','_7','_k','_n','_v2','_rx','_ex','_9','__','_00','_fx'];
+function generateAlias(){
+  const p = ALIAS_PREFIXES[Math.floor(Math.random()*ALIAS_PREFIXES.length)];
+  const s = ALIAS_SUFFIXES[Math.floor(Math.random()*ALIAS_SUFFIXES.length)];
+  const n = Math.floor(Math.random()*99);
+  return `${p}${n}${s}`;
+}
+
+function initRunState(){
+  runSeed = Date.now();
+  runStartTime = ticks;
+  runNodesHit = new Set();
+  runExfilCount = 0;
+  runRepEarned = rep;
+  // Generate fresh alias for this run
+  currentAlias = generateAlias();
+  currentUser = currentAlias;
+  cwd = `/home/${currentAlias}`;
+  // Update LFS home directory
+  LFS[`/home/${currentAlias}`] = {t:'d'};
+  LFS[`/home/${currentAlias}/tools`] = {t:'d'};
+  LFS[`/home/${currentAlias}/intel`] = {t:'d'};
+  LFS[`/home/${currentAlias}/intel/exfil`] = {t:'d'};
+  LFS[`/home/${currentAlias}/logs`] = {t:'d'};
+  LFS[`/home/${currentAlias}/logs/ops.log`] = {t:'f', content:`[00:00:01] Session started — ${currentAlias}\n[00:00:02] Run #${runNumber}`};
+  // Update taskbar
+  document.getElementById('sb-alias')?.querySelector('span') &&
+    (document.getElementById('sb-alias').querySelector('span').textContent = currentAlias);
+  document.getElementById('tb-run')?.querySelector('span') &&
+    (document.getElementById('tb-run').querySelector('span').textContent = runNumber);
+  // Randomise proc org seed so each run has different target
+  runSeed = Date.now() + runNumber * 7919;
+}
+
+// ══════════════════════════════════════════════
+// M6 — DEATH SCREEN
+// ══════════════════════════════════════════════
+
+function triggerDeath(cause){
+  // Save this run to meta
+  const runDuration = ticks - runStartTime;
+  const runRepFinal = rep - runRepEarned;
+
+  META.runCount++;
+  META.totalDeaths++;
+  META.totalRep += runRepFinal;
+  META.bestRep = Math.max(META.bestRep, runRepFinal);
+  META.bestRunNodes = Math.max(META.bestRunNodes, runNodesHit.size);
+  META.bestRunExfil = Math.max(META.bestRunExfil, runExfilCount);
+  META.aliasHistory.unshift({
+    alias: currentAlias,
+    outcome: 'BURNED',
+    rep: runRepFinal,
+    cause,
+    runNum: runNumber,
+    nodes: runNodesHit.size,
+    exfil: runExfilCount,
+  });
+  if(META.aliasHistory.length > 10) META.aliasHistory = META.aliasHistory.slice(0,10);
+  META.factionRep['NULL SIGNAL'] = (META.factionRep['NULL SIGNAL']||0) + Math.floor(runRepFinal/2);
+  saveMeta(META);
+
+  // Generate next alias
+  const nextAlias = generateAlias();
+
+  // Populate death screen
+  document.getElementById('death-cause').textContent = `CAUSE: ${cause.toUpperCase()}`;
+  document.getElementById('death-new-alias').textContent = nextAlias;
+  document.getElementById('death-stats').innerHTML = `
+    <div class="death-stat-row"><span class="death-stat-key">Alias</span><span class="death-stat-val bad">${currentAlias} [BURNED]</span></div>
+    <div class="death-stat-row"><span class="death-stat-key">Run #</span><span class="death-stat-val">${runNumber}</span></div>
+    <div class="death-stat-row"><span class="death-stat-key">Nodes infiltrated</span><span class="death-stat-val">${runNodesHit.size}</span></div>
+    <div class="death-stat-row"><span class="death-stat-key">Files exfiltrated</span><span class="death-stat-val">${runExfilCount}</span></div>
+    <div class="death-stat-row"><span class="death-stat-key">Credits earned</span><span class="death-stat-val ${runRepFinal>0?'good':'bad'}">${runRepFinal} cr</span></div>
+    <div class="death-stat-row"><span class="death-stat-key">Session time</span><span class="death-stat-val">${formatTime(runDuration)}</span></div>
+    <div class="death-stat-row"><span class="death-stat-key">Total deaths</span><span class="death-stat-val bad">${META.totalDeaths}</span></div>
+    <div class="death-stat-row"><span class="death-stat-key">Best run credits</span><span class="death-stat-val good">${META.bestRep} cr</span></div>
+  `;
+
+  // Show death screen
+  const screen = document.getElementById('death-screen');
+  screen.classList.add('show');
+
+  // Disconnect if still connected
+  if(connectedNode){ connectedNode=null; stopTrace(); }
+}
+
+function formatTime(secs){
+  const m = Math.floor(secs/60), s = secs%60;
+  return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// ══════════════════════════════════════════════
+// M6 — RUN COMPLETE SCREEN
+// ══════════════════════════════════════════════
+
+function triggerRunComplete(){
+  const runDuration = ticks - runStartTime;
+  const runRepFinal = rep - runRepEarned;
+
+  META.runCount++;
+  META.totalCompletions++;
+  META.totalRep += runRepFinal;
+  META.bestRep = Math.max(META.bestRep, runRepFinal);
+  META.aliasHistory.unshift({
+    alias: currentAlias,
+    outcome: 'SUCCESS',
+    rep: runRepFinal,
+    cause: 'Objectives complete',
+    runNum: runNumber,
+    nodes: runNodesHit.size,
+    exfil: runExfilCount,
+  });
+  if(META.aliasHistory.length > 10) META.aliasHistory = META.aliasHistory.slice(0,10);
+  META.factionRep['NULL SIGNAL'] = (META.factionRep['NULL SIGNAL']||0) + runRepFinal;
+  saveMeta(META);
+
+  document.getElementById('rc-sub').textContent = `RUN #${runNumber} — ${currentAlias}`;
+  document.getElementById('rc-stats').innerHTML = `
+    <div class="rc-stat-row"><span style="color:var(--text3)">Credits earned</span><span style="color:var(--green)">${runRepFinal} cr</span></div>
+    <div class="rc-stat-row"><span style="color:var(--text3)">Nodes infiltrated</span><span style="color:var(--text2)">${runNodesHit.size}</span></div>
+    <div class="rc-stat-row"><span style="color:var(--text3)">Files exfiltrated</span><span style="color:var(--text2)">${runExfilCount}</span></div>
+    <div class="rc-stat-row"><span style="color:var(--text3)">Session time</span><span style="color:var(--text2)">${formatTime(runDuration)}</span></div>
+    <div class="rc-stat-row"><span style="color:var(--text3)">Total completions</span><span style="color:var(--green)">${META.totalCompletions}</span></div>
+    <div class="rc-stat-row"><span style="color:var(--text3)">NULL SIGNAL rep</span><span style="color:var(--purple)">${META.factionRep['NULL SIGNAL']} cr</span></div>
+  `;
+  document.getElementById('run-complete').classList.add('show');
+}
+
+function closeRunComplete(){
+  document.getElementById('run-complete').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════
+// M6 — NEW RUN
+// ══════════════════════════════════════════════
+
+function startNewRun(){
+  // Hide screens
+  document.getElementById('death-screen').classList.remove('show');
+  document.getElementById('run-complete').classList.remove('show');
+
+  // Reload META (may have been updated)
+  META = loadMeta();
+  runNumber = META.runCount + 1;
+
+  // Reset per-run state
+  rep = 0;
+  traceLevel = 0;
+  connectedNode = null;
+  impersonatedUser = null;
+  exfilVault = [];
+  logsDeleted = {};
+  crackedPasswords = {};
+  adminAlerts.length = 0;
+  sentMails.length = 0;
+  rotatedPasswords = {};
+  Object.keys(nodeSecState).forEach(k => nodeSecState[k]='NOMINAL');
+  Object.keys(nodeSecEvents).forEach(k => nodeSecEvents[k]=[]);
+  Object.keys(patchedExploits).forEach(k => delete patchedExploits[k]);
+  Object.keys(nodeVisitCount).forEach(k => delete nodeVisitCount[k]);
+  firewallUnlocked['GATEWAY']=true;
+  firewallUnlocked['WEB-SRV']=false;
+  firewallUnlocked['MAIL-SRV']=false;
+  firewallUnlocked['DB-SRV']=false;
+  firewallUnlocked['EXEC-TERM']=false;
+  OBJECTIVES.forEach(o => o.done=false);
+  SOCIAL_OBJECTIVES.forEach(o => o.done=false);
+
+  // M7 — reset tool state (keep meta-unlocked tools, reset loadout to defaults)
+  loadout=['scan_basic','crack_basic','exfil_basic','proxy_basic','phish_kit_v1',null];
+  TOOL_CATALOG.forEach(t => { t.owned = ['scan_basic','crack_basic','exfil_basic','proxy_basic','phish_kit_v1'].includes(t.id); });
+  ownedTools = TOOL_CATALOG.filter(t=>t.owned).map(t=>t.id);
+  credits = 0;
+  generateMarket();
+
+  // Reset mails to base set (remove run-specific alerts)
+  while(MAILS.length > 3) MAILS.pop();
+  MAILS.forEach(m => m.unread=true);
+
+  // Close all windows
+  Object.keys(WINS).forEach(id => closeApp(id));
+
+  // Reinit run state with new alias + new seed
+  initRunState();
+
+  // Regenerate proc org with new seed
+  delete NETWORK['PROC-ORG'];
+  delete NODE_POS['PROC-ORG'];
+  proceduralOrg = null;
+
+  // Update UI
+  stopTrace();
+  updateImpersonateBar();
+  cwd = `/home/${currentUser}`;
+
+  // Brief flash then relaunch
+  setTimeout(()=>{
+    launchDesktop();
+    notify(`New identity: ${currentUser} — Run #${runNumber}`,'info');
+  }, 300);
+}
+
+// ══════════════════════════════════════════════
+// M6 — META// APP
+// ══════════════════════════════════════════════
+
+function buildMeta(body){
+  body.innerHTML=`<div class="meta-wrap" id="meta-inner"></div>`;
+  refreshMeta();
+}
+
+function refreshMeta(){
+  const el = document.getElementById('meta-inner'); if(!el) return;
+  const m = META;
+
+  let html = `
+  <div class="meta-section">
+    <div class="meta-section-hdr">CURRENT RUN</div>
+    <div class="meta-row"><span class="meta-key">Alias</span><span class="meta-val highlight">${currentAlias||currentUser}</span></div>
+    <div class="meta-row"><span class="meta-key">Run #</span><span class="meta-val">${runNumber}</span></div>
+    <div class="meta-row"><span class="meta-key">Credits this run</span><span class="meta-val good">${rep} cr</span></div>
+    <div class="meta-row"><span class="meta-key">Nodes hit</span><span class="meta-val">${runNodesHit.size}</span></div>
+    <div class="meta-row"><span class="meta-key">Files exfiltrated</span><span class="meta-val">${runExfilCount}</span></div>
+  </div>
+
+  <div class="meta-section">
+    <div class="meta-section-hdr">CAREER STATS</div>
+    <div class="meta-row"><span class="meta-key">Total runs</span><span class="meta-val">${m.runCount}</span></div>
+    <div class="meta-row"><span class="meta-key">Completions</span><span class="meta-val good">${m.totalCompletions}</span></div>
+    <div class="meta-row"><span class="meta-key">Deaths</span><span class="meta-val warn">${m.totalDeaths}</span></div>
+    <div class="meta-row"><span class="meta-key">Total credits</span><span class="meta-val">${m.totalRep} cr</span></div>
+    <div class="meta-row"><span class="meta-key">Best run</span><span class="meta-val good">${m.bestRep} cr</span></div>
+    <div class="meta-row"><span class="meta-key">Best nodes hit</span><span class="meta-val">${m.bestRunNodes}</span></div>
+  </div>
+
+  <div class="meta-section">
+    <div class="meta-section-hdr">FACTION STANDING</div>
+    ${Object.entries(m.factionRep).map(([f,r])=>`
+    <div class="meta-row">
+      <span class="meta-key">${f}</span>
+      <span class="meta-val ${r>500?'good':r>100?'highlight':''}">${r} cr — ${r>1000?'TRUSTED':r>500?'KNOWN':r>100?'NOTICED':'UNKNOWN'}</span>
+    </div>`).join('')}
+  </div>
+
+  <div class="meta-section">
+    <div class="meta-section-hdr">ALIAS HISTORY</div>
+    ${m.aliasHistory.length === 0
+      ? `<div style="color:var(--text3);font-size:9px;">No completed runs yet.</div>`
+      : m.aliasHistory.map(a=>`
+    <div class="alias-history-item ${a.outcome==='SUCCESS'?'current':'burned'}">
+      <span style="color:${a.outcome==='SUCCESS'?'var(--green)':'var(--red)'}">${a.alias}</span>
+      — Run #${a.runNum} — ${a.rep}cr — ${a.outcome==='SUCCESS'?'✓ CLEAN EXIT':'✗ '+a.cause.substring(0,30)}
+    </div>`).join('')}
+  </div>
+
+  <div class="meta-section">
+    <div class="meta-section-hdr">UNLOCKED TOOLS</div>
+    ${m.unlockedTools.map(t=>`<div class="meta-row"><span class="meta-key">✓</span><span class="meta-val">${t}</span></div>`).join('')}
+    <div style="font-size:8px;color:var(--text3);margin-top:4px;">More tools unlock in M7 — Tool Ecosystem</div>
+  </div>
+
+  <div style="margin-top:8px;">
+    <button onclick="resetMeta()" style="background:transparent;border:1px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:9px;padding:4px 8px;cursor:pointer;letter-spacing:1px;">RESET META PROGRESS</button>
+  </div>`;
+
+  el.innerHTML = html;
+}
 
 // ══════════════════════════════════════════════
 // M5b — IMPERSONATION VIA STOLEN CREDENTIALS
@@ -2500,10 +3320,12 @@ function markSocialObjective(id){
   if(obj && !obj.done){
     obj.done = true;
     rep += 400;
+    credits = rep; // M7 — credits track rep
     document.getElementById('tb-rep')?.querySelector('span') &&
       (document.getElementById('tb-rep').querySelector('span').textContent = rep);
     notify(`BONUS OBJECTIVE: ${obj.text.substring(0,45)}...`, 'ok');
     refreshMission();
+    refreshForge(); // M7 — update market affordability
   }
 }
 
@@ -2519,7 +3341,7 @@ function runCmd(raw){
     secstate:cmdSecstate,
     nano:(args)=>{ if(!args[0]){pline('Usage: nano [file]','err');return;} openNano(args[0]); },
     note:(args)=>{ if(!args[0]){pline('Usage: note [file]','err');return;} const p=resolvePath(args[0]); if(!LFS[p]){pline(`note: ${args[0]} not found — create with nano first`,'err');return;} openStickyNote(args[0].split('/').pop(),p); },
-    open:(args)=>{ if(!args[0]){pline('Usage: open [app]  e.g. open mail','err');return;} const appMap={mail:'mail',map:'netmap',netmap:'netmap',mission:'mission',exfil:'exfil',intel:'intel',sec:'secmon',secmon:'secmon',sys:'sysmon',sysmon:'sysmon',term:'terminal',terminal:'terminal',phish:'phish'}; const target=appMap[args[0].toLowerCase()]; if(target){openApp(target);pline(`Opening ${target}...`,'ok');}else{pline(`open: unknown app '${args[0]}'. Try: mail, netmap, mission, exfil, intel, secmon, phish`,'err');} },
+    open:(args)=>{ if(!args[0]){pline('Usage: open [app]  e.g. open mail','err');return;} const appMap={mail:'mail',map:'netmap',netmap:'netmap',mission:'mission',exfil:'exfil',intel:'intel',sec:'secmon',secmon:'secmon',sys:'sysmon',sysmon:'sysmon',term:'terminal',terminal:'terminal',phish:'phish',meta:'meta',forge:'forge'}; const target=appMap[args[0].toLowerCase()]; if(target){openApp(target);pline(`Opening ${target}...`,'ok');}else{pline(`open: unknown app '${args[0]}'. Try: mail, netmap, mission, exfil, intel, forge, phish, meta`,'err');} },
     phish:(args)=>{
       // Usage: phish [email] --template [id] --from [email]
       if(!args[0]){ pline('Usage: phish [target-email] [--template id] [--from impersonator-email]','err'); pline('       phish list-targets','dim'); pline('       phish list-templates','dim'); return; }
@@ -2859,6 +3681,7 @@ function connect(args){
     document.getElementById('sb-path').querySelector('span').textContent=n.ip;
     startTrace();
     checkSecOnConnect(id);
+    runNodesHit.add(id); // M6 — track for run stats
     // M3 — inline objective check for EXEC-TERM access
     if(id==='EXEC-TERM') setTimeout(()=>{ if(connectedNode==='EXEC-TERM') markObjective('access'); },900);
     refreshNetmap();
@@ -2871,6 +3694,10 @@ function disconnect(){
   if(!connectedNode){pline('Not connected.','warn');return;}
   const old=NETWORK[connectedNode];
   const wasLogged=!logsDeleted[connectedNode];
+  // M7 — auto log scrub if tool equipped
+  if(getActiveStats().autoLogScrub && !logsDeleted[connectedNode]){
+    logsDeleted[connectedNode]=true;
+  }
   connectedNode=null; cwd=`/home/${currentUser}`;
   stopTrace(); updatePrompt();
   document.getElementById('tb-conn').querySelector('span').textContent='OFFLINE';
@@ -2913,7 +3740,7 @@ function crack(args){
   else if(content.includes('AX-EXEC'))result='AX-EXEC-7f3a9b2c1d';
   else result='axiom2024';  // fallback generic
 
-  const total=40+Math.floor(Math.random()*30);
+  const total=Math.max(5, Math.floor((40+Math.floor(Math.random()*30)) / getActiveStats().crackSpeed));
   const iv=setInterval(()=>{
     prog+=2;
     const pct=Math.min(100,Math.floor(prog/total*100));
@@ -2963,11 +3790,13 @@ function cmdExfil(args){
       {t:'',c:'blank'},
     ]);
     notify(`Exfil: ${fname} (${(fdata.exfil||'low').toUpperCase()})`,fdata.exfil==='high'?'ok':'info');
-    // M4 — add to intel DB
+    runExfilCount++; // M6 — track for run stats
+    // M7 — use active exfil tool trace stat
+    const exfilTraceBump = getActiveStats().exfilTrace;
+    if(traceActive) traceLevel=Math.min(100,traceLevel+exfilTraceBump);
     addIntel('files',{key:fname,val:`${node.label} — ${(fdata.exfil||'low').toUpperCase()}`});
 
-    // Bump trace a bit — exfil is noisy
-    if(traceActive)traceLevel=Math.min(100,traceLevel+6);
+    // M7 — exfil trace bump now handled by active tool stat above
     // M3 — trigger security escalation on exfil
     checkSecOnExfil(connectedNode);
 
@@ -3009,9 +3838,11 @@ function markObjective(id){
     obj.done=true;
     notify(`OBJECTIVE COMPLETE: ${obj.text.substring(0,40)}...`,'ok');
     rep+=800;
+    credits=rep; // M7 — credits track rep
     document.getElementById('tb-rep').querySelector('span').textContent=rep;
     document.getElementById('sb-obj').querySelector('span').textContent=`${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}`;
     refreshMission();
+    refreshForge(); // M7 — update market affordability
   }
 }
 function checkCleanObjective(){
@@ -3024,10 +3855,12 @@ function checkCleanObjective(){
 // ══════════════════════════════════════════════
 function startTrace(){
   traceActive=true; traceLevel=0;
+  // M7 — apply stealth tool trace rate modifier
+  const toolMod = getActiveStats().traceRate;
   document.getElementById('trace-ind').style.display='block';
   updateTraceUI();
   traceTimer=setInterval(()=>{
-    traceLevel=Math.min(100,traceLevel+traceRate);
+    traceLevel=Math.min(100,traceLevel+(traceRate*toolMod));
     updateTraceUI();
     checkSecOnTraceHigh();
     if(traceLevel>=100){stopTrace();onTraceComplete();}
@@ -3053,18 +3886,26 @@ function updateTraceUI(){
 }
 function onTraceComplete(){
   const old=connectedNode;
-  disconnect();
+  if(connectedNode){ connectedNode=null; cwd=`/home/${currentUser}`; }
+  stopTrace();
+  updatePrompt();
+  document.getElementById('tb-conn').querySelector('span').textContent='OFFLINE';
+  document.getElementById('tb-conn').className='tbs';
+  document.getElementById('sb-node').querySelector('span').textContent='—';
+  document.getElementById('sb-path').querySelector('span').textContent='—';
+
   plines([
     {t:'',c:'blank'},
     {t:'████████████████████████████████████████',c:'err'},
     {t:'█                                      █',c:'err'},
     {t:'█   TRACE COMPLETE — SESSION BURNED    █',c:'err'},
-    {t:'█   Your activity was logged           █',c:'err'},
+    {t:'█   IDENTITY COMPROMISED               █',c:'err'},
     {t:'████████████████████████████████████████',c:'err'},
     {t:'',c:'blank'},
-    {t:'[!] Return and cover your tracks next time.',c:'warn'},
-    {t:'',c:'blank'},
   ]);
+  scrollT();
+  // M6 — trigger death screen after brief delay
+  setTimeout(()=>triggerDeath('Trace complete — session logged'), 2000);
 }
 
 // ══════════════════════════════════════════════
