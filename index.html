@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, interactive-widget=resizes-content">
 <title>NULL//TRACE — OS v0.5</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
@@ -25,57 +25,62 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 #scanlines{position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999;}
 
 /* BOOT */
-#boot{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px;z-index:1000;font-size:13px;}
+#boot{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:60px;z-index:1000;font-size:15px;}
 .bl{color:var(--text2);line-height:1.6;opacity:0;white-space:pre;}
 .bl.ok{color:var(--green);}.bl.warn{color:var(--amber);}.bl.cyan{color:var(--cyan);}.bl.dim{color:var(--text3);}.bl.show{opacity:1;}
 #bbar{margin-top:28px;width:380px;display:none;}
-#bbar-lbl{color:var(--text3);font-size:11px;letter-spacing:2px;margin-bottom:6px;}
+#bbar-lbl{color:var(--text3);font-size:14px;letter-spacing:2px;margin-bottom:6px;}
 #bbar-t{width:100%;height:2px;background:var(--bg3);}
 #bbar-f{height:100%;width:0%;background:var(--cyan);transition:width .04s linear;}
 
 /* LOGIN */
 #login{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;justify-content:center;align-items:center;z-index:900;}
 .ll{font-size:44px;font-weight:700;color:var(--cyan);letter-spacing:6px;margin-bottom:4px;}
-.lv{font-size:11px;color:var(--text3);letter-spacing:4px;margin-bottom:44px;}
+.lv{font-size:14px;color:var(--text3);letter-spacing:4px;margin-bottom:44px;}
 .lbox{background:var(--bg2);border:1px solid var(--border);padding:30px 38px;width:360px;position:relative;z-index:950;}
 .lf{margin-bottom:14px;}
-.llbl{font-size:10px;color:var(--text2);letter-spacing:2px;margin-bottom:5px;display:block;}
-.li{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:9px 11px;outline:none;transition:border-color .15s;}
+.llbl{font-size:14px;color:var(--text2);letter-spacing:2px;margin-bottom:5px;display:block;}
+.li{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:16px;padding:9px 11px;outline:none;transition:border-color .15s;}
 .li:focus{border-color:var(--cyan3);}
-.lb{width:100%;background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;margin-top:6px;transition:background .15s;}
+.lb{width:100%;background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:3px;padding:11px;cursor:pointer;margin-top:6px;transition:background .15s;}
 .lb:hover{background:var(--cyan);}
-.le{font-size:11px;color:var(--red);margin-top:10px;min-height:15px;}
-.lh{font-size:10px;color:var(--text3);margin-top:20px;text-align:center;letter-spacing:1px;}
+.le{font-size:14px;color:var(--red);margin-top:10px;min-height:15px;}
+.lh{font-size:14px;color:var(--text3);margin-top:20px;text-align:center;letter-spacing:1px;}
 
 /* DESKTOP */
 #desktop{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;}
 
 /* TASKBAR */
-#tb{height:30px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;flex-shrink:0;z-index:100;}
+#tb{height:30px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px;flex-shrink:0;z-index:100;overflow:visible;}
 #tb-l{display:flex;align-items:center;gap:14px;}
-.tb-logo{font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:2px;}
-.tb-apps{display:flex;gap:3px;}
-.tab{background:transparent;border:1px solid transparent;color:var(--text2);font-family:var(--mono);font-size:9px;padding:2px 7px;cursor:pointer;letter-spacing:1px;transition:all .1s;}
+.tb-logo{font-size:14px;font-weight:700;color:var(--cyan);letter-spacing:2px;}
+.tb-apps{display:flex;gap:3px;overflow-x:auto;overflow-y:visible;}
+/* Window tabs in taskbar */
+.win-tab{background:transparent;border:1px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:13px;padding:1px 8px;cursor:pointer;letter-spacing:1px;transition:all .1s;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;}
+.win-tab:hover{border-color:var(--border2);color:var(--text2);}
+.win-tab.focused{border-color:var(--cyan3);color:var(--cyan);background:var(--cglow);}
+.win-tab.minimized{border-style:dashed;color:var(--text3);opacity:.7;}
+
 .tab:hover{color:var(--cyan);border-color:var(--border);background:var(--bg3);}
 .tab.active{color:var(--cyan);border-color:var(--cyan3);background:var(--cglow);}
 .tab.minimized{opacity:0.5;}
 #tb-r{display:flex;align-items:center;gap:12px;}
-.tbs{font-size:9px;color:var(--text3);}
+.tbs{font-size:15px;color:var(--text3);}
 .tbs span{color:var(--text2);}
 .tbs.warn span{color:var(--amber);}
 .tbs.danger span{color:var(--red);}
 .tbs.ok span{color:var(--green);}
-#tb-clk{font-size:10px;color:var(--text2);}
+#tb-clk{font-size:14px;color:var(--text2);}
 
 /* WORKSPACE */
 #ws{flex:1;position:relative;overflow:hidden;}
 
 /* DESKTOP ICONS */
 #dicons{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:6px;z-index:1;}
-.dico{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px;width:68px;cursor:pointer;border:1px solid transparent;transition:all .1s;}
+
 .dico:hover{background:var(--cglow);border-color:var(--cyan3);}
 .dico-g{font-size:18px;color:var(--cyan);}
-.dico-l{font-size:8px;color:var(--text2);letter-spacing:1px;text-align:center;}
+.dico-l{font-size:14px;color:var(--text2);letter-spacing:1px;text-align:center;}
 
 /* WINDOWS */
 .win{position:absolute;background:var(--bg2);border:1px solid var(--border);display:flex;flex-direction:column;min-width:280px;min-height:180px;box-shadow:0 8px 32px rgba(0,0,0,0.6);}
@@ -85,26 +90,63 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .wb{width:9px;height:9px;border-radius:50%;border:none;cursor:pointer;transition:opacity .1s;}
 .wb.cl{background:var(--rdim);}.wb.mn{background:var(--adim);}.wb.mx{background:var(--gdim);}
 .wb:hover{opacity:.75;}
-.wt{flex:1;font-size:9px;letter-spacing:2px;color:var(--text3);text-align:center;}
+.wt{flex:1;font-size:15px;letter-spacing:2px;color:var(--text3);text-align:center;}
+/* ── NOTIFICATION BADGES ── */
+.tab{background:transparent;border:1px solid transparent;color:var(--text2);font-family:var(--mono);font-size:15px;padding:2px 7px;cursor:pointer;letter-spacing:1px;transition:all .1s;position:relative;}
+
+/* ── APPS DROPDOWN ── */
+#apps-btn{background:transparent;border:1px solid var(--border);color:var(--cyan);font-family:var(--mono);font-size:14px;padding:2px 10px;cursor:pointer;letter-spacing:1px;transition:all .1s;position:relative;white-space:nowrap;}
+#apps-btn:hover,#apps-btn.open{background:var(--cglow);border-color:var(--cyan3);}
+#apps-btn[data-badge]::after{content:attr(data-badge);position:absolute;top:-5px;right:-6px;background:var(--red);color:#fff;font-size:9px;font-family:var(--mono);min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;pointer-events:none;}
+#apps-dropdown{position:fixed;top:30px;left:0;background:var(--bg2);border:1px solid var(--cyan3);border-top:none;z-index:2000;display:none;min-width:560px;box-shadow:0 12px 40px rgba(0,0,0,.8);padding:10px;}
+#apps-dropdown.show{display:block;}
+.apps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0 8px;}
+.apps-col-hdr{font-size:10px;letter-spacing:2px;color:var(--text3);padding:4px 6px 6px;border-bottom:1px solid var(--border);margin-bottom:4px;}
+.apps-item{display:flex;align-items:center;gap:6px;padding:5px 6px;cursor:pointer;border-radius:2px;transition:background .1s;position:relative;}
+.apps-item:hover{background:var(--bg4);}
+.apps-item-icon{font-size:13px;width:18px;text-align:center;flex-shrink:0;order:0;}
+.apps-item-name{font-size:13px;color:var(--text2);font-family:var(--mono);order:1;flex:1;}
+.apps-item[data-badge]::after{content:attr(data-badge);display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:9px;min-width:13px;height:13px;border-radius:7px;padding:0 2px;line-height:1;margin-left:4px;order:2;flex-shrink:0;}
+.apps-item.badge-amber[data-badge]::after{background:var(--amber);}
+.apps-item.badge-purple[data-badge]::after{background:var(--purple);}
+.apps-pin-btn{font-size:10px;color:var(--text3);margin-left:4px;opacity:0;transition:opacity .1s;cursor:pointer;letter-spacing:1px;padding:1px 4px;order:3;flex-shrink:0;}
+.apps-item:hover .apps-pin-btn{opacity:1;}
+.apps-item.pinned .apps-pin-btn{opacity:1;color:var(--cyan);}
+.apps-pin-btn:hover{color:var(--cyan);}
+.apps-footer{border-top:1px solid var(--border);margin-top:8px;padding-top:6px;font-size:11px;color:var(--text3);text-align:center;}
+/* ── DESKTOP CONTEXT MENU ── */
+#ctx-menu{position:fixed;background:var(--bg2);border:1px solid var(--border2);z-index:3000;display:none;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.7);padding:4px 0;}
+#ctx-menu.show{display:block;}
+.ctx-item{padding:7px 14px;font-size:13px;font-family:var(--mono);color:var(--text2);cursor:pointer;letter-spacing:1px;}
+.ctx-item:hover{background:var(--bg4);color:var(--text);}
+.ctx-item.danger{color:var(--red);}
+.ctx-item.danger:hover{background:var(--rbg);}
+/* ── DESKTOP ICON EDIT MODE ── */
+.dico.pinned-indicator::after{content:'📌';position:absolute;top:2px;right:2px;font-size:9px;}
+.tab[data-badge]::after{content:attr(data-badge);position:absolute;top:auto;bottom:-6px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-family:var(--mono);min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;pointer-events:none;}
+.tab.badge-amber[data-badge]::after{background:var(--amber);}
+.tab.badge-purple[data-badge]::after{background:var(--purple);}
+.dico{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px;width:68px;cursor:pointer;border:1px solid transparent;transition:all .1s;position:relative;}
+.dico[data-badge]::after{content:attr(data-badge);position:absolute;top:2px;right:2px;background:var(--red);color:#fff;font-size:9px;font-family:var(--mono);min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;pointer-events:none;}
 .wbody{flex:1;overflow:hidden;display:flex;flex-direction:column;}
 .rh{position:absolute;bottom:0;right:0;width:14px;height:14px;cursor:se-resize;}
 .rh::after{content:'';position:absolute;bottom:3px;right:3px;width:6px;height:6px;border-right:1px solid var(--border3);border-bottom:1px solid var(--border3);}
 
 /* STATUS BAR */
 #sbar{height:20px;background:var(--bg2);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 10px;gap:14px;flex-shrink:0;}
-.sbi{font-size:8px;letter-spacing:1px;color:var(--text3);}
+.sbi{font-size:14px;letter-spacing:1px;color:var(--text3);}
 .sbi span{color:var(--text2);}
 .sbi.ok span{color:var(--green);}
 .sbi.warn span{color:var(--amber);}
 .sbi.danger span{color:var(--red);}
 
 /* TERMINAL */
-#tout{flex:1;overflow-y:auto;padding:10px 12px;font-size:11.5px;line-height:1.7;scroll-behavior:smooth;}
+#tout{flex:1;overflow-y:auto;padding:10px 12px;font-size:15px;line-height:1.7;scroll-behavior:smooth;}
 .tl{white-space:pre-wrap;word-break:break-all;}
 .tl.cmd{color:var(--cyan);}.tl.out{color:var(--text2);}.tl.ok{color:var(--green);}.tl.err{color:var(--red);}.tl.warn{color:var(--amber);}.tl.info{color:var(--purple);}.tl.data{color:var(--text);}.tl.dim{color:var(--text3);}.tl.cyan{color:var(--cyan);}.tl.blank{height:6px;display:block;}.tl.blue{color:var(--blue);}
 .tpr{display:flex;align-items:center;padding:3px 12px 7px;gap:0;flex-shrink:0;border-top:1px solid var(--border);}
-.tprl{font-size:11.5px;color:var(--cyan);white-space:nowrap;flex-shrink:0;}
-.tinp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:11.5px;outline:none;caret-color:var(--cyan);user-select:text;-webkit-user-select:text;}
+.tprl{font-size:15px;color:var(--cyan);white-space:nowrap;flex-shrink:0;}
+.tinp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:16px;outline:none;caret-color:var(--cyan);user-select:text;-webkit-user-select:text;}
 
 /* CRACKER PROGRESS */
 .crack-bar{height:3px;background:var(--bg4);margin:4px 0;}
@@ -115,34 +157,34 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 #netmap-svg{width:100%;height:100%;}
 .node-group{cursor:pointer;}
 .node-group:hover .node-rect{filter:brightness(1.3);}
-.node-label{font-family:var(--mono);font-size:9px;fill:var(--text2);text-anchor:middle;}
-.node-sublabel{font-family:var(--mono);font-size:8px;fill:var(--text3);text-anchor:middle;}
+.node-label{font-family:var(--mono);font-size:13px;fill:var(--text2);text-anchor:middle;}
+.node-sublabel{font-family:var(--mono);font-size:12px;fill:var(--text3);text-anchor:middle;}
 .conn-line{stroke:var(--border2);stroke-width:1;stroke-dasharray:4 3;}
 .conn-line.active{stroke:var(--cyan);stroke-width:1.5;stroke-dasharray:none;animation:dash .8s linear infinite;}
 @keyframes dash{to{stroke-dashoffset:-20;}}
-.node-status{font-family:var(--mono);font-size:7px;text-anchor:middle;}
+.node-status{font-family:var(--mono);font-size:12px;text-anchor:middle;}
 
 /* MAIL */
 .ml-wrap{display:flex;height:100%;}
 .ml-list{width:200px;border-right:1px solid var(--border);overflow-y:auto;flex-shrink:0;}
-.ml-hdr{font-size:8px;letter-spacing:2px;color:var(--text3);padding:8px 10px 5px;border-bottom:1px solid var(--border);}
+.ml-hdr{font-size:14px;letter-spacing:2px;color:var(--text3);padding:8px 10px 5px;border-bottom:1px solid var(--border);}
 .mi{padding:9px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
 .mi:hover{background:var(--bg3);}
 .mi.sel{background:var(--cglow);border-left:2px solid var(--cyan);}
 .mi.unread .mifrom{color:var(--text);font-weight:700;}
-.mifrom{font-size:10px;color:var(--text2);margin-bottom:2px;}
-.misubj{font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.mitime{font-size:8px;color:var(--text3);float:right;}
-.mv{flex:1;padding:14px;overflow-y:auto;font-size:11px;}
-.mv-subj{font-size:13px;color:var(--text);margin-bottom:6px;font-weight:500;}
-.mv-meta{font-size:9px;color:var(--text3);line-height:1.9;}
+.mifrom{font-size:14px;color:var(--text2);margin-bottom:2px;}
+.misubj{font-size:15px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mitime{font-size:14px;color:var(--text3);float:right;}
+.mv{flex:1;padding:14px;overflow-y:auto;font-size:14px;}
+.mv-subj{font-size:15px;color:var(--text);margin-bottom:6px;font-weight:500;}
+.mv-meta{font-size:15px;color:var(--text3);line-height:1.9;}
 .mv-meta span{color:var(--text2);}
-.mv-body{color:var(--text2);line-height:1.9;font-size:10.5px;white-space:pre-wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
-.mv-empty{flex:1;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);letter-spacing:2px;}
+.mv-body{color:var(--text2);line-height:1.9;font-size:14px;white-space:pre-wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.mv-empty{flex:1;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text3);letter-spacing:2px;}
 
 /* SYSMON */
-.sm-body{padding:10px;font-size:10px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
-.sm-stitle{font-size:8px;letter-spacing:3px;color:var(--text3);margin-bottom:6px;}
+.sm-body{padding:10px;font-size:14px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;}
+.sm-stitle{font-size:14px;letter-spacing:3px;color:var(--text3);margin-bottom:6px;}
 .sm-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
 .sm-k{color:var(--text3);}.sm-v{color:var(--text2);}
 .sm-v.ok{color:var(--green);}.sm-v.warn{color:var(--amber);}.sm-v.danger{color:var(--red);}
@@ -168,83 +210,136 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 
 /* ── M5b STYLES ── */
 #impersonate-bar{display:none;position:fixed;bottom:22px;left:0;right:0;height:18px;background:rgba(163,113,247,0.15);border-top:1px solid var(--purple);z-index:400;align-items:center;padding:0 12px;gap:8px;pointer-events:none;}
-#impersonate-bar span{font-size:9px;font-family:var(--mono);color:var(--purple);letter-spacing:1px;}
+#impersonate-bar span{font-size:15px;font-family:var(--mono);color:var(--purple);letter-spacing:1px;}
 .mail-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
-.mail-tab{padding:5px 12px;font-size:9px;letter-spacing:2px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;}
+.mail-tab{padding:5px 12px;font-size:15px;letter-spacing:2px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;}
 .mail-tab:hover{color:var(--text2);}.mail-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
 .compose-wrap{display:flex;flex-direction:column;height:100%;padding:10px;}
 .compose-field{display:flex;align-items:center;gap:8px;margin-bottom:6px;border-bottom:1px solid var(--border);padding-bottom:6px;}
-.compose-lbl{font-size:9px;color:var(--text3);letter-spacing:2px;width:40px;flex-shrink:0;}
-.compose-inp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:11px;outline:none;user-select:text;-webkit-user-select:text;}
+.compose-lbl{font-size:15px;color:var(--text3);letter-spacing:2px;width:40px;flex-shrink:0;}
+.compose-inp{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:16px;outline:none;user-select:text;-webkit-user-select:text;}
 .compose-inp::placeholder{color:var(--text3);}
-.compose-body{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:11px;padding:8px;outline:none;resize:none;line-height:1.7;margin-top:6px;user-select:text;-webkit-user-select:text;}
+.compose-body{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:16px;padding:8px;outline:none;resize:none;line-height:1.7;margin-top:6px;user-select:text;-webkit-user-select:text;}
 .compose-footer{display:flex;align-items:center;gap:10px;margin-top:8px;}
-.compose-send{background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:2px;padding:5px 12px;cursor:pointer;}
+.compose-send{background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:2px;padding:5px 12px;cursor:pointer;}
 .compose-send:hover{background:var(--cyan);}
-.compose-from{font-size:9px;color:var(--text3);}.compose-from span{color:var(--purple);}
-.pw-rotated{font-size:9px;color:var(--red);background:var(--rbg);border:1px solid var(--rdim);padding:2px 6px;letter-spacing:1px;}
+.compose-from{font-size:15px;color:var(--text3);}.compose-from span{color:var(--purple);}
+.pw-rotated{font-size:15px;color:var(--red);background:var(--rbg);border:1px solid var(--rdim);padding:2px 6px;letter-spacing:1px;}
 .mission-path{margin-top:8px;padding:6px 8px;background:var(--bg3);border:1px solid var(--border);}
-.mission-path-hdr{font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:4px;}
-.mission-path-item{font-size:9px;color:var(--text2);padding:2px 0;display:flex;align-items:center;gap:6px;}
+.mission-path-hdr{font-size:14px;letter-spacing:2px;color:var(--text3);margin-bottom:4px;}
+.mission-path-item{font-size:15px;color:var(--text2);padding:2px 0;display:flex;align-items:center;gap:6px;}
 .mission-path-item.done{color:var(--green);}.mission-path-item.done::before{content:'✓';color:var(--green);}
 .mission-path-item:not(.done)::before{content:'○';color:var(--text3);}
 
 #cmdpal{position:fixed;top:60px;left:50%;transform:translateX(-50%);width:480px;background:var(--bg2);border:1px solid var(--cyan3);z-index:2000;display:none;box-shadow:0 16px 48px rgba(0,0,0,0.8);}
-#cmdpal-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;padding:12px 14px;outline:none;caret-color:var(--cyan);}
+#cmdpal-input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:16px;padding:12px 14px;outline:none;caret-color:var(--cyan);}
 #cmdpal-results{max-height:280px;overflow-y:auto;}
 .cpr{padding:8px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);}
 .cpr:hover,.cpr.active{background:var(--cglow);}
-.cpr-icon{font-size:13px;color:var(--cyan);width:16px;text-align:center;}
-.cpr-name{font-size:12px;color:var(--text);flex:1;}
-.cpr-hint{font-size:10px;color:var(--text3);}
-#cmdpal-footer{padding:6px 14px;font-size:9px;color:var(--text3);letter-spacing:1px;border-top:1px solid var(--border);}
+.cpr-icon{font-size:15px;color:var(--cyan);width:16px;text-align:center;}
+.cpr-name{font-size:14px;color:var(--text);flex:1;}
+.cpr-hint{font-size:14px;color:var(--text3);}
+#cmdpal-footer{padding:6px 14px;font-size:15px;color:var(--text3);letter-spacing:1px;border-top:1px solid var(--border);}
 
 /* ── NANO EDITOR ── */
 .nano-wrap{display:flex;flex-direction:column;height:100%;}
-.nano-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:4px 12px;font-size:9px;color:var(--text3);letter-spacing:2px;display:flex;justify-content:space-between;flex-shrink:0;}
+.nano-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:4px 12px;font-size:15px;color:var(--text3);letter-spacing:2px;display:flex;justify-content:space-between;flex-shrink:0;}
+
+/* ── M8c CONTRACT BOARD ── */
+.board-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.board-hdr{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.board-hdr-title{font-size:12px;letter-spacing:2px;color:var(--text3);}
+.board-rep{font-size:12px;color:var(--amber);}
+.board-list{flex:1;overflow-y:auto;padding:10px;}
+.contract-card{border:1px solid var(--border);background:var(--bg3);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s;position:relative;}
+.contract-card:hover{border-color:var(--border2);background:var(--bg4);}
+.contract-card.accepted{border-color:var(--green);background:var(--gbg);}
+.contract-card.accepted::after{content:'ACTIVE';position:absolute;top:8px;right:10px;font-size:10px;color:var(--green);letter-spacing:2px;}
+.contract-card.completed{border-color:var(--text3);opacity:.5;cursor:default;}
+.contract-card.completed::after{content:'COMPLETE';position:absolute;top:8px;right:10px;font-size:10px;color:var(--text3);letter-spacing:2px;}
+.contract-codename{font-size:14px;color:var(--text);font-weight:600;margin-bottom:4px;font-family:var(--mono);}
+.contract-meta{display:flex;gap:10px;margin-bottom:6px;align-items:center;}
+.contract-tier{font-size:11px;padding:1px 6px;letter-spacing:1px;}
+.contract-tier.t1{color:var(--text3);background:var(--bg4);}
+.contract-tier.t2{color:var(--cyan);background:var(--cglow);}
+.contract-tier.t3{color:var(--purple);background:var(--pbg);}
+.contract-tier.t4{color:var(--amber);background:var(--abg);}
+.contract-type{font-size:11px;color:var(--text3);letter-spacing:1px;}
+.contract-client{font-size:11px;color:var(--purple);}
+.contract-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:6px;}
+.contract-payout{font-size:13px;color:var(--amber);font-family:var(--mono);}
+.contract-intel{font-size:12px;color:var(--text3);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);}
+.contract-intel span{color:var(--cyan);}
+.contract-accept-btn{margin-top:8px;background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:2px;padding:5px 14px;cursor:pointer;}
+.contract-accept-btn:hover{background:var(--cyan);}
+.board-empty{padding:20px;text-align:center;color:var(--text3);font-size:13px;line-height:2;}
+
+.mi.spectr{border-left:2px solid var(--purple);}
+.mi.spectr .mifrom{color:var(--purple);letter-spacing:1px;}
+.spectr-body{color:var(--text2);line-height:2;font-family:var(--mono);font-size:14px;white-space:pre-wrap;}
+.spectr-body .spectr-sig{color:var(--purple);margin-top:16px;display:block;}
+.spectr-body .spectr-redacted{color:var(--bg4);background:var(--bg4);letter-spacing:-1px;border-radius:2px;cursor:pointer;}
+.spectr-body .spectr-redacted:hover{color:var(--text3);background:transparent;}
+.spectr-hdr{padding:10px 14px;border-bottom:1px solid rgba(163,113,247,.3);background:var(--pbg);margin-bottom:8px;}
+.spectr-hdr-from{font-size:12px;color:var(--purple);letter-spacing:2px;margin-bottom:2px;}
+.spectr-hdr-subj{font-size:14px;color:var(--text);margin-bottom:2px;}
+.spectr-hdr-meta{font-size:12px;color:var(--text3);}
+.tl.ghost{color:var(--purple);opacity:.85;font-style:italic;}
+.feed-wrap{padding:10px;overflow-y:auto;height:100%;}
+.feed-item{border-left:2px solid var(--border2);padding:8px 12px;margin-bottom:10px;}
+.feed-item.breach{border-color:var(--red);}.feed-item.leaked{border-color:var(--amber);}
+.feed-item.arrested{border-color:var(--purple);}.feed-item.zeroday{border-color:var(--cyan);}
+.feed-item.agency{border-color:var(--green);}
+.feed-tag{font-size:11px;letter-spacing:2px;margin-bottom:4px;}
+.feed-tag.breach{color:var(--red);}.feed-tag.leaked{color:var(--amber);}
+.feed-tag.arrested{color:var(--purple);}.feed-tag.zeroday{color:var(--cyan);}
+.feed-tag.agency{color:var(--green);}
+.feed-headline{font-size:14px;color:var(--text);margin-bottom:4px;}
+.feed-body{font-size:13px;color:var(--text3);line-height:1.7;}
+.feed-date{font-size:11px;color:var(--text3);margin-top:4px;}
 
 /* ── M7 TOOL ECOSYSTEM ── */
 .forge-wrap{display:flex;flex-direction:column;height:100%;}
 .forge-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
-.forge-tab{padding:5px 12px;font-size:9px;letter-spacing:2px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;}
+.forge-tab{padding:5px 12px;font-size:15px;letter-spacing:2px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .1s;}
 .forge-tab:hover{color:var(--text2);}
 .forge-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
 .forge-body{flex:1;overflow-y:auto;padding:10px;}
 /* Tool card */
-.tool-card{border:1px solid var(--border);background:var(--bg3);padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:all .1s;position:relative;}
+.tool-card{border:1px solid var(--border);background:var(--bg3);padding:8px 10px;margin-bottom:6px;cursor:pointer;transition:all .1s;position:relative;padding-right:10px;}
 .tool-card:hover{border-color:var(--border2);background:var(--bg4);}
 .tool-card.selected{border-color:var(--cyan);background:var(--cglow);}
 .tool-card.equipped{border-color:var(--green);background:var(--gbg);}
 .tool-card.locked{opacity:.4;cursor:not-allowed;}
 .tool-card-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
-.tool-name{font-size:11px;color:var(--text);font-weight:500;}
-.tool-tier{font-size:8px;padding:1px 5px;letter-spacing:1px;}
+.tool-name{font-size:14px;color:var(--text);font-weight:500;}
+.tool-tier{font-size:14px;padding:1px 5px;letter-spacing:1px;}
 .tool-tier.t1{color:var(--text3);background:var(--bg4);}
 .tool-tier.t2{color:var(--cyan);background:var(--cglow);}
 .tool-tier.t3{color:var(--purple);background:var(--pbg);}
 .tool-tier.t4{color:var(--amber);background:var(--abg);}
-.tool-cat{font-size:8px;color:var(--text3);margin-left:auto;}
-.tool-desc{font-size:9px;color:var(--text3);line-height:1.5;margin-bottom:4px;}
-.tool-effect{font-size:9px;color:var(--cyan);font-family:var(--mono);}
-.tool-cost{font-size:9px;color:var(--amber);position:absolute;top:8px;right:10px;}
-.tool-owned{font-size:9px;color:var(--green);position:absolute;top:8px;right:10px;}
+.tool-cat{font-size:14px;color:var(--text3);margin-left:auto;}
+.tool-desc{font-size:15px;color:var(--text3);line-height:1.5;margin-bottom:4px;}
+.tool-effect{font-size:15px;color:var(--cyan);font-family:var(--mono);}
+.tool-cost{font-size:13px;color:var(--amber);font-family:var(--mono);margin-top:6px;display:block;}
+.tool-owned{font-size:13px;color:var(--green);font-family:var(--mono);margin-top:4px;display:block;}
 /* Loadout slots */
 .loadout-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;}
 .loadout-slot{border:1px dashed var(--border2);padding:8px;min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;transition:all .1s;position:relative;}
 .loadout-slot:hover{border-color:var(--cyan3);background:var(--cglow);}
 .loadout-slot.filled{border-style:solid;border-color:var(--green);background:var(--gbg);}
 .loadout-slot.filled:hover{border-color:var(--red);background:var(--rbg);}
-.slot-label{font-size:8px;color:var(--text3);letter-spacing:1px;margin-bottom:3px;}
-.slot-tool-name{font-size:9px;color:var(--green);text-align:center;}
-.slot-empty{font-size:8px;color:var(--text3);letter-spacing:1px;}
-.slot-remove{font-size:8px;color:var(--red);position:absolute;top:3px;right:5px;cursor:pointer;}
+.slot-label{font-size:14px;color:var(--text3);letter-spacing:1px;margin-bottom:3px;}
+.slot-tool-name{font-size:15px;color:var(--green);text-align:center;}
+.slot-empty{font-size:14px;color:var(--text3);letter-spacing:1px;}
+.slot-remove{font-size:14px;color:var(--red);position:absolute;top:3px;right:5px;cursor:pointer;}
 /* Synergy badge */
-.synergy-banner{padding:6px 8px;background:var(--pbg);border:1px solid rgba(163,113,247,.4);margin-bottom:8px;font-size:9px;color:var(--purple);letter-spacing:1px;}
+.synergy-banner{padding:6px 8px;background:var(--pbg);border:1px solid rgba(163,113,247,.4);margin-bottom:8px;font-size:15px;color:var(--purple);letter-spacing:1px;}
 .synergy-banner strong{color:var(--purple);}
 /* Credits display */
-.credits-display{font-size:11px;color:var(--amber);font-family:var(--mono);margin-bottom:10px;padding:6px 8px;background:var(--abg);border:1px solid var(--adim);}
+.credits-display{font-size:14px;color:var(--amber);font-family:var(--mono);margin-bottom:10px;padding:6px 8px;background:var(--abg);border:1px solid var(--adim);}
 /* Market */
-.market-refresh{font-size:8px;color:var(--text3);margin-bottom:8px;letter-spacing:1px;}
+.market-refresh{font-size:14px;color:var(--text3);margin-bottom:8px;letter-spacing:1px;}
 .market-refresh span{color:var(--cyan);cursor:pointer;}
 .market-refresh span:hover{color:var(--text2);}
 
@@ -252,78 +347,78 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 #death-screen{position:fixed;inset:0;background:#000;z-index:5000;display:none;flex-direction:column;justify-content:center;align-items:center;padding:60px;}
 #death-screen.show{display:flex;animation:fadeIn .8s ease;}
 .death-title{font-size:48px;font-weight:700;color:var(--red);letter-spacing:8px;font-family:var(--mono);margin-bottom:8px;}
-.death-sub{font-size:13px;color:var(--text3);letter-spacing:4px;margin-bottom:48px;}
-.death-cause{font-size:12px;color:var(--amber);background:var(--abg);border:1px solid var(--adim);padding:8px 20px;margin-bottom:32px;letter-spacing:2px;}
+.death-sub{font-size:15px;color:var(--text3);letter-spacing:4px;margin-bottom:48px;}
+.death-cause{font-size:14px;color:var(--amber);background:var(--abg);border:1px solid var(--adim);padding:8px 20px;margin-bottom:32px;letter-spacing:2px;}
 .death-stats{width:500px;margin-bottom:40px;}
-.death-stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;}
+.death-stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:14px;}
 .death-stat-key{color:var(--text3);}
 .death-stat-val{color:var(--text2);}
 .death-stat-val.good{color:var(--green);}
 .death-stat-val.bad{color:var(--red);}
-.death-alias-new{font-size:11px;color:var(--text3);margin-bottom:24px;letter-spacing:2px;}
+.death-alias-new{font-size:14px;color:var(--text3);margin-bottom:24px;letter-spacing:2px;}
 .death-alias-new span{color:var(--cyan);}
-.death-btn{background:transparent;border:1px solid var(--cyan3);color:var(--cyan);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:4px;padding:12px 32px;cursor:pointer;transition:all .15s;}
+.death-btn{background:transparent;border:1px solid var(--cyan3);color:var(--cyan);font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:4px;padding:12px 32px;cursor:pointer;transition:all .15s;}
 .death-btn:hover{background:var(--cglow);border-color:var(--cyan);}
 /* Run complete screen */
 #run-complete{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:4500;display:none;flex-direction:column;justify-content:center;align-items:center;padding:60px;}
 #run-complete.show{display:flex;animation:fadeIn .5s ease;}
 .rc-title{font-size:32px;font-weight:700;color:var(--green);letter-spacing:6px;font-family:var(--mono);margin-bottom:8px;}
-.rc-sub{font-size:11px;color:var(--text3);letter-spacing:3px;margin-bottom:40px;}
+.rc-sub{font-size:14px;color:var(--text3);letter-spacing:3px;margin-bottom:40px;}
 .rc-stats{width:480px;margin-bottom:32px;}
-.rc-stat-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px;}
-.rc-btn{background:var(--gdim);border:none;color:var(--text);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:3px;padding:10px 28px;cursor:pointer;margin:4px;transition:background .15s;}
+.rc-stat-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:14px;}
+.rc-btn{background:var(--gdim);border:none;color:var(--text);font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:3px;padding:10px 28px;cursor:pointer;margin:4px;transition:background .15s;}
 .rc-btn:hover{background:var(--green);}
 .rc-btn.secondary{background:transparent;border:1px solid var(--border2);color:var(--text2);}
 .rc-btn.secondary:hover{border-color:var(--cyan);color:var(--cyan);}
 /* META// app */
-.meta-wrap{padding:12px;font-size:10px;overflow-y:auto;}
+.meta-wrap{padding:12px;font-size:14px;overflow-y:auto;}
 .meta-section{margin-bottom:14px;}
-.meta-section-hdr{font-size:8px;letter-spacing:3px;color:var(--text3);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.meta-section-hdr{font-size:14px;letter-spacing:3px;color:var(--text3);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);}
 .meta-row{display:flex;justify-content:space-between;padding:4px 0;}
 .meta-key{color:var(--text3);}
 .meta-val{color:var(--text2);}
 .meta-val.highlight{color:var(--cyan);}
 .meta-val.good{color:var(--green);}
 .meta-val.warn{color:var(--amber);}
-.alias-history-item{padding:4px 6px;border-left:2px solid var(--border);margin-bottom:3px;font-size:9px;color:var(--text3);}
+.alias-history-item{padding:4px 6px;border-left:2px solid var(--border);margin-bottom:3px;font-size:15px;color:var(--text3);}
 .alias-history-item.current{border-color:var(--cyan);color:var(--text2);}
 .alias-history-item.burned{border-color:var(--red);}
 /* Run number badge in taskbar */
-#tb-run{font-size:9px;color:var(--text3);}
+#tb-run{font-size:15px;color:var(--text3);}
 #tb-run span{color:var(--amber);}
 /* Contract difficulty badges */
-.contract-easy{color:var(--green);font-size:8px;padding:1px 4px;background:var(--gbg);}
-.contract-med{color:var(--amber);font-size:8px;padding:1px 4px;background:var(--abg);}
-.contract-hard{color:var(--red);font-size:8px;padding:1px 4px;background:var(--rbg);}
+.contract-easy{color:var(--green);font-size:14px;padding:1px 4px;background:var(--gbg);}
+.contract-med{color:var(--amber);font-size:14px;padding:1px 4px;background:var(--abg);}
+.contract-hard{color:var(--red);font-size:14px;padding:1px 4px;background:var(--rbg);}
 
 .nano-header span{color:var(--cyan);}
 .nano-body{flex:1;position:relative;}
-#nano-ta{width:100%;height:100%;background:var(--bg);border:none;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;resize:none;line-height:1.7;caret-color:var(--cyan);}
-.nano-footer{background:var(--bg3);border-top:1px solid var(--border);padding:4px 12px;font-size:9px;color:var(--text3);display:flex;gap:16px;flex-shrink:0;}
+#nano-ta{width:100%;height:100%;background:var(--bg);border:none;color:var(--text);font-family:var(--mono);font-size:14px;padding:10px 12px;outline:none;resize:none;line-height:1.7;caret-color:var(--cyan);}
+.nano-footer{background:var(--bg3);border-top:1px solid var(--border);padding:4px 12px;font-size:15px;color:var(--text3);display:flex;gap:16px;flex-shrink:0;}
 .nano-key{color:var(--cyan);}
 
 /* ── STICKY NOTES ── */
 .sticky{position:absolute;background:#1a1a0a;border:1px solid #3a3a00;display:flex;flex-direction:column;min-width:180px;min-height:120px;z-index:200;}
 .sticky.focused{border-color:#6a6a00;box-shadow:0 4px 16px rgba(0,0,0,0.6);}
 .sticky-tb{height:24px;background:#222200;border-bottom:1px solid #3a3a00;display:flex;align-items:center;padding:0 6px;cursor:move;flex-shrink:0;gap:5px;}
-.sticky-title{flex:1;font-size:9px;color:#8a8a00;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.sticky-close{background:none;border:none;color:#6a6a00;cursor:pointer;font-size:11px;padding:0;line-height:1;}
+.sticky-title{flex:1;font-size:15px;color:#8a8a00;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sticky-close{background:none;border:none;color:#6a6a00;cursor:pointer;font-size:14px;padding:0;line-height:1;}
 .sticky-close:hover{color:#d29922;}
-.sticky-body{flex:1;padding:8px 10px;overflow-y:auto;font-size:11px;color:#c8c820;font-family:var(--mono);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+.sticky-body{flex:1;padding:8px 10px;overflow-y:auto;font-size:14px;color:#c8c820;font-family:var(--mono);line-height:1.7;white-space:pre-wrap;word-break:break-word;}
 .sticky-rh{position:absolute;bottom:0;right:0;width:12px;height:12px;cursor:se-resize;}
 .sticky-rh::after{content:'';position:absolute;bottom:2px;right:2px;width:5px;height:5px;border-right:1px solid #3a3a00;border-bottom:1px solid #3a3a00;}
 
 /* ── TAB AUTOCOMPLETE ── */
-#tab-suggest{position:absolute;background:var(--bg2);border:1px solid var(--border2);font-size:11px;font-family:var(--mono);z-index:300;max-height:120px;overflow-y:auto;pointer-events:none;}
+#tab-suggest{position:absolute;background:var(--bg2);border:1px solid var(--border2);font-size:14px;font-family:var(--mono);z-index:300;max-height:120px;overflow-y:auto;pointer-events:none;}
 .ts-item{padding:3px 10px;color:var(--text2);}
 .ts-item.active{background:var(--cglow);color:var(--cyan);}
 
 /* ── INTEL APP ── */
-.intel-wrap{padding:10px;font-size:10px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+.intel-wrap{padding:10px;font-size:14px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
 .intel-section{border:1px solid var(--border);background:var(--bg3);}
-.intel-section-hdr{padding:5px 8px;font-size:8px;letter-spacing:2px;color:var(--text3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
+.intel-section-hdr{padding:5px 8px;font-size:14px;letter-spacing:2px;color:var(--text3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
 .intel-section-hdr span{color:var(--cyan);}
-.intel-entry{padding:5px 8px;border-bottom:1px solid var(--border);font-size:10px;}
+.intel-entry{padding:5px 8px;border-bottom:1px solid var(--border);font-size:14px;}
 .intel-entry:last-child{border-bottom:none;}
 .intel-key{color:var(--text3);margin-right:6px;}
 .intel-val{color:var(--text2);}
@@ -331,41 +426,41 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .intel-val.crit{color:var(--red);}
 
 /* ── M5 PHISHING ENGINE ── */
-.phish-wrap{display:flex;height:100%;font-size:11px;}
+.phish-wrap{display:flex;height:100%;font-size:14px;}
 .phish-sidebar{width:200px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
-.phish-sidebar-hdr{font-size:8px;letter-spacing:2px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.phish-sidebar-hdr{font-size:14px;letter-spacing:2px;color:var(--text3);padding:8px 10px;border-bottom:1px solid var(--border);flex-shrink:0;}
 .phish-target-item{padding:8px 10px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;}
 .phish-target-item:hover{background:var(--bg3);}
 .phish-target-item.sel{background:var(--cglow);border-left:2px solid var(--cyan);}
-.phish-target-name{font-size:10px;color:var(--text2);margin-bottom:2px;}
-.phish-target-role{font-size:8px;color:var(--text3);}
-.phish-aw{font-size:8px;float:right;padding:1px 4px;letter-spacing:1px;}
+.phish-target-name{font-size:14px;color:var(--text2);margin-bottom:2px;}
+.phish-target-role{font-size:14px;color:var(--text3);}
+.phish-aw{font-size:14px;float:right;padding:1px 4px;letter-spacing:1px;}
 .phish-aw.low{color:var(--green);background:var(--gbg);}
 .phish-aw.med{color:var(--amber);background:var(--abg);}
 .phish-aw.high{color:var(--red);background:var(--rbg);}
 .phish-composer{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-.phish-chdr{padding:8px 12px;border-bottom:1px solid var(--border);font-size:8px;letter-spacing:2px;color:var(--text3);}
+.phish-chdr{padding:8px 12px;border-bottom:1px solid var(--border);font-size:14px;letter-spacing:2px;color:var(--text3);}
 .phish-field{display:flex;align-items:center;padding:5px 12px;border-bottom:1px solid var(--border);gap:8px;}
-.phish-flbl{font-size:9px;color:var(--text3);width:52px;flex-shrink:0;letter-spacing:1px;}
-.phish-fval{font-size:10px;color:var(--text2);flex:1;}
-.phish-sel{background:var(--bg);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:10px;padding:2px 6px;outline:none;flex:1;user-select:text;-webkit-user-select:text;}
+.phish-flbl{font-size:15px;color:var(--text3);width:52px;flex-shrink:0;letter-spacing:1px;}
+.phish-fval{font-size:14px;color:var(--text2);flex:1;}
+.phish-sel{background:var(--bg);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:16px;padding:2px 6px;outline:none;flex:1;user-select:text;-webkit-user-select:text;}
 .phish-sel:focus{border-color:var(--cyan3);}
 .phish-preview{flex:1;padding:10px 12px;overflow-y:auto;background:var(--bg);}
-.phish-preview-subj{font-size:11px;color:var(--text);font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
-.phish-preview-body{font-size:10px;color:var(--text2);line-height:1.8;white-space:pre-wrap;}
+.phish-preview-subj{font-size:14px;color:var(--text);font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.phish-preview-body{font-size:14px;color:var(--text2);line-height:1.8;white-space:pre-wrap;}
 .phish-token{color:var(--amber);}
 .phish-footer{padding:8px 12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.phish-send-btn{background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:2px;padding:6px 14px;cursor:pointer;transition:background .15s;}
+.phish-send-btn{background:var(--cyan3);border:none;color:var(--text);font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:2px;padding:6px 14px;cursor:pointer;transition:background .15s;}
 .phish-send-btn:hover{background:var(--cyan);}
 .phish-send-btn:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed;}
-.phish-quality{font-size:9px;color:var(--text3);}
+.phish-quality{font-size:15px;color:var(--text3);}
 .phish-quality span{color:var(--amber);}
-#phish-outcome{position:fixed;top:38px;left:50%;transform:translateX(-50%);padding:10px 18px;font-size:11px;font-family:var(--mono);z-index:3000;display:none;letter-spacing:1px;animation:slideIn .2s ease;min-width:300px;text-align:center;}
+#phish-outcome{position:fixed;top:38px;left:50%;transform:translateX(-50%);padding:10px 18px;font-size:14px;font-family:var(--mono);z-index:3000;display:none;letter-spacing:1px;animation:slideIn .2s ease;min-width:300px;text-align:center;}
 #phish-outcome.success{background:var(--gbg);border:1px solid var(--gdim);color:var(--green);}
 #phish-outcome.fail{background:var(--rbg);border:1px solid var(--rdim);color:var(--red);}
 #phish-outcome.alert{background:var(--abg);border:1px solid var(--adim);color:var(--amber);}
 {color:#3fb950;}.sec-suspicious{color:#d29922;}.sec-incident{color:#f85149;}.sec-lockdown{color:#a371f7;}
-.sec-badge{font-size:9px;padding:1px 5px;letter-spacing:1px;font-family:var(--mono);}
+.sec-badge{font-size:15px;padding:1px 5px;letter-spacing:1px;font-family:var(--mono);}
 .sec-badge.nominal{background:rgba(63,185,80,0.1);border:1px solid #238636;}
 .sec-badge.suspicious{background:rgba(210,153,34,0.1);border:1px solid #9e6a03;}
 .sec-badge.incident{background:rgba(248,81,73,0.1);border:1px solid #da3633;}
@@ -374,47 +469,47 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .mi.alert .mifrom{color:var(--red);}
 .mi.alert{border-left:2px solid var(--red);}
 /* SECMON panel */
-.secmon-wrap{padding:10px;font-size:10px;overflow-y:auto;}
+.secmon-wrap{padding:10px;font-size:14px;overflow-y:auto;}
 .secmon-node{padding:7px 8px;border:1px solid var(--border);margin-bottom:5px;background:var(--bg3);}
 .secmon-node-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
-.secmon-node-name{font-size:10px;color:var(--text2);font-weight:700;}
-.secmon-event{font-size:9px;color:var(--text3);margin-top:2px;padding-left:6px;border-left:1px solid var(--border);}
+.secmon-node-name{font-size:14px;color:var(--text2);font-weight:700;}
+.secmon-event{font-size:15px;color:var(--text3);margin-top:2px;padding-left:6px;border-left:1px solid var(--border);}
 .secmon-event.warn{color:var(--amber);}.secmon-event.err{color:var(--red);}
 
-.exfil-wrap{padding:10px;font-size:10px;overflow-y:auto;}
-.exfil-hdr{font-size:8px;letter-spacing:3px;color:var(--text3);margin-bottom:8px;}
+.exfil-wrap{padding:10px;font-size:14px;overflow-y:auto;}
+.exfil-hdr{font-size:14px;letter-spacing:3px;color:var(--text3);margin-bottom:8px;}
 .exfil-item{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border:1px solid var(--border);margin-bottom:4px;background:var(--bg3);}
-.exfil-name{color:var(--text2);font-size:10px;}
-.exfil-tag{font-size:8px;padding:2px 5px;letter-spacing:1px;}
+.exfil-name{color:var(--text2);font-size:14px;}
+.exfil-tag{font-size:14px;padding:2px 5px;letter-spacing:1px;}
 .exfil-tag.high{background:var(--rbg);color:var(--red);}
 .exfil-tag.med{background:var(--abg);color:var(--amber);}
 .exfil-tag.low{background:var(--gbg);color:var(--green);}
-.exfil-empty{color:var(--text3);font-size:10px;padding:8px;letter-spacing:1px;}
+.exfil-empty{color:var(--text3);font-size:14px;padding:8px;letter-spacing:1px;}
 
 /* MISSION PANEL */
-.mission-wrap{padding:12px;font-size:10px;overflow-y:auto;}
-.mission-title{font-size:12px;color:var(--cyan);font-weight:700;margin-bottom:4px;letter-spacing:1px;}
-.mission-sub{font-size:9px;color:var(--text3);margin-bottom:12px;letter-spacing:1px;}
+.mission-wrap{padding:12px;font-size:14px;overflow-y:auto;}
+.mission-title{font-size:14px;color:var(--cyan);font-weight:700;margin-bottom:4px;letter-spacing:1px;}
+.mission-sub{font-size:15px;color:var(--text3);margin-bottom:12px;letter-spacing:1px;}
 .obj-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);}
-.obj-check{width:12px;height:12px;border:1px solid var(--border3);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;}
+.obj-check{width:12px;height:12px;border:1px solid var(--border3);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:15px;}
 .obj-check.done{background:var(--gbg);border-color:var(--gdim);color:var(--green);}
 .obj-check.fail{background:var(--rbg);border-color:var(--rdim);color:var(--red);}
 .obj-text{color:var(--text2);line-height:1.5;}
 .obj-text.done{color:var(--text3);text-decoration:line-through;}
-.obj-hint{font-size:9px;color:var(--text3);margin-top:2px;}
+.obj-hint{font-size:15px;color:var(--text3);margin-top:2px;}
 .mission-reward{margin-top:10px;padding:8px;background:var(--bg3);border:1px solid var(--border);}
-.mission-reward-lbl{font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:4px;}
-.mission-reward-val{color:var(--amber);font-size:11px;}
+.mission-reward-lbl{font-size:14px;letter-spacing:2px;color:var(--text3);margin-bottom:4px;}
+.mission-reward-val{color:var(--amber);font-size:14px;}
 
 /* TRACE WIDGET */
 #trace-ind{position:fixed;bottom:28px;right:14px;width:190px;background:var(--bg2);border:1px solid var(--border);padding:8px 10px;z-index:500;display:none;pointer-events:none;}
-.tr-lbl{font-size:8px;letter-spacing:2px;color:var(--text3);margin-bottom:5px;display:flex;justify-content:space-between;}
+.tr-lbl{font-size:14px;letter-spacing:2px;color:var(--text3);margin-bottom:5px;display:flex;justify-content:space-between;}
 #tr-pct{color:var(--red);}
 .tr-t{height:3px;background:var(--bg4);}
 #tr-f{height:100%;width:0%;background:var(--green);transition:width .25s,background .25s;}
 
 /* NOTIFICATION */
-#notif{position:fixed;top:40px;right:14px;background:var(--bg3);border:1px solid var(--border);padding:8px 12px;z-index:800;display:none;font-size:10px;max-width:260px;animation:slideIn .2s ease;}
+#notif{position:fixed;top:40px;right:14px;background:var(--bg3);border:1px solid var(--border);padding:8px 12px;z-index:800;display:none;font-size:14px;max-width:260px;animation:slideIn .2s ease;}
 #notif.ok{border-color:var(--gdim);background:var(--gbg);}
 #notif.warn{border-color:var(--adim);background:var(--abg);}
 #notif.err{border-color:var(--rdim);background:var(--rbg);}
@@ -426,6 +521,286 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 @keyframes fi{from{opacity:0;}to{opacity:1;}}
 .blink{animation:blk 1s step-end infinite;}
 @keyframes blk{50%{opacity:0;}}
+
+/* ══════════════════════════════════════════
+   MOBILE SHELL — bottom nav + full-screen apps
+══════════════════════════════════════════ */
+#mob-shell{
+  position:fixed;inset:0;
+  background:var(--bg);
+  display:none;
+  flex-direction:column;
+  z-index:100;
+}
+/* Status strip at top */
+#mob-status{
+  height:28px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  gap:14px;
+  flex-shrink:0;
+  font-family:var(--mono);
+  font-size:11px;
+}
+#mob-status span{color:var(--text3);}
+#mob-clk{color:var(--text2) !important;}
+
+/* Full-screen app content area */
+#mob-app-panel{
+  flex:1;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+
+/* Bottom nav bar */
+#mob-nav{
+  height:56px;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:stretch;
+  flex-shrink:0;
+  /* Safe area for iPhone home indicator */
+  padding-bottom:env(safe-area-inset-bottom, 0px);
+}
+.mob-nav-btn{
+  flex:1;
+  background:transparent;
+  border:none;
+  color:var(--text3);
+  font-family:var(--mono);
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  position:relative;
+  transition:background .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-nav-btn:active{background:var(--bg3);}
+.mob-nav-btn.active{color:var(--cyan);border-top:2px solid var(--cyan);}
+.mob-nav-icon{font-size:16px;line-height:1;}
+.mob-nav-lbl{font-size:9px;letter-spacing:1px;}
+.mob-nav-badge{
+  position:absolute;top:6px;right:calc(50% - 14px);
+  background:var(--red);color:#fff;
+  font-size:9px;font-family:var(--mono);
+  width:14px;height:14px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* More drawer — slides up from bottom */
+#mob-more-drawer{
+  position:absolute;
+  bottom:56px;left:0;right:0;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  padding:12px;
+  z-index:200;
+  animation:slideUp .15s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.mob-drawer-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-bottom:10px;
+}
+.mob-drawer-btn{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  color:var(--text2);
+  font-family:var(--mono);
+  font-size:11px;
+  padding:10px 4px;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-drawer-btn span{font-size:16px;}
+.mob-drawer-btn:active{background:var(--cglow);border-color:var(--cyan);}
+.mob-drawer-close{
+  width:100%;
+  background:transparent;
+  border:1px solid var(--border);
+  color:var(--text3);
+  font-family:var(--mono);
+  font-size:12px;
+  padding:8px;
+  cursor:pointer;
+  letter-spacing:2px;
+}
+
+/* Mobile terminal — sticky input at bottom */
+#mob-term-out{
+  flex:1;
+  overflow-y:auto;
+  padding:10px 12px;
+  font-size:14px;
+  line-height:1.7;
+  font-family:var(--mono);
+  /* Extra bottom padding so content isn't hidden behind sticky input */
+  padding-bottom:60px;
+}
+#mob-term-input-bar{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  padding:6px 10px;
+  gap:0;
+  z-index:10;
+}
+#mob-term-prompt{
+  font-family:var(--mono);
+  font-size:13px;
+  color:var(--cyan);
+  white-space:nowrap;
+  flex-shrink:0;
+}
+#mob-term-inp{
+  flex:1;
+  background:transparent;
+  border:none;
+  color:var(--text);
+  font-family:var(--mono);
+  font-size:16px; /* 16px prevents iOS zoom */
+  outline:none;
+  caret-color:var(--cyan);
+  user-select:text;
+  -webkit-user-select:text;
+}
+/* Quick command bar above input on mobile */
+#mob-quickbar{
+  display:flex;
+  gap:6px;
+  padding:4px 10px;
+  background:var(--bg3);
+  border-top:1px solid var(--border);
+  overflow-x:auto;
+  flex-shrink:0;
+}
+.mob-quick-btn{
+  background:var(--bg4);
+  border:1px solid var(--border);
+  color:var(--text2);
+  font-family:var(--mono);
+  font-size:11px;
+  padding:4px 8px;
+  cursor:pointer;
+  white-space:nowrap;
+  flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+}
+.mob-quick-btn:active{background:var(--cglow);color:var(--cyan);}
+
+══════════════════════════════════════════ */
+
+/* Ensure proper text scaling on iOS */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* Windows: always clamp to viewport */
+.win {
+  max-width: calc(100vw - 8px) !important;
+  max-height: calc(100vh - 56px) !important;
+  box-sizing: border-box !important;
+}
+
+/* Taskbar: scrollable on narrow screens */
+@media (max-width: 720px) {
+  #tb { padding: 0 6px; }
+  .tb-apps { overflow-x: auto; gap: 2px; flex-shrink: 1; }
+  .tab { padding: 2px 6px; font-size: 11px; white-space: nowrap; }
+  .tb-logo { display: none; }
+  #tb-r { gap: 8px; flex-shrink: 0; }
+  .tbs { display: none; }
+  #tb-run { display: none; }
+  #tb-clk { font-size: 11px; white-space: nowrap; }
+}
+
+/* Mobile: windows snap to full width */
+@media (max-width: 600px) {
+  .win {
+    left: 0 !important;
+    top: 30px !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: unset !important;
+    height: calc(100vh - 52px) !important;
+    max-height: calc(100vh - 52px) !important;
+    border-left: none !important;
+    border-right: none !important;
+  }
+  .rh { display: none !important; }
+  /* Two-panel apps stack vertically */
+  .phish-wrap { flex-direction: column !important; }
+  .phish-sidebar {
+    width: 100% !important;
+    max-height: 160px;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+  .ml-wrap { flex-direction: column !important; }
+  /* Mail inbox — stack list above message view */
+  #mail-inbox-view { flex-direction: column !important; }
+  .ml-list {
+    width: 100% !important;
+    max-height: 200px;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+  #ml-view {
+    flex: 1;
+    min-height: 200px;
+    overflow-y: auto;
+  }
+  /* Terminal: prevent iOS auto-zoom on focus */
+  .tinp { font-size: 16px !important; }
+  /* Full-screen overlays */
+  #death-screen { padding: 20px; }
+  .death-title { font-size: 28px; letter-spacing: 3px; }
+  .death-stats, .rc-stats { width: 100% !important; }
+  #run-complete { padding: 20px; }
+  /* Palette full-width */
+  #cmdpal { width: calc(100vw - 12px) !important; left: 6px !important; transform: none !important; top: 34px; }
+  /* Forge 2-col on mobile */
+  .loadout-grid { grid-template-columns: 1fr 1fr !important; }
+  /* Status bar compress */
+  #sbar { gap: 8px; }
+  .sbi { font-size: 10px; }
+  /* Desktop icons off on mobile */
+  #dicons { display: none; }
+}
+
+/* Touch-friendly tap targets (44px minimum per WCAG 2.5.5) */
+@media (pointer: coarse) {
+  .tab { min-height: 36px; align-items: center; display: inline-flex; }
+  .wb { width: 14px !important; height: 14px !important; }
+  .mail-tab, .forge-tab { min-height: 40px; display: flex; align-items: center; }
+  .phish-target-item { padding: 12px 10px; }
+  .tool-card { padding: 12px; }
+  .mi { padding: 12px 10px; }
+  .compose-send, .phish-send-btn, .rc-btn, .death-btn, .lb { min-height: 48px; font-size: 15px; }
+  .obj-item { padding: 10px 0; }
+  /* Larger scroll thumbs on touch */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+}
+
 </style>
 </head>
 <body>
@@ -473,7 +848,7 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 <!-- LOGIN -->
 <div id="login">
   <div class="ll">NULL//TRACE</div>
-  <div class="lv">OS v0.7.0 — M7 BUILD</div>
+  <div class="lv">OS v0.8.0 — M8 BUILD</div>
   <div class="lbox">
     <div class="lf"><label class="llbl">ALIAS</label><input class="li" id="lu" type="text" value="ghost_0x1" autocomplete="off" spellcheck="false" tabindex="1"></div>
     <div class="lf"><label class="llbl">PASSPHRASE</label><input class="li" id="lp" type="password" autocomplete="off" tabindex="2"></div>
@@ -486,21 +861,10 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 <!-- DESKTOP -->
 <div id="desktop">
   <div id="tb">
-    <div id="tb-l">
+    <div id="tb-l" style="overflow:visible;">
       <div class="tb-logo">N//T</div>
-      <div class="tb-apps" id="tb-apps">
-        <button class="tab" onclick="openApp('terminal')">TERM//</button>
-        <button class="tab" onclick="openApp('netmap')">NET//MAP</button>
-        <button class="tab" onclick="openApp('mail')">MAIL//</button>
-        <button class="tab" onclick="openApp('phish')">PHISH//</button>
-        <button class="tab" onclick="openApp('forge')">FORGE//</button>
-        <button class="tab" onclick="openApp('exfil')">EXFIL//</button>
-        <button class="tab" onclick="openApp('intel')">INTEL//</button>
-        <button class="tab" onclick="openApp('mission')">MISSION//</button>
-        <button class="tab" onclick="openApp('meta')">META//</button>
-        <button class="tab" onclick="openApp('secmon')">SEC//MON</button>
-        <button class="tab" onclick="openApp('sysmon')">SYS//</button>
-      </div>
+      <button id="apps-btn" onclick="toggleAppsMenu(event)">APPS ▾</button>
+      <div class="tb-apps" id="tb-windows"></div>
     </div>
     <div id="tb-r">
       <div class="tbs" id="tb-proxy">PROXY:<span>NONE</span></div>
@@ -510,14 +874,46 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
       <div id="tb-clk">00:00:00</div>
     </div>
   </div>
-  <div id="ws">
-    <div id="dicons">
-      <div class="dico" ondblclick="openApp('terminal')"><div class="dico-g">❯_</div><div class="dico-l">TERM//</div></div>
-      <div class="dico" ondblclick="openApp('netmap')"><div class="dico-g">⬡</div><div class="dico-l">NET//MAP</div></div>
-      <div class="dico" ondblclick="openApp('mail')"><div class="dico-g">@</div><div class="dico-l">MAIL//</div></div>
-      <div class="dico" ondblclick="openApp('secmon')"><div class="dico-g">◈</div><div class="dico-l">SEC//MON</div></div>
-      <div class="dico" ondblclick="openApp('mission')"><div class="dico-g">◎</div><div class="dico-l">MISSION//</div></div>
+
+  <!-- APPS DROPDOWN -->
+  <div id="apps-dropdown">
+    <div class="apps-grid">
+      <div>
+        <div class="apps-col-hdr">SYSTEM</div>
+        <div class="apps-item" data-app="netmap"  onclick="appsLaunch('netmap')"> <span class="apps-item-icon">⬡</span><span class="apps-item-name">NET//MAP</span> <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('netmap')">PIN</span></div>
+        <div class="apps-item" data-app="secmon"  onclick="appsLaunch('secmon')"> <span class="apps-item-icon">◈</span><span class="apps-item-name">SEC//MON</span><span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('secmon')">PIN</span></div>
+        <div class="apps-item" data-app="sysmon"  onclick="appsLaunch('sysmon')"> <span class="apps-item-icon">◉</span><span class="apps-item-name">SYS//</span>    <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('sysmon')">PIN</span></div>
+      </div>
+      <div>
+        <div class="apps-col-hdr">INTEL</div>
+        <div class="apps-item badge-amber" id="aitem-intel"   data-app="intel"   onclick="appsLaunch('intel')">  <span class="apps-item-icon">i</span><span class="apps-item-name">INTEL//</span>  <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('intel')">PIN</span></div>
+        <div class="apps-item"             data-app="feed"    onclick="appsLaunch('feed')">   <span class="apps-item-icon">📡</span><span class="apps-item-name">FEED//</span>   <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('feed')">PIN</span></div>
+        <div class="apps-item"             data-app="meta"    onclick="appsLaunch('meta')">   <span class="apps-item-icon">≋</span><span class="apps-item-name">META//</span>   <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('meta')">PIN</span></div>
+      </div>
+      <div>
+        <div class="apps-col-hdr">OPERATIONS</div>
+        <div class="apps-item badge-red"    id="aitem-mail"    data-app="mail"    onclick="appsLaunch('mail')">    <span class="apps-item-icon">@</span><span class="apps-item-name">MAIL//</span>    <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('mail')">PIN</span></div>
+        <div class="apps-item badge-amber"  id="aitem-forge"   data-app="forge"   onclick="appsLaunch('forge')">   <span class="apps-item-icon">⚒</span><span class="apps-item-name">FORGE//</span>   <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('forge')">PIN</span></div>
+        <div class="apps-item"             data-app="exfil"   onclick="appsLaunch('exfil')">  <span class="apps-item-icon">↑</span><span class="apps-item-name">EXFIL//</span>   <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('exfil')">PIN</span></div>
+        <div class="apps-item badge-purple" id="aitem-mission" data-app="mission" onclick="appsLaunch('mission')"> <span class="apps-item-icon">◎</span><span class="apps-item-name">MISSION//</span><span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('mission')">PIN</span></div>
+        <div class="apps-item badge-purple" id="aitem-board"   data-app="board"   onclick="appsLaunch('board')">   <span class="apps-item-icon">◈</span><span class="apps-item-name">BOARD//</span>   <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('board')">PIN</span></div>
+      </div>
+      <div>
+        <div class="apps-col-hdr">SOCIAL</div>
+        <div class="apps-item" data-app="phish"   onclick="appsLaunch('phish')">  <span class="apps-item-icon">✉</span><span class="apps-item-name">PHISH//</span>   <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('phish')">PIN</span></div>
+        <div class="apps-item" data-app="nano"    onclick="appsLaunch('nano-new')"><span class="apps-item-icon">✏</span><span class="apps-item-name">NANO//</span>    <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('nano')">PIN</span></div>
+      </div>
     </div>
+    <div class="apps-footer">Right-click desktop icons to unpin · Click PIN to add to desktop</div>
+  </div>
+
+  <!-- CONTEXT MENU -->
+  <div id="ctx-menu">
+    <div class="ctx-item" id="ctx-open"   onclick="ctxOpen()">Open</div>
+    <div class="ctx-item danger"          onclick="ctxUnpin()">Remove from Desktop</div>
+  </div>
+  <div id="ws">
+    <div id="dicons"></div>
   </div>
   <div id="sbar">
     <div class="sbi ok" id="sb-status">STATUS:<span>SECURE</span></div>
@@ -526,6 +922,58 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
     <div class="sbi" id="sb-path">PATH:<span>—</span></div>
     <div class="sbi" id="sb-obj" style="margin-left:auto">OBJ:<span>0/4</span></div>
     <div class="sbi" id="sb-trace">TRACE:<span>—</span></div>
+  </div>
+</div>
+
+<!-- MOBILE FULL-SCREEN APP PANEL -->
+<div id="mob-shell" style="display:none;">
+  <!-- Mobile status strip -->
+  <div id="mob-status">
+    <span id="mob-alias">ghost_0x1</span>
+    <span id="mob-conn" style="color:var(--text3)">OFFLINE</span>
+    <span id="mob-trace" style="color:var(--text3)">—</span>
+    <span id="mob-clk" style="margin-left:auto">00:00:00</span>
+  </div>
+  <!-- Full-screen app content -->
+  <div id="mob-app-panel"></div>
+  <!-- Bottom nav bar -->
+  <div id="mob-nav">
+    <button class="mob-nav-btn active" id="mnav-terminal" onclick="mobOpenApp('terminal')">
+      <span class="mob-nav-icon">❯_</span>
+      <span class="mob-nav-lbl">TERM</span>
+    </button>
+    <button class="mob-nav-btn" id="mnav-netmap" onclick="mobOpenApp('netmap')">
+      <span class="mob-nav-icon">⬡</span>
+      <span class="mob-nav-lbl">MAP</span>
+    </button>
+    <button class="mob-nav-btn" id="mnav-mail" onclick="mobOpenApp('mail')">
+      <span class="mob-nav-icon">@</span>
+      <span class="mob-nav-lbl">MAIL</span>
+      <span class="mob-nav-badge" id="mnav-mail-badge" style="display:none"></span>
+    </button>
+    <button class="mob-nav-btn" id="mnav-mission" onclick="mobOpenApp('mission')">
+      <span class="mob-nav-icon">◎</span>
+      <span class="mob-nav-lbl">OBJ</span>
+    </button>
+    <button class="mob-nav-btn" id="mnav-more" onclick="mobToggleMore()">
+      <span class="mob-nav-icon">⋯</span>
+      <span class="mob-nav-lbl">MORE</span>
+    </button>
+  </div>
+  <!-- More apps drawer (slides up) -->
+  <div id="mob-more-drawer" style="display:none;">
+    <div class="mob-drawer-grid">
+      <button class="mob-drawer-btn" onclick="mobOpenApp('phish')"><span>✉</span>PHISH</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('forge')"><span>⚒</span>FORGE</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('exfil')"><span>↑</span>EXFIL</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('intel')"><span>i</span>INTEL</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('meta')"><span>≋</span>META</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('board')"><span>◈</span>BOARD</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('feed')"><span>📡</span>FEED</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('secmon')"><span>◈</span>SEC</button>
+      <button class="mob-drawer-btn" onclick="mobOpenApp('sysmon')"><span>◉</span>SYS</button>
+    </div>
+    <button class="mob-drawer-close" onclick="mobToggleMore()">✕ CLOSE</button>
   </div>
 </div>
 
@@ -587,6 +1035,9 @@ function escalateSecurity(nodeId,reason,newState){
       patchedExploits[nodeId]=true;
       // M5b — trigger org-wide response for proc org
       setTimeout(()=>triggerOrgWideIncidentResponse(nodeId, reason), 1500);
+      // M8c — log for FEED//
+      if(proceduralOrg && nodeId==='PROC-ORG')
+        logFeedAction('incident_triggered', {orgName: proceduralOrg.name});
     } else if(newState==='LOCKDOWN'){
       pline(`[!!!] LOCKDOWN — ${NETWORK[nodeId].label} — DISCONNECT NOW`,'err');
       pline(`[!!!] ${reason}`,'err');
@@ -854,7 +1305,7 @@ const LFS = {
 // ══════════════════════════════════════════════
 const MAILS = [
   {id:0,from:'NULL-SIGNAL-HANDLER',subj:'CONTRACT: OP-VORTEX',time:'00:00',unread:true,body:`Operator,\n\nContract designated: OP-VORTEX\nClient: ANONYMOUS\nTarget: Axiom Industries Corp Network\nObjective: Corporate intelligence extraction\n\nPRIMARY OBJECTIVES:\n 1. Locate exec auth token\n 2. Access EXEC-TERM (10.10.1.1)\n 3. Exfiltrate acquisition plan from rchen home dir\n 4. Exit without trace completion\n\nBonus: Exfil the full DB dump from /backups/\n\nEntry: GATEWAY (192.168.1.1) — no auth required\nNote: Internal nodes are firewalled.\nCred hunting required. Start at WEB-SRV.\n\nPayout: 4,200 cr on completion\nBonus: +800 cr for clean exit\n\n— NULL SIGNAL HANDLER`},
-  {id:1,from:'AUTOSYS',subj:'[WARN] No proxy configured',time:'00:01',unread:true,body:`SYSTEM ALERT\n\nNo proxy chain detected.\nAll connections expose your real IP: 10.0.0.47\n\nIf traced on any node, your identity burns.\nProxy management: coming in v0.3.\n\nRisk level: HIGH\n— AutoSys`},
+  {id:1,from:'AUTOSYS',subj:'[WARN] No proxy configured',time:'00:01',unread:true,body:`SYSTEM ALERT\n\nNo proxy chain detected.\nAll connections expose your real IP: 10.0.0.47\n\nIf traced on any node, your activity is logged\nagainst this address. Identity burn risk: HIGH.\n\nTO FIX:\n  1. Open FORGE// → MARKET\n  2. Buy a ProxyChain tool (or use the free v1)\n  3. Equip it in FORGE// → LOADOUT\n\nProxyChain v1 is in your default loadout.\nCheck FORGE// to confirm it is equipped.\n\nCommands:\n  proxy status    check current protection\n  proxy help      full setup guide\n\n— AutoSys`},
   {id:2,from:'NULL-SIGNAL-HANDLER',subj:'INTEL: Target org overview',time:'00:02',unread:false,body:`Operator,\n\nPre-operation intelligence on Axiom Corp:\n\nORG: Axiom Industries\nSIZE: ~200 employees\nSECURITY: Mixed — some hardened, some negligent\n\nKEY PERSONNEL:\n  R. Chen    CFO — executive terminal access\n  J. Martin  DevOps — web/db server admin\n  K. Sullivan IT Admin — mail server admin\n  B. Wong    Security — SIEM monitoring\n\nNote: Jeff Martin is known to leave credentials\nin plaintext. Start there.\n\nGood luck.\n— NSH`},
 ];
 
@@ -960,13 +1411,29 @@ function doLogin(){
 // DESKTOP
 // ══════════════════════════════════════════════
 function launchDesktop(){
+  if(checkMobileMode()){
+    // Mobile — use full-screen shell instead of floating windows
+    document.getElementById('desktop').style.display='none';
+    launchMobileShell();
+    startClock();
+    const aliasEl=document.getElementById('sb-alias');
+    if(aliasEl) aliasEl.querySelector('span').textContent=currentUser;
+    setTimeout(()=>initProceduralOrg(),1200);
+    // M8a — fire triggers on mobile
+    setTimeout(()=>{ fireSpectrTrigger('first_boot'); checkRunBasedTriggers(); startGhostPresence(); }, 2000);
+    setTimeout(()=>updateBadges(), 1500); // M8b — initial badges
+    return;
+  }
+  // Desktop mode — normal window manager
   const d=document.getElementById('desktop');
   d.style.display='flex'; d.classList.add('fade-in');
   document.getElementById('sb-alias').querySelector('span').textContent=currentUser;
   startClock();
-  setTimeout(()=>{openApp('terminal'); openApp('mission');},400);
-  setTimeout(()=>openApp('netmap'),700);
-  setTimeout(()=>initProceduralOrg(),1200);
+  setTimeout(()=>openApp('terminal'), 400);
+  setTimeout(()=>renderDesktopIcons(), 200);
+  setTimeout(()=>initProceduralOrg(), 1200);
+  setTimeout(()=>{ fireSpectrTrigger('first_boot'); checkRunBasedTriggers(); startGhostPresence(); }, 2000);
+  setTimeout(()=>updateBadges(), 1500);
 }
 let ticks=0;
 function startClock(){
@@ -976,6 +1443,13 @@ function startClock(){
     const m=String(Math.floor((ticks%3600)/60)).padStart(2,'0');
     const s=String(ticks%60).padStart(2,'0');
     document.getElementById('tb-clk').textContent=`${h}:${m}:${s}`;
+    // Update proxy display every tick
+    const proxyEl = document.getElementById('tb-proxy');
+    if(proxyEl && typeof loadout !== 'undefined'){
+      const proxyTool = loadout.filter(Boolean).map(id=>TOOL_CATALOG.find(t=>t.id===id)).find(t=>t?.cat==='STEALTH'&&t?.stat?.traceRate);
+      proxyEl.querySelector('span').textContent = proxyTool ? proxyTool.name.replace('ProxyChain ','PC-').replace('Chain','') : 'NONE';
+      proxyEl.className = proxyTool ? 'tbs ok' : 'tbs warn';
+    }
   },1000);
 }
 
@@ -989,7 +1463,9 @@ const WDEFS={
   netmap:  {title:'NET//MAP — AXIOM CORP',w:560,h:420,x:340,y:60},
   mail:    {title:'MAIL// — INBOX',       w:580,h:400,x:160,y:110},
   exfil:   {title:'EXFIL// — VAULT',      w:360,h:320,x:280,y:140},
-  mission: {title:'MISSION// — OP-VORTEX',w:380,h:380,x:420,y:70},
+  mission: {title:'MISSION// — ACTIVE CONTRACT',w:380,h:440,x:420,y:70},
+  board:   {title:'BOARD// — CONTRACT BOARD',   w:480,h:460,x:130,y:70},
+  feed:    {title:'FEED// — WORLD NEWS',        w:460,h:460,x:150,y:75},
   secmon:  {title:'SEC//MON — SECURITY',  w:340,h:420,x:460,y:90},
   sysmon:  {title:'SYS// — MONITOR',      w:300,h:360,x:300,y:90},
   phish:   {title:'PHISH// — SOCIAL ENGINEERING', w:620,h:460,x:130,y:65},
@@ -1000,6 +1476,12 @@ const WDEFS={
 
 let termCount=0;
 function openApp(id){
+  // M8b — clear badge when app is opened
+  if(id==='mail'){    setBadge('aitem-mail',0);    setBadge('dico-mail',0); }
+  if(id==='intel'){   unseenIntel=0;    setBadge('aitem-intel',0); }
+  if(id==='mission'){ unseenMission=0;  setBadge('aitem-mission',0); setBadge('dico-mission',0); setBadge('aitem-board',0); }
+  if(id==='board'){   unseenMission=0;  setBadge('aitem-board',0);   setBadge('aitem-mission',0); }
+  if(id==='forge'){   newMarketTools=0; setBadge('aitem-forge',0); }
   // Multiple terminal instances — each gets a unique id
   if(id==='terminal'){
     // find next free terminal slot
@@ -1018,7 +1500,12 @@ function openApp(id){
   const def=WDEFS[id];
   const win=document.createElement('div');
   win.className='win'; win.id=`win-${id}`;
-  win.style.cssText=`width:${def.w}px;height:${def.h}px;left:${def.x}px;top:${def.y}px;z-index:${++zCnt};`;
+  const isMobile = window.innerWidth <= 600;
+  const wx = isMobile ? 0 : Math.min(def.x, window.innerWidth - 280);
+  const wy = isMobile ? 30 : Math.min(def.y, window.innerHeight - 200);
+  const ww = isMobile ? window.innerWidth : def.w;
+  const wh = isMobile ? window.innerHeight - 52 : def.h;
+  win.style.cssText=`width:${ww}px;height:${wh}px;left:${wx}px;top:${wy}px;z-index:${++zCnt};`;
   win.classList.add('fade-in');
   win.innerHTML=`<div class="wtb" id="wtb-${id}"><div class="wbtns"><button class="wb cl" onclick="closeApp('${id}')"></button><button class="wb mn" onclick="minApp('${id}')"></button><button class="wb mx" onclick="maxApp('${id}')"></button></div><div class="wt">${def.title}</div><div style="width:22px"></div></div><div class="wbody" id="wbody-${id}"></div><div class="rh" id="rh-${id}"></div>`;
   document.getElementById('ws').appendChild(win);
@@ -1039,6 +1526,7 @@ function focusWin(id){
     activeTermWin=id;
     setTimeout(()=>document.getElementById(`tinp-${id}`)?.focus(),50);
   }
+  syncTabs(); // update taskbar focus state
 }
 function closeApp(id){
   if(!WINS[id])return;
@@ -1065,59 +1553,78 @@ function maxApp(id){
   }
 }
 function syncTabs(){
-  document.querySelectorAll('.tab').forEach(btn=>{
-    const m=btn.getAttribute('onclick')?.match(/'([\w-]+)'/);
-    if(!m)return;
-    const id=m[1];
-    btn.classList.remove('active','minimized');
-    // For terminal button, mark active if ANY terminal window is open
-    if(id==='terminal'){
-      const anyTerm=Object.keys(WINS).some(k=>k==='terminal'||k.startsWith('terminal-'));
-      if(anyTerm) btn.classList.add('active');
-    } else if(WINS[id]){
-      btn.classList.add('active');
-      if(WINS[id].minimized)btn.classList.add('minimized');
-    }
+  const bar = document.getElementById('tb-windows');
+  if(!bar) return;
+  bar.innerHTML = '';
+  Object.entries(WINS).forEach(([id, win])=>{
+    const def = WDEFS[id] || {};
+    // Derive a short label from title or id
+    const rawTitle = def.title || id;
+    const label = rawTitle.split('—')[0].trim().replace('// ','//').substring(0,16);
+    const btn = document.createElement('button');
+    btn.className = `win-tab${id===focusedWin?' focused':''}${win.minimized?' minimized':''}`;
+    btn.title = rawTitle;
+    btn.textContent = label;
+    btn.onclick = ()=>{
+      if(win.minimized){ minApp(id); focusWin(id); }
+      else if(id===focusedWin){ minApp(id); }
+      else { focusWin(id); }
+    };
+    bar.appendChild(btn);
   });
 }
 function makeDrag(win,handle){
   let ox,oy,sl,st;
+  function startDrag(cx,cy){
+    ox=cx;oy=cy;sl=parseInt(win.style.left)||0;st=parseInt(win.style.top)||0;
+  }
+  function moveDrag(cx,cy){
+    win.style.left=Math.max(0,sl+cx-ox)+'px';
+    win.style.top=Math.max(0,st+cy-oy)+'px';
+  }
+  // Mouse
   handle.addEventListener('mousedown',e=>{
     if(e.target.classList.contains('wb'))return;
-    ox=e.clientX;oy=e.clientY;sl=parseInt(win.style.left)||0;st=parseInt(win.style.top)||0;
-    const mv=ev=>{win.style.left=Math.max(0,sl+ev.clientX-ox)+'px';win.style.top=Math.max(0,st+ev.clientY-oy)+'px';};
+    startDrag(e.clientX,e.clientY);
+    const mv=ev=>{moveDrag(ev.clientX,ev.clientY);};
     const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
-    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
+    e.preventDefault();
   });
+  // Touch
+  handle.addEventListener('touchstart',e=>{
+    if(e.target.classList.contains('wb'))return;
+    const t=e.touches[0];
+    startDrag(t.clientX,t.clientY);
+    const mv=ev=>{const t2=ev.touches[0];moveDrag(t2.clientX,t2.clientY);ev.preventDefault();};
+    const up=()=>{handle.removeEventListener('touchmove',mv);handle.removeEventListener('touchend',up);};
+    handle.addEventListener('touchmove',mv,{passive:false});
+    handle.addEventListener('touchend',up);
+  },{passive:true});
 }
 function makeResize(win,handle){
+  function startResize(cx,cy){ return {sw:parseInt(win.style.width),sh:parseInt(win.style.height),sx:cx,sy:cy}; }
+  // Mouse
   handle.addEventListener('mousedown',e=>{
-    const sw=parseInt(win.style.width),sh=parseInt(win.style.height),sx=e.clientX,sy=e.clientY;
+    const {sw,sh,sx,sy}=startResize(e.clientX,e.clientY);
     const mv=ev=>{win.style.width=Math.max(280,sw+ev.clientX-sx)+'px';win.style.height=Math.max(180,sh+ev.clientY-sy)+'px';};
     const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
     document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);e.preventDefault();
   });
+  // Touch
+  handle.addEventListener('touchstart',e=>{
+    const t=e.touches[0];
+    const {sw,sh,sx,sy}=startResize(t.clientX,t.clientY);
+    const mv=ev=>{const t2=ev.touches[0];win.style.width=Math.max(280,sw+t2.clientX-sx)+'px';win.style.height=Math.max(180,sh+t2.clientY-sy)+'px';ev.preventDefault();};
+    const up=()=>{handle.removeEventListener('touchmove',mv);handle.removeEventListener('touchend',up);};
+    handle.addEventListener('touchmove',mv,{passive:false});
+    handle.addEventListener('touchend',up);
+  },{passive:true});
 }
 
 // ══════════════════════════════════════════════
 // APP BUILDER
 // ══════════════════════════════════════════════
-function buildApp(id){
-  const body=document.getElementById(`wbody-${id}`);
-  if(id==='terminal'||id.startsWith('terminal-'))buildTerminal(body,id);
-  else if(id==='netmap')buildNetmap(body);
-  else if(id==='mail')buildMail(body);
-  else if(id==='phish')buildPhish(body);
-  else if(id==='exfil')buildExfil(body);
-  else if(id==='mission')buildMission(body);
-  else if(id==='secmon')buildSecmon(body);
-  else if(id==='sysmon')buildSysmon(body);
-  else if(id==='intel')buildIntel(body);
-  else if(id==='meta')buildMeta(body);
-  else if(id==='forge')buildForge(body);
-  else if(id.startsWith('nano-'))buildNano(body,id);
-  else if(id.startsWith('note-'))buildNote(body,id);
-}
 
 // ══════════════════════════════════════════════
 // TERMINAL — M4: multi-instance + tab complete
@@ -1125,7 +1632,7 @@ function buildApp(id){
 // Each terminal instance has its own output/input ids based on winId
 function buildTerminal(body, winId='terminal'){
   const oid=`tout-${winId}`, iid=`tinp-${winId}`, pid=`tprl-${winId}`;
-  body.innerHTML=`<div id="${oid}" class="tout-base" style="flex:1;padding:10px 12px;font-size:11.5px;line-height:1.7;scroll-behavior:smooth;overflow-y:auto;"></div><div class="tpr" style="position:relative;"><span class="tprl" id="${pid}">${getPrompt()}</span><input id="${iid}" class="tinp" spellcheck="false" autocomplete="off"><div id="tab-suggest-${winId}" style="display:none;position:absolute;bottom:100%;left:0;background:var(--bg2);border:1px solid var(--border2);font-size:11px;font-family:var(--mono);z-index:300;max-height:120px;overflow-y:auto;min-width:200px;"></div></div>`;
+  body.innerHTML=`<div id="${oid}" class="tout-base" style="flex:1;padding:10px 12px;font-size:15px;line-height:1.7;scroll-behavior:smooth;overflow-y:auto;"></div><div class="tpr" style="position:relative;"><span class="tprl" id="${pid}">${getPrompt()}</span><input id="${iid}" class="tinp" spellcheck="false" autocomplete="off" autocapitalize="none" autocorrect="off"><div id="tab-suggest-${winId}" style="display:none;position:absolute;bottom:100%;left:0;background:var(--bg2);border:1px solid var(--border2);font-size:13px;font-family:var(--mono);z-index:300;max-height:120px;overflow-y:auto;min-width:200px;"></div></div>`;
 
   // scrollbar styles for dynamic output div
   const s=document.getElementById(oid);
@@ -1134,13 +1641,14 @@ function buildTerminal(body, winId='terminal'){
   const isFirst=winId==='terminal';
   tPrintTo(winId,[
     {t:'╔═══════════════════════════════════════════╗',c:'cyan'},
-    {t:'║   NULL//TRACE OS v0.7  —  M7 BUILD        ║',c:'cyan'},
-    {t:'║   Tool Ecosystem ONLINE                   ║',c:'cyan'},
+    {t:'║   NULL//TRACE OS v0.8  —  M8 BUILD        ║',c:'cyan'},
+    {t:'║   SPECTR ONLINE                           ║',c:'cyan'},
     {t:'╚═══════════════════════════════════════════╝',c:'cyan'},
     {t:'',c:'blank'},
     {t:`Identity: ${currentUser}`,c:'ok'},
     {t:`Ctrl+Space: command palette  |  Ctrl+T: new terminal`,c:'info'},
-    {t:`NEW: FORGE// — buy tools, build loadout, activate synergies`,c:'info'},
+    {t:`Check MAIL// — you have a message waiting`,c:'warn'},
+    {t:`Open BOARD// for contracts  |  MISSION// for objectives`,c:'dim'},
     {t:`Type 'help' for all commands`,c:'dim'},
     {t:'',c:'blank'},
   ]);
@@ -1154,6 +1662,9 @@ function buildTerminal(body, winId='terminal'){
 // Per-terminal print helpers
 function tPrintTo(winId, lines){ lines.forEach(({t,c})=>tPLine(winId,t,c)); tScrollTo(winId); }
 function tPLine(winId, txt, cls='out'){
+  if(typeof isMobileMode!=='undefined' && isMobileMode && mobActiveApp==='terminal'){
+    mobPrint(txt, cls); return;
+  }
   const out=document.getElementById(`tout-${winId}`); if(!out)return;
   const el=document.createElement('div');
   el.className=`tl ${cls}`; el.textContent=txt||' '; out.appendChild(el);
@@ -1226,7 +1737,7 @@ const ALL_COMMANDS=['help','clear','pwd','ls','cd','cat','mkdir','touch','rm',
   'whoami','status','ifconfig','scan','connect','disconnect','crack','exfil',
   'rm-logs','fw-unlock','secstate','nodes','history','uname','date','echo',
   'man','sudo','exit','reboot','open','nano','note','phish','impersonate',
-  'login','logout'];
+  'login','logout','fontsize','proxy'];
 
 let tabSuggestions=[], tabIdx=-1;
 
@@ -1304,6 +1815,8 @@ const PALETTE_ITEMS=[
   {icon:'✉',  name:'PHISH//',            hint:'social eng',   action:()=>openApp('phish')},
   {icon:'◈',  name:'SEC//MON',           hint:'security',     action:()=>openApp('secmon')},
   {icon:'⚒',  name:'FORGE//',            hint:'tool ecosystem', action:()=>openApp('forge')},
+  {icon:'◈',  name:'BOARD//',            hint:'contracts',      action:()=>openApp('board')},
+  {icon:'📡', name:'FEED//',             hint:'world news',     action:()=>openApp('feed')},
   {icon:'≋',  name:'META//',             hint:'persistent progress', action:()=>openApp('meta')},
   {icon:'◎',  name:'MISSION//',          hint:'objectives',   action:()=>openApp('mission')},
   {icon:'↑',  name:'EXFIL// Vault',      hint:'stolen files', action:()=>openApp('exfil')},
@@ -1408,7 +1921,7 @@ function buildNano(body, winId){
       </div>
     </div>`;
   const ta=document.getElementById(`nano-ta-${winId}`);
-  ta.style.cssText='width:100%;height:100%;background:var(--bg);border:none;color:var(--text);font-family:var(--mono);font-size:12px;padding:10px 12px;outline:none;resize:none;line-height:1.7;caret-color:var(--cyan);user-select:text;-webkit-user-select:text;';
+  ta.style.cssText='width:100%;height:100%;background:var(--bg);border:none;color:var(--text);font-family:var(--mono);font-size:16px;padding:10px 12px;outline:none;resize:none;line-height:1.7;caret-color:var(--cyan);user-select:text;-webkit-user-select:text;';
   ta.focus();
   ta.addEventListener('input',()=>{
     document.getElementById(`nano-modified-${winId}`).textContent='[modified]';
@@ -1505,7 +2018,11 @@ const intelDB={
 function addIntel(category, entry){
   const db=intelDB[category];
   if(!db) return;
-  if(!db.find(e=>e.key===entry.key)) db.push({...entry, time:ticks});
+  if(!db.find(e=>e.key===entry.key)){
+    db.push({...entry, time:ticks});
+    unseenIntel++; // M8b — badge
+    updateBadges();
+  }
   refreshIntel();
 }
 
@@ -1657,6 +2174,8 @@ function initProceduralOrg(){
 
   // M5a — build trust graph on org generation
   proceduralOrg.trustGraph = buildTrustGraph(org.employees);
+  // M8c — generate contract board now that proc org is ready
+  setTimeout(()=>{ generateContractBoard(); refreshBoard(); }, 100);
   // Stamp each employee with awareness level seeded by role
   org.employees.forEach(e=>{
     const awarenessMap={
@@ -2035,6 +2554,11 @@ function onPhishSuccess(target, template, subject, body){
   // M5b — mark social engineering objectives
   markSocialObjective('phish-success');
   if(target.awareness === 'HIGH') markSocialObjective('phish-high');
+  // M8a — SPECTR triggers
+  fireSpectrTrigger('first_phish');
+  if(target.awareness === 'HIGH') fireSpectrTrigger('phish_high_awareness');
+  // M8c — log for FEED//
+  logFeedAction('phish_success', {orgName: proceduralOrg?.name});
 
   // Inject success mail into their inbox on mail server
   adminAlerts.push({
@@ -2402,6 +2926,8 @@ function generateMarket(){
     const tool = weighted[idx];
     if(!seen.has(tool.id)){ seen.add(tool.id); marketInventory.push(tool); }
   }
+  newMarketTools = marketInventory.length; // M8b — badge new tools
+  updateBadges();
 }
 
 // ── Buy tool ──
@@ -2451,6 +2977,7 @@ function useTraceKill(){
   getActiveStats().traceKillUsed = true;
   traceLevel = 0;
   updateTraceUI();
+  fireSpectrTrigger('first_tracekill'); // M8a
   plines([{t:'',c:'blank'},{t:'[+] TRACEKILL ACTIVATED — trace reset to 0%',c:'ok'},{t:'',c:'blank'}]);
   notify('TraceKill used — trace reset','ok');
   refreshForge();
@@ -2695,6 +3222,11 @@ function triggerDeath(cause){
 
   META.runCount++;
   META.totalDeaths++;
+  // M8a — SPECTR reacts to death milestones
+  fireSpectrTrigger('first_death');
+  fireSpectrTrigger('five_deaths');
+  // M8c — log for FEED// (burned alias shows up in arrest reports)
+  logFeedAction('death', {alias: currentAlias});
   META.totalRep += runRepFinal;
   META.bestRep = Math.max(META.bestRep, runRepFinal);
   META.bestRunNodes = Math.max(META.bestRunNodes, runNodesHit.size);
@@ -2752,6 +3284,8 @@ function triggerRunComplete(){
 
   META.runCount++;
   META.totalCompletions++;
+  // M8a — SPECTR notes a clean run
+  fireSpectrTrigger('first_clean_run');
   META.totalRep += runRepFinal;
   META.bestRep = Math.max(META.bestRep, runRepFinal);
   META.aliasHistory.unshift({
@@ -2818,6 +3352,8 @@ function startNewRun(){
   firewallUnlocked['EXEC-TERM']=false;
   OBJECTIVES.forEach(o => o.done=false);
   SOCIAL_OBJECTIVES.forEach(o => o.done=false);
+  spectrFired.clear(); // M8a — reset per-run triggers
+  unseenIntel=0; unseenMission=0; newMarketTools=0; // M8b — reset badges
 
   // M7 — reset tool state (keep meta-unlocked tools, reset loadout to defaults)
   loadout=['scan_basic','crack_basic','exfil_basic','proxy_basic','phish_kit_v1',null];
@@ -3330,7 +3866,1062 @@ function markSocialObjective(id){
 }
 
 // ══════════════════════════════════════════════
-// COMMANDS
+// M8c — CONTRACT BOARD
+// ══════════════════════════════════════════════
+
+const CONTRACT_TYPES = ['DATA_EXTRACT','CREDENTIAL_HARVEST','SABOTAGE','GHOST_OP','SOCIAL_ONLY'];
+
+const CONTRACT_CODENAMES = [
+  'HOLLOW PINE','STATIC VEIL','IRON MOTH','SILENT EPOCH','BROKEN WIRE',
+  'ASHEN PROXY','NULL VECTOR','PHANTOM ROOT','COLD SIGNAL','VOID TRACE',
+  'AMBER GHOST','SEVERED NODE','DARK LATTICE','OPEN CIRCUIT','MIRROR FLOOD',
+  'COPPER SHROUD','LOST PACKET','BLIND RELAY','ECHO FRACTURE','STEEL WHISPER',
+];
+
+const CONTRACT_CLIENTS = ['NULL SIGNAL','GHOST PROTOCOL','BAZAAR','[REDACTED]'];
+
+// Active board state
+let contractBoard = [];       // contracts available this run
+let activeContract = null;    // currently accepted contract id
+let completedContracts = [];  // ids of completed contracts this run
+
+// Generate a contract pool for the run
+function generateContractBoard(){
+  const factionRep = META?.factionRep?.['NULL SIGNAL'] || 0;
+  const runNum = META?.runCount || 0;
+
+  // Tier weights based on progression
+  const tierPool = runNum < 3
+    ? [1,1,2]           // early: two T1s, one T2
+    : runNum < 6
+    ? [1,2,2,3]         // mid: mixed
+    : runNum < 10
+    ? [2,2,3,3]         // experienced: T2-T3
+    : [2,3,3,4];        // veteran: T3-T4
+
+  contractBoard = [];
+  const usedNames = new Set();
+
+  tierPool.forEach(tier => {
+    const contract = generateContract(tier, usedNames);
+    contractBoard.push(contract);
+    usedNames.add(contract.codename);
+  });
+
+  // Always include Axiom/OP-VORTEX as a fixed option
+  contractBoard.unshift({
+    id: 'op-vortex',
+    codename: 'OP-VORTEX',
+    tier: 2,
+    type: 'DATA_EXTRACT',
+    client: 'NULL SIGNAL',
+    target: 'Axiom Industries Corp',
+    targetNode: 'AXIOM',
+    desc: 'Corporate intelligence extraction from Axiom Industries. Locate exec auth token, access EXEC-TERM, exfiltrate acquisition plan.',
+    payout: 4200,
+    bonusPayout: 800,
+    intel: ['Entry: GATEWAY (192.168.1.1) — no auth required','Credentials scattered across internal nodes','Exec token needed for final node access'],
+    objectives: OBJECTIVES.map(o => ({...o, done: false})),
+    isAxiom: true,
+    accepted: false,
+    completed: false,
+  });
+}
+
+function generateContract(tier, usedNames){
+  const rng = () => Math.random();
+  const pick = arr => arr[Math.floor(rng() * arr.length)];
+
+  // Pick unused codename
+  let codename;
+  do { codename = pick(CONTRACT_CODENAMES); } while(usedNames.has(codename));
+
+  const type = pick(CONTRACT_TYPES);
+  const client = tier >= 3 ? pick(CONTRACT_CLIENTS) : pick(['NULL SIGNAL','GHOST PROTOCOL']);
+
+  // Payout by tier
+  const payoutRanges = {1:[800,1200], 2:[2000,3000], 3:[4000,6000], 4:[8000,12000]};
+  const [minP, maxP] = payoutRanges[tier];
+  const payout = Math.floor(rng() * (maxP - minP) + minP);
+  const bonus  = Math.floor(payout * 0.2);
+
+  // Org target — always proc org
+  const org = proceduralOrg;
+  const orgName = org ? org.name : 'TARGET CORP';
+  const domain  = org ? org.domain : 'target.corp';
+
+  // Generate objectives based on type
+  const objectives = buildContractObjectives(type, tier, org);
+
+  // Intel hints seeded from org
+  const intel = buildContractIntel(type, org, tier);
+
+  // Description
+  const descs = {
+    DATA_EXTRACT:         `Infiltrate ${orgName} and exfiltrate sensitive data from their internal network. Leave no trace.`,
+    CREDENTIAL_HARVEST:   `Social engineering operation targeting ${orgName} staff. Harvest credentials through phishing campaign.`,
+    SABOTAGE:             `Penetrate ${orgName} systems and plant a disruption file. Trigger incident response, then vanish.`,
+    GHOST_OP:             `Full infiltration of ${orgName} — complete all objectives without triggering any security alerts.`,
+    SOCIAL_ONLY:          `Reach ${orgName} internal systems using social engineering exclusively. No technical exploits.`,
+  };
+
+  return {
+    id: `contract-${Date.now()}-${Math.floor(rng()*9999)}`,
+    codename,
+    tier,
+    type,
+    client,
+    target: orgName,
+    targetNode: 'PROC-ORG',
+    desc: descs[type],
+    payout,
+    bonusPayout: bonus,
+    intel,
+    objectives,
+    isAxiom: false,
+    accepted: false,
+    completed: false,
+  };
+}
+
+function buildContractObjectives(type, tier, org){
+  const objs = [];
+  const empName = org?.employees?.[0] ? `${org.employees[0].fname} ${org.employees[0].lname}` : 'CEO';
+
+  if(type === 'DATA_EXTRACT' || tier >= 2){
+    objs.push({id:'c-connect',  text:`Connect to ${org?.name || 'target'} network (PROC-ORG)`, done:false});
+    objs.push({id:'c-exfil',    text:'Exfiltrate CONFIDENTIAL.txt from CEO directory',          done:false});
+  }
+  if(type === 'CREDENTIAL_HARVEST' || tier >= 2){
+    objs.push({id:'c-phish',    text:'Successfully phish at least one employee',                done:false});
+    objs.push({id:'c-harvest',  text:'Obtain valid credentials via social engineering',         done:false});
+  }
+  if(type === 'SABOTAGE'){
+    objs.push({id:'c-connect',  text:`Connect to ${org?.name || 'target'} network`,             done:false});
+    objs.push({id:'c-incident', text:'Trigger INCIDENT state on target org',                    done:false});
+    objs.push({id:'c-clean',    text:'Disconnect before trace completion',                      done:false});
+  }
+  if(type === 'GHOST_OP'){
+    objs.push({id:'c-connect',  text:`Connect to ${org?.name || 'target'} network`,             done:false});
+    objs.push({id:'c-exfil',    text:'Exfiltrate any HIGH value file',                          done:false});
+    objs.push({id:'c-ghost',    text:'Complete without triggering SUSPICIOUS state',             done:false});
+  }
+  if(type === 'SOCIAL_ONLY'){
+    objs.push({id:'c-phish',    text:`Phish ${empName} (CEO) successfully`,                     done:false});
+    objs.push({id:'c-login',    text:'Login to PROC-ORG using stolen credentials',              done:false});
+    objs.push({id:'c-exfil',    text:'Exfiltrate any file using social access only',            done:false});
+  }
+  // Tier 3+ bonus
+  if(tier >= 3){
+    objs.push({id:'c-bonus',    text:'Delete session logs on all visited nodes (bonus)',        done:false});
+  }
+  return objs.length ? objs : [{id:'c-connect', text:`Infiltrate ${org?.name||'target'} network`, done:false}];
+}
+
+function buildContractIntel(type, org, tier){
+  if(!org) return ['Target org loading...'];
+  const intel = [];
+  const ceo = org.employees?.[0];
+  intel.push(`Entry: ${org.ip} (PROC-ORG) — open port`);
+  if(ceo) intel.push(`Key target: ${ceo.fname} ${ceo.lname} — ${ceo.role} (${ceo.awareness} awareness)`);
+  if(type === 'CREDENTIAL_HARVEST' || type === 'SOCIAL_ONLY'){
+    intel.push(`${org.employees?.length || 0} employees in org — check PHISH// for targets`);
+  }
+  if(tier >= 2) intel.push(`Security level: ${org.secLevel || 'NOMINAL'} — trace rate moderate`);
+  return intel.slice(0, 3);
+}
+
+// Accept a contract — loads its objectives into the active mission
+function acceptContract(contractId){
+  const contract = contractBoard.find(c => c.id === contractId);
+  if(!contract || contract.completed) return;
+
+  // If accepting Axiom contract, use built-in OBJECTIVES
+  if(contract.isAxiom){
+    activeContract = contractId;
+    OBJECTIVES.forEach(o => o.done = false);
+    contractBoard.forEach(c => { c.accepted = (c.id === contractId); });
+    refreshMission();
+    refreshBoard();
+    notify(`Contract accepted: ${contract.codename}`, 'ok');
+    // SPECTR notes it
+    if(META.runCount <= 2) setTimeout(()=>pline(`// SPECTR: OP-VORTEX. Classic entry point. Don't get comfortable.`,'ghost'), 3000);
+    return;
+  }
+
+  activeContract = contractId;
+  contract.accepted = true;
+  contractBoard.forEach(c => { if(c.id !== contractId) c.accepted = false; });
+
+  // Load contract objectives into active OBJECTIVES array
+  OBJECTIVES.length = 0;
+  contract.objectives.forEach(o => OBJECTIVES.push({...o}));
+
+  // Update mission title
+  const missionWin = document.getElementById('win-mission');
+  if(missionWin){
+    const title = missionWin.querySelector('.wt');
+    if(title) title.textContent = `MISSION// — ${contract.codename}`;
+  }
+
+  refreshMission();
+  refreshBoard();
+  unseenMission++; updateBadges();
+  notify(`Contract accepted: ${contract.codename} — ${contract.payout} cr`, 'ok');
+
+  // SPECTR reacts to contract acceptance
+  setTimeout(()=>{
+    pline('', 'blank');
+    pline(`// SPECTR: ${contract.codename}. ${contract.client} client. Don't ask who.`, 'ghost');
+    pline('', 'blank');
+    scrollT();
+  }, 4000);
+}
+
+// Check if active contract objectives are all done → complete it
+function checkContractCompletion(){
+  if(!activeContract) return;
+  const allDone = OBJECTIVES.every(o => o.done);
+  if(!allDone) return;
+
+  const contract = contractBoard.find(c => c.id === activeContract);
+  if(!contract || contract.completed) return;
+
+  contract.completed = true;
+  completedContracts.push(activeContract);
+
+  // Award payout
+  rep += contract.payout;
+  credits = rep;
+  document.getElementById('tb-rep')?.querySelector('span') &&
+    (document.getElementById('tb-rep').querySelector('span').textContent = rep);
+
+  notify(`CONTRACT COMPLETE: ${contract.codename} — +${contract.payout} cr`, 'ok');
+  refreshBoard();
+
+  // SPECTR notes completion
+  setTimeout(()=>{
+    pline('', 'blank');
+    pline(`// SPECTR: ${contract.codename} closed. Payout transferred. Next.`, 'ghost');
+    pline('', 'blank');
+    scrollT();
+  }, 2000);
+}
+
+// Reset contracts on new run
+function resetContractBoard(){
+  contractBoard = [];
+  activeContract = null;
+  completedContracts = [];
+}
+
+// ── BOARD// APP ──
+function buildBoard(body){
+  body.innerHTML = `<div class="board-wrap"><div class="board-hdr"><span class="board-hdr-title">AVAILABLE CONTRACTS</span><span class="board-rep">REP: ${META?.factionRep?.['NULL SIGNAL']||0} cr</span></div><div class="board-list" id="board-list"></div></div>`;
+  renderBoardList();
+}
+
+function renderBoardList(){
+  const list = document.getElementById('board-list');
+  if(!list) return;
+
+  if(!contractBoard.length){
+    list.innerHTML = `<div class="board-empty">No contracts available.<br>Contracts generate on run start.</div>`;
+    return;
+  }
+
+  list.innerHTML = contractBoard.map(c => {
+    const tierClass = `t${c.tier}`;
+    const cardClass = c.completed ? 'completed' : c.accepted ? 'accepted' : '';
+    const intelHtml = c.intel.map(i => `<div>· <span>${i}</span></div>`).join('');
+    const acceptBtn = (!c.accepted && !c.completed)
+      ? `<button class="contract-accept-btn" onclick="acceptContract('${c.id}')">ACCEPT CONTRACT ›</button>`
+      : '';
+    return `
+<div class="contract-card ${cardClass}">
+  <div class="contract-codename">${c.codename}</div>
+  <div class="contract-meta">
+    <span class="contract-tier ${tierClass}">T${c.tier}</span>
+    <span class="contract-type">${c.type.replace('_',' ')}</span>
+    <span class="contract-client">${c.client}</span>
+  </div>
+  <div class="contract-desc">${c.desc}</div>
+  <div class="contract-payout">${c.payout} cr &nbsp;+&nbsp; ${c.bonusPayout} cr bonus</div>
+  <div class="contract-intel">${intelHtml}</div>
+  ${acceptBtn}
+</div>`;
+  }).join('');
+}
+
+function refreshBoard(){
+  if(document.getElementById('board-list')) renderBoardList();
+}
+
+// ══════════════════════════════════════════════
+// M8c — FEED// NEWS ENGINE
+// ══════════════════════════════════════════════
+
+// Action log — records player events for story generation
+// Stored in META.actionLog across runs
+const FEED_KEY = 'nulltrace_feed_v1';
+let feedStories = [];   // [{tag,headline,body,date,run}]
+let feedActionLog = []; // [{type,data,run,tick}] — raw events
+
+function loadFeed(){
+  try {
+    const raw = localStorage.getItem(FEED_KEY);
+    if(raw){ const d=JSON.parse(raw); feedStories=d.stories||[]; feedActionLog=d.log||[]; }
+  } catch(e) {}
+}
+function saveFeed(){
+  try {
+    localStorage.setItem(FEED_KEY, JSON.stringify({stories:feedStories.slice(0,40), log:feedActionLog.slice(0,60)}));
+  } catch(e) {}
+}
+
+// Log a player action for story generation
+function logFeedAction(type, data={}){
+  feedActionLog.unshift({type, data, run:runNumber, tick:ticks});
+  // Possibly generate a story from this action (delayed — stories appear "later")
+  setTimeout(()=>maybeGenerateFeedStory(type, data), 500);
+}
+
+// World event pool — generated independently of player actions
+const WORLD_EVENT_TEMPLATES = [
+  { tag:'zeroday', weight:3,
+    gen:()=>({
+      headline:`Critical Vulnerability Disclosed in ${pick(['OpenSSL','Apache','SSH daemon','Linux kernel','DNS resolver'])}`,
+      body:`Security researchers published details of a critical vulnerability affecting widely-deployed infrastructure. The flaw allows remote code execution without authentication. Patch available; exploitation observed in the wild.`,
+    })},
+  { tag:'agency', weight:3,
+    gen:()=>({
+      headline:`Joint Advisory: Phishing Campaigns Targeting ${pick(['Finance Sector','Healthcare Networks','Legal Firms','Government Contractors','Tech Companies'])}`,
+      body:`Federal agencies issued a joint advisory warning organizations of sophisticated phishing campaigns. Attackers are using targeted lures with personal data. Staff training and MFA are recommended mitigations.`,
+    })},
+  { tag:'breach', weight:4,
+    gen:(org)=>({
+      headline:`${org} Reports Unauthorized Access to Internal Systems`,
+      body:`${org} confirmed a security incident affecting internal infrastructure. An undisclosed number of employee records may have been exposed. The company has engaged an external incident response firm and is cooperating with authorities.`,
+    })},
+  { tag:'leaked', weight:3,
+    gen:(domain)=>({
+      headline:`Credential Database Surfaced on Dark Web Forums`,
+      body:`A cache of credentials attributed to ${domain} appeared on underground forums. The dataset contains email addresses and password hashes. Affected users are advised to rotate credentials immediately.`,
+    })},
+];
+
+// Player-action triggered story templates
+const ACTION_STORY_TEMPLATES = {
+  'exfil': (data) => ({
+    tag:'breach', delay: 2 + Math.floor(Math.random()*3), // appears 2-4 runs later
+    headline:`${data.orgName||'Unnamed Corp'} Confirms Data Breach`,
+    body:`${data.orgName||'A regional firm'} in the ${data.industry||'technology'} sector confirmed that an attacker exfiltrated internal documents. The company discovered the breach through anomalous network activity. No threat actor has been identified.`,
+  }),
+  'phish_success': (data) => ({
+    tag:'leaked', delay: 1 + Math.floor(Math.random()*2),
+    headline:`Employee Credentials from ${data.orgName||'Corporate Target'} Circulating Online`,
+    body:`Login credentials belonging to staff at ${data.orgName||'an unnamed organization'} have appeared in underground markets. The credentials appear to have been obtained through a social engineering attack. The organization has been notified.`,
+  }),
+  'death': (data) => ({
+    tag:'arrested', delay: 1,
+    headline:`Federal Authorities Charge Operator Known as "${data.alias||'unknown'}"`,
+    body:`Federal authorities have charged an individual operating under the alias "${data.alias||'unknown'}" with multiple counts of computer fraud. The operator was identified following a traced network session. Sentencing is pending.`,
+  }),
+  'incident_triggered': (data) => ({
+    tag:'agency', delay: 1,
+    headline:`${data.orgName||'Target Organization'} Activates Incident Response Protocol`,
+    body:`${data.orgName||'An organization'} activated its incident response team following detection of unauthorized access. External forensics firm engaged. Law enforcement has been notified. The intrusion is described as "sophisticated."`,
+  }),
+};
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function maybeGenerateFeedStory(actionType, data){
+  const template = ACTION_STORY_TEMPLATES[actionType];
+  if(!template) return;
+  if(Math.random() > 0.7) return; // 70% chance a story generates
+  const story = template(data);
+  story.run = runNumber + (story.delay||1);
+  story.date = generateFeedDate();
+  story.id = Date.now() + Math.random();
+  // Don't show it yet — queue for future run
+  if(!META.pendingFeedStories) META.pendingFeedStories = [];
+  META.pendingFeedStories.push(story);
+  saveMeta(META);
+}
+
+function generateWorldEvents(count=2){
+  const stories = [];
+  for(let i=0; i<count; i++){
+    // Weighted random pick
+    const total = WORLD_EVENT_TEMPLATES.reduce((s,t)=>s+t.weight,0);
+    let r = Math.random()*total;
+    let tmpl = WORLD_EVENT_TEMPLATES[0];
+    for(const t of WORLD_EVENT_TEMPLATES){ r-=t.weight; if(r<=0){tmpl=t;break;} }
+    const orgs = ['Axiom Corp','Vertex Systems','NovaTech','Meridian Financial','Apex Labs','DataCore Inc','Cascade Networks','Solstice Media'];
+    const domains = ['axiom.corp','vertex.io','novatech.net','meridian.fin','apexlabs.com','datacore.io'];
+    const story = tmpl.gen(pick(orgs), pick(domains));
+    story.tag = tmpl.tag;
+    story.run = runNumber;
+    story.date = generateFeedDate();
+    story.id = Date.now() + i + Math.random();
+    stories.push(story);
+  }
+  return stories;
+}
+
+function generateFeedDate(){
+  const now = new Date();
+  const daysAgo = Math.floor(Math.random()*14);
+  now.setDate(now.getDate() - daysAgo);
+  return now.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+function initFeedForRun(){
+  loadFeed();
+  // Promote pending stories from previous runs
+  if(META.pendingFeedStories){
+    const ready = META.pendingFeedStories.filter(s => s.run <= runNumber);
+    const pending = META.pendingFeedStories.filter(s => s.run > runNumber);
+    feedStories = [...ready, ...feedStories];
+    META.pendingFeedStories = pending;
+    saveMeta(META);
+  }
+  // Generate world events for this run
+  const worldEvents = generateWorldEvents(2 + Math.floor(Math.random()*2));
+  feedStories = [...worldEvents, ...feedStories];
+  saveFeed();
+}
+
+// ── FEED// APP ──
+function buildFeed(body){
+  body.innerHTML=`<div class="feed-wrap" id="feed-inner"></div>`;
+  renderFeed();
+}
+
+function renderFeed(){
+  const el = document.getElementById('feed-inner'); if(!el) return;
+  if(!feedStories.length){
+    el.innerHTML=`<div style="color:var(--text3);font-size:13px;padding:12px;line-height:2;">No stories yet.<br>Complete operations to generate world events.</div>`;
+    return;
+  }
+  el.innerHTML = feedStories.map(s=>`
+<div class="feed-item ${s.tag||'breach'}">
+  <div class="feed-tag ${s.tag||'breach'}">[${(s.tag||'breach').toUpperCase()}]</div>
+  <div class="feed-headline">${s.headline}</div>
+  <div class="feed-body">${s.body}</div>
+  <div class="feed-date">${s.date||''} · Run #${s.run||'?'}</div>
+</div>`).join('');
+}
+
+function refreshFeed(){
+  if(document.getElementById('feed-inner')) renderFeed();
+}
+
+// ══════════════════════════════════════════════
+// M8c — SAVE/LOAD RUN STATE
+// ══════════════════════════════════════════════
+
+const RUN_SAVE_KEY = 'nulltrace_run_v1';
+
+function saveRunState(){
+  try {
+    const state = {
+      // Identity
+      currentUser, currentAlias, cwd, runNumber, runSeed,
+      // Economy
+      rep, credits, runRepEarned, runExfilCount,
+      // Progress
+      runNodesHit: [...runNodesHit],
+      exfilVault: exfilVault.map(f=>({name:f.name,content:f.content,node:f.node})),
+      logsDeleted, crackedPasswords,
+      // Objectives
+      objectives: OBJECTIVES.map(o=>({id:o.id,done:o.done})),
+      socialObjectives: SOCIAL_OBJECTIVES.map(o=>({id:o.id,done:o.done})),
+      // Network state
+      nodeSecState: {...nodeSecState},
+      firewallUnlocked: {...firewallUnlocked},
+      // Tools
+      loadout: [...loadout],
+      ownedTools: [...ownedTools],
+      // Contracts
+      activeContract,
+      completedContracts: [...completedContracts],
+      contractStates: contractBoard.map(c=>({id:c.id,accepted:c.accepted,completed:c.completed})),
+      // Intel
+      intelDB: JSON.parse(JSON.stringify(intelDB)),
+      // Ticks
+      ticks,
+      savedAt: Date.now(),
+    };
+    localStorage.setItem(RUN_SAVE_KEY, JSON.stringify(state));
+  } catch(e) { console.warn('Save failed:', e); }
+}
+
+function loadRunState(){
+  try {
+    const raw = localStorage.getItem(RUN_SAVE_KEY);
+    if(!raw) return false;
+    const s = JSON.parse(raw);
+
+    // Only restore if it's for the current run number
+    if(s.runNumber !== META.runCount + 1) return false;
+
+    currentUser = s.currentUser || currentUser;
+    currentAlias = s.currentAlias || currentAlias;
+    cwd = s.cwd || cwd;
+    runNumber = s.runNumber;
+    runSeed = s.runSeed;
+    rep = s.rep || 0;
+    credits = s.credits || 0;
+    runRepEarned = s.runRepEarned || 0;
+    runExfilCount = s.runExfilCount || 0;
+    runNodesHit = new Set(s.runNodesHit || []);
+    exfilVault = s.exfilVault || [];
+    logsDeleted = s.logsDeleted || {};
+    crackedPasswords = s.crackedPasswords || {};
+    ticks = s.ticks || 0;
+
+    // Restore objective states
+    if(s.objectives) s.objectives.forEach(o=>{
+      const obj = OBJECTIVES.find(x=>x.id===o.id);
+      if(obj) obj.done = o.done;
+    });
+    if(s.socialObjectives) s.socialObjectives.forEach(o=>{
+      const obj = SOCIAL_OBJECTIVES.find(x=>x.id===o.id);
+      if(obj) obj.done = o.done;
+    });
+
+    // Restore network state
+    if(s.nodeSecState) Object.assign(nodeSecState, s.nodeSecState);
+    if(s.firewallUnlocked) Object.assign(firewallUnlocked, s.firewallUnlocked);
+
+    // Restore tools
+    if(s.loadout) loadout.splice(0, loadout.length, ...s.loadout);
+    if(s.ownedTools){ ownedTools.splice(0, ownedTools.length, ...s.ownedTools); }
+
+    // Restore contracts
+    if(s.activeContract) activeContract = s.activeContract;
+    if(s.completedContracts) completedContracts.splice(0, completedContracts.length, ...s.completedContracts);
+
+    // Restore intel
+    if(s.intelDB) Object.assign(intelDB, s.intelDB);
+
+    // Update UI
+    document.getElementById('tb-rep')?.querySelector('span') &&
+      (document.getElementById('tb-rep').querySelector('span').textContent = rep);
+    document.getElementById('sb-alias')?.querySelector('span') &&
+      (document.getElementById('sb-alias').querySelector('span').textContent = currentUser);
+
+    return true;
+  } catch(e) {
+    console.warn('Load failed:', e);
+    return false;
+  }
+}
+
+function clearRunSave(){
+  try { localStorage.removeItem(RUN_SAVE_KEY); } catch(e) {}
+}
+
+// ══════════════════════════════════════════════
+// M7.5 — FONT SIZE SYSTEM
+// ══════════════════════════════════════════════
+
+// Presets: name → root font-size in px (UI scales from this)
+const FONT_PRESETS = {
+  'xs':   11,   // original pre-M7.5 compact size
+  'sm':   13,   // slightly compact
+  'md':   16,   // default M7.5 (WCAG compliant)
+  'lg':   19,   // comfortable
+  'xl':   22,   // large / accessibility
+};
+
+// Load saved preference or default to md
+let currentFontScale = parseInt(localStorage.getItem('nt_fontsize') || '16');
+
+function applyFontSize(px){
+  currentFontScale = Math.max(9, Math.min(28, px));
+  // Use zoom — scales entire UI including all px values, borders, padding, icons
+  const zoom = currentFontScale / 16; // 16px = 1.0 zoom (default)
+  document.documentElement.style.zoom = zoom;
+  try { localStorage.setItem('nt_fontsize', String(currentFontScale)); } catch(e){}
+}
+
+function cmdFontsize(args){
+  if(!args[0]){
+    plines([
+      {t:'',c:'blank'},
+      {t:'  fontsize — UI scale control (zooms entire OS)',c:'cyan'},
+      {t:'',c:'blank'},
+      {t:`  Current size: ${currentFontScale}px (${Math.round(currentFontScale/16*100)}% zoom)`,c:'ok'},
+      {t:'',c:'blank'},
+      {t:'  Presets:',c:'out'},
+      {t:'    fontsize xs   — 11px  (69%)  original compact style',c:'dim'},
+      {t:'    fontsize sm   — 13px  (81%)  slightly compact',c:'dim'},
+      {t:'    fontsize md   — 16px  (100%) default, WCAG compliant',c:'dim'},
+      {t:'    fontsize lg   — 19px  (119%) comfortable',c:'dim'},
+      {t:'    fontsize xl   — 22px  (138%) large / accessibility',c:'dim'},
+      {t:'',c:'blank'},
+      {t:'  Custom:',c:'out'},
+      {t:'    fontsize [9-28]  — set any size in pixels',c:'dim'},
+      {t:'    fontsize reset  — restore default (16px / 100%)',c:'dim'},
+      {t:'',c:'blank'},
+      {t:'  Changes are instant and saved across sessions.',c:'dim'},
+    ]);
+    return;
+  }
+
+  const arg = args[0].toLowerCase();
+
+  if(arg === 'reset'){
+    applyFontSize(16);
+    pline(`[+] Font size reset to default (16px)`,'ok');
+    return;
+  }
+
+  // Named preset
+  if(FONT_PRESETS[arg] !== undefined){
+    applyFontSize(FONT_PRESETS[arg]);
+    pline(`[+] Font size: ${arg.toUpperCase()} (${currentFontScale}px)`,'ok');
+    pline(`[*] Preference saved — persists across runs`,'dim');
+    return;
+  }
+
+  // Numeric
+  const n = parseInt(arg);
+  if(isNaN(n) || n < 9 || n > 28){
+    pline(`fontsize: invalid value '${arg}' — use 9-28 or a preset (xs/sm/md/lg/xl)`,'err');
+    return;
+  }
+  applyFontSize(n);
+  pline(`[+] Font size set to ${currentFontScale}px`,'ok');
+  pline(`[*] Preference saved — persists across runs`,'dim');
+}
+
+// ══════════════════════════════════════════════
+// M8a — SPECTR NARRATIVE ENGINE
+// ══════════════════════════════════════════════
+
+// SPECTR trigger registry — keyed by trigger id
+// Each trigger fires once (or on specific conditions) and injects a mail
+const SPECTR_TRIGGERS = {
+  // ── First run onboarding ──
+  'first_boot': {
+    condition: () => META.runCount === 0,
+    delay: 3000,
+    subject: 'You found it.',
+    body: `Good.
+
+Most people who stumble onto this interface close the tab.
+You didn't. That's either curiosity or desperation.
+Either works.
+
+My name doesn't matter. Call me SPECTR.
+I route contracts. You execute them.
+Simple arrangement.
+
+You have a terminal. You have a network map.
+The rest you figure out.
+
+First target is already in your mission queue.
+Axiom Corp. Standard extraction job.
+Nothing fancy — I wanted to see how you move.
+
+Don't get traced.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── First connection ──
+  'first_connect': {
+    condition: () => META.runCount <= 1,
+    delay: 1500,
+    subject: 'Tip.',
+    body: `Scan before you connect.
+Connect before you crack.
+Crack before you exfil.
+Exfil before you get caught.
+
+In that order.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── First death ──
+  'first_death': {
+    condition: () => META.totalDeaths === 1,
+    delay: 0,
+    subject: 'Expected.',
+    body: `Alias burned.
+
+That happens. The trace catches everyone eventually —
+the difference is how long you stay on before it does.
+
+New identity. Fresh start.
+The network doesn't remember you. I do.
+
+Get back in.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── 5 total deaths ──
+  'five_deaths': {
+    condition: () => META.totalDeaths === 5,
+    delay: 0,
+    subject: 'Still here.',
+    body: `Five aliases burned.
+
+Most operators quit after two.
+Some never even make it that far.
+
+You're still here. That's not nothing.
+
+The jobs are going to get harder.
+The targets are going to get smarter.
+Your tools need to get better.
+
+Check the FORGE. There are things there
+that will change how you work.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── First successful phish ──
+  'first_phish': {
+    condition: () => true,
+    delay: 2000,
+    subject: 'Noted.',
+    body: `Humans.
+
+Still the weakest link after all these years.
+Doesn't matter how hardened the infrastructure is —
+someone will always click the link.
+
+You found that out for yourself today.
+
+Social engineering isn't elegant.
+But it works. File that.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── First HIGH-awareness phish ──
+  'phish_high_awareness': {
+    condition: () => true,
+    delay: 2000,
+    subject: 'That surprised me.',
+    body: `HIGH awareness target. Successful phish.
+
+That's not supposed to happen.
+They're trained for exactly that scenario.
+You found a gap anyway.
+
+I'm noting this.
+
+Don't let it make you careless.
+The next one might not click.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── First clean run (all objectives) ──
+  'first_clean_run': {
+    condition: () => META.totalCompletions === 1,
+    delay: 1000,
+    subject: 'Clean.',
+    body: `All objectives. No lockdown. Clean exit.
+
+That's rare. Most operators get greedy
+or sloppy somewhere in the chain.
+
+You didn't.
+
+The payout's in your balance.
+The faction took notice.
+I took notice.
+
+There's more work coming.
+Harder targets. Better payouts.
+Keep moving.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── Run 4 — SPECTR starts hinting ──
+  'run4_hint': {
+    condition: () => META.runCount === 3,
+    delay: 5000,
+    subject: 'Something you should know.',
+    body: `You've been consistent.
+
+I don't give context to operators who can't
+demonstrate they'll still be alive in four runs.
+You've cleared that bar.
+
+So: you're not the only one working these targets.
+There are others. Different operators, different
+handlers. We don't share names.
+
+What I can tell you is that some of the companies
+you've been hitting — they've been hit before.
+Recently. By someone else.
+
+I don't know who. That's not nothing.
+
+Keep your eyes open. Anomalies in the
+filesystem. Traces that don't match your timeline.
+Someone's been there.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── Run 7 — fragment reveal ──
+  'run7_fragment': {
+    condition: () => META.runCount === 6,
+    delay: 4000,
+    subject: '███████',
+    body: `There's a project.
+
+I don't have a name for it yet. Just a pattern.
+The contracts I route to you — most of them
+come from one of three factions you know about.
+
+Some don't.
+
+There's a fourth source. No name. No faction tag.
+Just jobs that appear in the queue, fully specced,
+correct payout, no attribution.
+
+I've been taking them. They're good jobs.
+But I don't know who's on the other end.
+
+I'm telling you this because if something changes —
+if the jobs stop, or shift targets, or if I
+go quiet for a run — you'll know why.
+
+Watch the FEED.
+Not everything in there is background noise.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── First TraceKill use ──
+  'first_tracekill': {
+    condition: () => true,
+    delay: 1500,
+    subject: 'Good instinct.',
+    body: `Emergency egress. Trace reset.
+
+That's what the tool is for.
+Panic kills operators. You didn't panic.
+You used the resource and kept moving.
+
+That's the difference between
+someone who lasts and someone who doesn't.
+
+— S`,
+    style: 'spectr',
+  },
+};
+
+// Track which triggers have fired this session + ever
+const spectrFired = new Set(); // fired this session (reset on new run)
+let spectrQueue = [];          // pending delayed messages
+let ghostPresenceTimer = null;
+
+// Ghost presence — rare one-liners injected into active terminal mid-session
+const GHOST_LINES = [
+  'Still watching.',
+  'Move faster.',
+  'Clean your logs.',
+  'They\'re going to notice.',
+  'You\'re being sloppy.',
+  'Good.',
+  'Don\'t get comfortable.',
+  'The trace doesn\'t care how careful you think you are.',
+  'There\'s someone else in that network.',
+  'I said don\'t get traced.',
+];
+
+function maybeGhostPresence(){
+  // 15% chance per 3-minute interval of a ghost line appearing
+  if(Math.random() > 0.15) return;
+  if(!connectedNode) return; // only inject when connected
+  const line = GHOST_LINES[Math.floor(Math.random()*GHOST_LINES.length)];
+  setTimeout(()=>{
+    pline('', 'blank');
+    pline(`// SPECTR: ${line}`, 'ghost');
+    pline('', 'blank');
+    scrollT();
+    if(isMobileMode && mobActiveApp==='terminal') {
+      // mobile already handled by tPLine routing
+    }
+  }, Math.random()*30000 + 10000); // 10-40s delay so it feels ambient
+}
+
+function startGhostPresence(){
+  if(ghostPresenceTimer) clearInterval(ghostPresenceTimer);
+  ghostPresenceTimer = setInterval(maybeGhostPresence, 180000); // every 3 min
+}
+
+// Fire a SPECTR trigger by id
+function fireSpectrTrigger(triggerId){
+  if(spectrFired.has(triggerId)) return;
+  // Check if globally fired (stored in META)
+  if(!META.spectrFired) META.spectrFired = [];
+  const globalTriggers = ['first_boot','first_death','five_deaths','run4_hint',
+                          'run7_fragment','first_clean_run'];
+  if(globalTriggers.includes(triggerId) && META.spectrFired.includes(triggerId)) return;
+
+  const trigger = SPECTR_TRIGGERS[triggerId];
+  if(!trigger) return;
+  if(!trigger.condition()) return;
+
+  spectrFired.add(triggerId);
+  if(globalTriggers.includes(triggerId)){
+    META.spectrFired.push(triggerId);
+    saveMeta(META);
+  }
+
+  setTimeout(()=>injectSpectrMail(triggerId, trigger), trigger.delay || 0);
+}
+
+function injectSpectrMail(triggerId, trigger){
+  const t = getCurrentTime();
+  const mail = {
+    id: 9000 + MAILS.length + adminAlerts.length,
+    from: 'SPECTR',
+    subj: trigger.subject,
+    time: t,
+    unread: true,
+    isAlert: false,
+    isSpectr: true,
+    body: trigger.body,
+  };
+  adminAlerts.push(mail);
+  refreshMailList();
+  // Subtle notification — no loud fanfare for SPECTR
+  notify(`// SPECTR: new message`, 'info');
+  // Update mobile badge
+  if(typeof isMobileMode !== 'undefined' && isMobileMode) updateMobStatus();
+}
+
+// Check run-count based triggers on launch
+function checkRunBasedTriggers(){
+  ['run4_hint','run7_fragment'].forEach(id => fireSpectrTrigger(id));
+}
+
+// ── PROXY COMMAND ──
+function cmdProxy(args){
+  const sub = args[0]?.toLowerCase();
+
+  // Find all proxy tools in loadout and owned
+  const equippedProxy = loadout.filter(Boolean)
+    .map(id=>TOOL_CATALOG.find(t=>t.id===id))
+    .find(t=>t?.cat==='STEALTH'&&t?.stat?.traceRate);
+
+  const ownedProxies = TOOL_CATALOG.filter(t=>
+    t.cat==='STEALTH' && t.stat?.traceRate && loadout.includes(t.id)===false && ownedTools.includes(t.id)
+  );
+
+  if(!sub || sub==='status'){
+    const stats = getActiveStats();
+    plines([{t:'',c:'blank'},{t:'  PROXY STATUS',c:'cyan'}]);
+    if(equippedProxy){
+      pline(`  Chain:   ${equippedProxy.name} [ACTIVE]`,'ok');
+      pline(`  Effect:  trace rate reduced to ${Math.round(stats.traceRate*100)}% of base`,'ok');
+      pline(`  IP:      10.0.0.47 [masked via proxy]`,'ok');
+    } else {
+      pline(`  Chain:   NONE`,'warn');
+      pline(`  Effect:  no protection — trace rate 100%`,'warn');
+      pline(`  IP:      10.0.0.47 [EXPOSED]`,'warn');
+    }
+    pline('','blank');
+    if(ownedProxies.length){
+      pline(`  Owned (not equipped):  ${ownedProxies.map(t=>t.name).join(', ')}`,'dim');
+      pline(`  Use FORGE// → LOADOUT to equip`,'dim');
+    } else if(!equippedProxy){
+      pline(`  No proxy tools owned. Visit FORGE// → MARKET to buy one.`,'dim');
+    }
+    pline('','blank');
+    return;
+  }
+
+  if(sub==='help'){
+    plines([
+      {t:'',c:'blank'},
+      {t:'  PROXY SYSTEM',c:'cyan'},
+      {t:'',c:'blank'},
+      {t:'  Proxy chains reduce your trace rate during active sessions.',c:'out'},
+      {t:'  Without one, your real IP (10.0.0.47) is logged on every node.',c:'warn'},
+      {t:'',c:'blank'},
+      {t:'  HOW TO ACTIVATE:',c:'cyan'},
+      {t:'  1. Buy a ProxyChain tool from FORGE// → MARKET',c:'out'},
+      {t:'  2. Equip it in FORGE// → LOADOUT',c:'out'},
+      {t:'  3. Proxy activates automatically on next connection',c:'out'},
+      {t:'',c:'blank'},
+      {t:'  PROXY TOOLS:',c:'cyan'},
+      {t:'  ProxyChain v1  T1  free   trace rate -10%   (default loadout)',c:'dim'},
+      {t:'  ProxyChain v2  T2  700cr  trace rate -25%   (buy in MARKET)',c:'dim'},
+      {t:'  GhostMode      T4  3500cr 30s zero trace     (rare drop)',c:'dim'},
+      {t:'',c:'blank'},
+      {t:'  COMMANDS:',c:'cyan'},
+      {t:'  proxy status   show current proxy state',c:'out'},
+      {t:'  proxy help     show this help',c:'out'},
+      {t:'',c:'blank'},
+    ]);
+    return;
+  }
+
+  pline(`proxy: unknown subcommand '${sub}'. Try: proxy status, proxy help`,'err');
+}
+
+// ── FW-UNLOCK DISCOVERY CHAIN GUIDE ──
+// (called from help() below)
+function fwUnlockGuide(){
+  plines([
+    {t:'',c:'blank'},
+    {t:'  FIREWALL BYPASS — DISCOVERY CHAIN',c:'cyan'},
+    {t:'',c:'blank'},
+    {t:'  Internal nodes (MAIL-SRV, DB-SRV, EXEC-TERM) are firewalled.',c:'out'},
+    {t:'  You need credentials before you can connect to them.',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  THE CHAIN:',c:'cyan'},
+    {t:'  1. scan [node]     — reveals firewall state + a hint',c:'out'},
+    {t:'  2. connect [node]  — explore the filesystem',c:'out'},
+    {t:'  3. ls / cat        — read files to find credentials',c:'out'},
+    {t:'  4. crack [file]    — crack hashed password files',c:'out'},
+    {t:'  5. fw-unlock [locked-node] [user] [pass]',c:'out'},
+    {t:'  6. connect [locked-node]  — now accessible',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  AXIOM CORP CHAIN:',c:'cyan'},
+    {t:'  GATEWAY (open) → WEB-SRV (open)',c:'dim'},
+    {t:'  WEB-SRV → find ksullivan creds → fw-unlock MAIL-SRV',c:'dim'},
+    {t:'  WEB-SRV → find webapp creds   → fw-unlock DB-SRV',c:'dim'},
+    {t:'  DB-SRV or MAIL-SRV → find rchen token → fw-unlock EXEC-TERM',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'  EXAMPLE:',c:'cyan'},
+    {t:'  connect WEB-SRV',c:'data'},
+    {t:'  cat /var/www/notes.txt       ← credentials in plaintext',c:'data'},
+    {t:'  disconnect',c:'data'},
+    {t:'  fw-unlock MAIL-SRV ksullivan Sull1van#2024',c:'data'},
+    {t:'  connect MAIL-SRV',c:'data'},
+    {t:'',c:'blank'},
+    {t:'  Hint: scan a node first — it shows the credential hint.',c:'dim'},
+    {t:'',c:'blank'},
+  ]);
+}
 // ══════════════════════════════════════════════
 function runCmd(raw){
   const parts=raw.trim().split(/\s+/);
@@ -3341,7 +4932,7 @@ function runCmd(raw){
     secstate:cmdSecstate,
     nano:(args)=>{ if(!args[0]){pline('Usage: nano [file]','err');return;} openNano(args[0]); },
     note:(args)=>{ if(!args[0]){pline('Usage: note [file]','err');return;} const p=resolvePath(args[0]); if(!LFS[p]){pline(`note: ${args[0]} not found — create with nano first`,'err');return;} openStickyNote(args[0].split('/').pop(),p); },
-    open:(args)=>{ if(!args[0]){pline('Usage: open [app]  e.g. open mail','err');return;} const appMap={mail:'mail',map:'netmap',netmap:'netmap',mission:'mission',exfil:'exfil',intel:'intel',sec:'secmon',secmon:'secmon',sys:'sysmon',sysmon:'sysmon',term:'terminal',terminal:'terminal',phish:'phish',meta:'meta',forge:'forge'}; const target=appMap[args[0].toLowerCase()]; if(target){openApp(target);pline(`Opening ${target}...`,'ok');}else{pline(`open: unknown app '${args[0]}'. Try: mail, netmap, mission, exfil, intel, forge, phish, meta`,'err');} },
+    open:(args)=>{ if(!args[0]){pline('Usage: open [app]  e.g. open mail','err');return;} const appMap={mail:'mail',map:'netmap',netmap:'netmap',mission:'mission',exfil:'exfil',intel:'intel',sec:'secmon',secmon:'secmon',sys:'sysmon',sysmon:'sysmon',term:'terminal',terminal:'terminal',phish:'phish',meta:'meta',forge:'forge',board:'board',feed:'feed'}; const target=appMap[args[0].toLowerCase()]; if(target){openApp(target);pline(`Opening ${target}...`,'ok');}else{pline(`open: unknown app '${args[0]}'. Try: mail, netmap, mission, exfil, intel, forge, phish, meta, board, feed`,'err');} },
     phish:(args)=>{
       // Usage: phish [email] --template [id] --from [email]
       if(!args[0]){ pline('Usage: phish [target-email] [--template id] [--from impersonator-email]','err'); pline('       phish list-targets','dim'); pline('       phish list-templates','dim'); return; }
@@ -3371,6 +4962,8 @@ function runCmd(raw){
     },
     login:(args)=>cmdLogin(args),
     logout:()=>cmdLogout(),
+    proxy:(args)=>cmdProxy(args),
+    fontsize:(args)=>cmdFontsize(args),
     impersonate:(args)=>{
       if(!args[0]){pline('Usage: impersonate [email]  — sets FROM for next phish','err');return;}
       if(args[0]==='clear'){
@@ -3424,11 +5017,19 @@ function help(){
     {t:'',c:'blank'},
     {t:'  NETWORK',c:'cyan'},
     {t:'  nodes                    list all known network nodes',c:'out'},
-    {t:'  scan [node/ip]           probe a target host for open services',c:'out'},
+    {t:'  scan [node/ip]           probe target — reveals firewall state + hint',c:'out'},
     {t:'  connect [node/ip]        connect to a remote host',c:'out'},
     {t:'  disconnect               close active connection',c:'out'},
-    {t:'  fw-unlock [node] [u] [p] bypass firewall with credentials',c:'out'},
+    {t:'  fw-unlock [node] [u] [p] bypass firewall with stolen credentials',c:'out'},
     {t:'  secstate                 show security state of all nodes',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  FIREWALL CHAIN: scan → explore → find creds → fw-unlock → connect',c:'dim'},
+    {t:'  fw-unlock help           full discovery chain walkthrough',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'  PROXY',c:'cyan'},
+    {t:'  proxy status             show proxy chain and trace protection',c:'out'},
+    {t:'  proxy help               proxy setup guide',c:'out'},
+    {t:'  (Equip ProxyChain in FORGE// → LOADOUT to activate)',c:'dim'},
     {t:'',c:'blank'},
     {t:'  OPERATIONS',c:'cyan'},
     {t:'  crack [file]             run password cracker on file',c:'out'},
@@ -3447,6 +5048,8 @@ function help(){
     {t:'',c:'blank'},
     {t:'  SHORTCUTS',c:'cyan'},
     {t:'  open [app]               open app (mail, netmap, intel, phish...)',c:'out'},
+    {t:'  fontsize [xs|sm|md|lg|xl|9-28]  set UI text scale',c:'out'},
+    {t:'  fontsize reset           restore default (16px)',c:'out'},
     {t:'  Ctrl+Space               command palette',c:'out'},
     {t:'  Ctrl+T                   new terminal window',c:'out'},
     {t:'  Tab                      autocomplete command or filename',c:'out'},
@@ -3546,10 +5149,20 @@ function listNodes(){
 }
 
 function ifconfig(){
+  const stats = getActiveStats();
+  const proxyTool = loadout.filter(Boolean).map(id=>TOOL_CATALOG.find(t=>t.id===id)).find(t=>t?.cat==='STEALTH'&&t?.stat?.traceRate);
+  const proxyActive = proxyTool != null;
+  const proxyName = proxyTool ? proxyTool.name : null;
+  const traceReduction = proxyActive ? Math.round((1-stats.traceRate)*100) : 0;
   plines([
     {t:'',c:'blank'},
     {t:'lo0   127.0.0.1',c:'data'},
-    {t:'eth0  10.0.0.47  (UNPROTECTED — no proxy)',c:'warn'},
+    {t:`eth0  10.0.0.47  ${proxyActive?'[PROTECTED]':'[UNPROTECTED — no proxy]'}`,c:proxyActive?'ok':'warn'},
+    ...(proxyActive ? [
+      {t:`      proxy: ${proxyName} — trace rate -${traceReduction}%`,c:'ok'},
+    ] : [
+      {t:`      WARNING: real IP exposed — equip ProxyChain in FORGE//`,c:'warn'},
+    ]),
     {t:'',c:'blank'},
   ]);
 }
@@ -3573,6 +5186,23 @@ function status(){
     {t:'  MISSION',c:'cyan'},
     {t:`  Objectives  ${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}`,c:'out'},
     {t:`  Exfil vault ${exfilVault.length} file(s)`,c:'out'},
+    {t:'',c:'blank'},
+    {t:'  PROXY',c:'cyan'},
+    ...( ()=>{
+      const proxyTool = loadout.filter(Boolean).map(id=>TOOL_CATALOG.find(t=>t.id===id)).find(t=>t?.cat==='STEALTH'&&t?.stat?.traceRate);
+      const stats = getActiveStats();
+      if(proxyTool){
+        return [
+          {t:`  Chain    ${proxyTool.name} [ACTIVE]`,c:'ok'},
+          {t:`  Effect   trace rate ${Math.round(stats.traceRate*100)}% of base`,c:'ok'},
+          {t:`  IP       10.0.0.47 [masked]`,c:'ok'},
+        ];
+      }
+      return [
+        {t:`  Chain    NONE — real IP exposed`,c:'warn'},
+        {t:`  Risk     HIGH — equip ProxyChain in FORGE//`,c:'warn'},
+      ];
+    })(),
     {t:'',c:'blank'},
   ]);
 }
@@ -3614,6 +5244,8 @@ function scan(args){
 
 // ── FIREWALL UNLOCK ──
 function fwUnlock(args){
+  // fw-unlock help — discovery chain guide
+  if(args[0]==='help'){ fwUnlockGuide(); return; }
   // fw-unlock [node] [user] [pass]
   const [nodeArg,user,...passParts]=args;
   const pass=passParts.join(' ');
@@ -3682,6 +5314,7 @@ function connect(args){
     startTrace();
     checkSecOnConnect(id);
     runNodesHit.add(id); // M6 — track for run stats
+    if(runNodesHit.size === 1) fireSpectrTrigger('first_connect'); // M8a
     // M3 — inline objective check for EXEC-TERM access
     if(id==='EXEC-TERM') setTimeout(()=>{ if(connectedNode==='EXEC-TERM') markObjective('access'); },900);
     refreshNetmap();
@@ -3712,6 +5345,7 @@ function disconnect(){
   ]);
   checkCleanObjective();
   refreshNetmap();
+  saveRunState(); // M8c — autosave on disconnect
 }
 
 // ── CRACK ──
@@ -3791,6 +5425,9 @@ function cmdExfil(args){
     ]);
     notify(`Exfil: ${fname} (${(fdata.exfil||'low').toUpperCase()})`,fdata.exfil==='high'?'ok':'info');
     runExfilCount++; // M6 — track for run stats
+    // M8c — log for FEED// story generation
+    if(proceduralOrg && connectedNode==='PROC-ORG')
+      logFeedAction('exfil',{orgName:proceduralOrg.name, industry:proceduralOrg.industry});
     // M7 — use active exfil tool trace stat
     const exfilTraceBump = getActiveStats().exfilTrace;
     if(traceActive) traceLevel=Math.min(100,traceLevel+exfilTraceBump);
@@ -3839,6 +5476,8 @@ function markObjective(id){
     notify(`OBJECTIVE COMPLETE: ${obj.text.substring(0,40)}...`,'ok');
     rep+=800;
     credits=rep; // M7 — credits track rep
+    unseenMission++; // M8b — badge
+    updateBadges();
     document.getElementById('tb-rep').querySelector('span').textContent=rep;
     document.getElementById('sb-obj').querySelector('span').textContent=`${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}`;
     refreshMission();
@@ -3956,13 +5595,13 @@ function renderNetmap(){
 
     const g=document.createElementNS('http://www.w3.org/2000/svg','g');
     g.setAttribute('class','node-group');
-    g.setAttribute('transform',`translate(${pos.x-48},${pos.y})`);
+    g.setAttribute('transform',`translate(${pos.x-55},${pos.y})`);
     g.onclick=()=>onNodeClick(id);
 
     // BG rect
     const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
     rect.setAttribute('class','node-rect');
-    rect.setAttribute('width','96'); rect.setAttribute('height','52');
+    rect.setAttribute('width','110'); rect.setAttribute('height','64');
     rect.setAttribute('rx','2');
     rect.setAttribute('fill',bgCol);
     rect.setAttribute('stroke',borderCol);
@@ -3971,13 +5610,13 @@ function renderNetmap(){
 
     // Tier stripe
     const stripe=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    stripe.setAttribute('width','96'); stripe.setAttribute('height','3');
+    stripe.setAttribute('width','110'); stripe.setAttribute('height','3');
     stripe.setAttribute('fill',tierCol); stripe.setAttribute('rx','2');
     g.appendChild(stripe);
 
     // Label
     const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    lbl.setAttribute('x','48'); lbl.setAttribute('y','20');
+    lbl.setAttribute('x','55'); lbl.setAttribute('y','22');
     lbl.setAttribute('class','node-label');
     lbl.setAttribute('fill',isConn?'#00b4d8':'#8b949e');
     lbl.setAttribute('font-weight',isConn?'700':'400');
@@ -3986,7 +5625,7 @@ function renderNetmap(){
 
     // IP
     const ip=document.createElementNS('http://www.w3.org/2000/svg','text');
-    ip.setAttribute('x','48'); ip.setAttribute('y','32');
+    ip.setAttribute('x','55'); ip.setAttribute('y','38');
     ip.setAttribute('class','node-sublabel');
     ip.setAttribute('fill','#484f58');
     ip.textContent=n.ip;
@@ -3994,7 +5633,7 @@ function renderNetmap(){
 
     // Status badge — M3 shows security state
     const badge=document.createElementNS('http://www.w3.org/2000/svg','text');
-    badge.setAttribute('x','48'); badge.setAttribute('y','46');
+    badge.setAttribute('x','55'); badge.setAttribute('y','55');
     badge.setAttribute('class','node-status');
     const secState=getSecState(id);
     const st=isConn
@@ -4056,11 +5695,15 @@ function renderMailList(){
   p.innerHTML=`<div class="ml-hdr">INBOX (${all.filter(m=>m.unread).length} UNREAD)</div>`;
   all.forEach(m=>{
     const el=document.createElement('div');
-    el.className=`mi ${m.unread?'unread':''} ${selMail===m.id?'sel':''} ${m.isAlert?'alert':''}`;
+    el.className=`mi ${m.unread?'unread':''} ${selMail===m.id?'sel':''} ${m.isAlert?'alert':''} ${m.isSpectr?'spectr':''}`;
     el.innerHTML=`<div class="mitime">${m.time}</div><div class="mifrom">${m.from}</div><div class="misubj">${m.subj}</div>`;
     el.onclick=()=>openMail(m.id);
     p.appendChild(el);
   });
+  // M7.5 — update mobile mail badge
+  if(typeof isMobileMode!=='undefined' && isMobileMode) updateMobStatus();
+  // M8b — update desktop badges
+  updateBadges();
 }
 function openMail(id){
   selMail=id;
@@ -4068,7 +5711,20 @@ function openMail(id){
   m.unread=false; renderMailList();
   const v=document.getElementById('ml-view'); if(!v)return;
   v.className='mv';
-  v.innerHTML=`<div class="mv-subj">${m.subj}</div><div class="mv-meta">FROM: <span>${m.from}</span><br>TO: <span>${currentUser}</span><br>TIME: <span>${m.time}</span></div><div class="mv-body">${m.body.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>`;
+  if(m.isSpectr){
+    // SPECTR mail — distinctive purple treatment
+    v.innerHTML=`
+<div class="spectr-hdr">
+  <div class="spectr-hdr-from">// SPECTR</div>
+  <div class="spectr-hdr-subj">${m.subj}</div>
+  <div class="spectr-hdr-meta">${m.time} — encrypted channel</div>
+</div>
+<div style="padding:10px 14px;">
+  <div class="spectr-body">${m.body.replace(/&/g,'&amp;').replace(/</g,'&lt;')}<span class="spectr-sig">— S</span></div>
+</div>`;
+  } else {
+    v.innerHTML=`<div class="mv-subj">${m.subj}</div><div class="mv-meta">FROM: <span>${m.from}</span><br>TO: <span>${currentUser}</span><br>TIME: <span>${m.time}</span></div><div class="mv-body">${m.body.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>`;
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -4196,6 +5852,220 @@ function refreshSysmon(){
 }
 
 // ══════════════════════════════════════════════
+// APPS MENU + DESKTOP ICONS
+// ══════════════════════════════════════════════
+
+const DESKTOP_SAVE_KEY = 'nulltrace_desktop_v1';
+const DEFAULT_PINS = ['terminal','netmap','mail','mission'];
+
+const APP_META = {
+  terminal: {icon:'❯_', label:'TERM//'},
+  netmap:   {icon:'⬡',  label:'NET//MAP'},
+  mail:     {icon:'@',  label:'MAIL//'},
+  mission:  {icon:'◎',  label:'MISSION//'},
+  board:    {icon:'◈',  label:'BOARD//'},
+  phish:    {icon:'✉',  label:'PHISH//'},
+  forge:    {icon:'⚒',  label:'FORGE//'},
+  exfil:    {icon:'↑',  label:'EXFIL//'},
+  intel:    {icon:'i',  label:'INTEL//'},
+  secmon:   {icon:'◈',  label:'SEC//MON'},
+  sysmon:   {icon:'◉',  label:'SYS//'},
+  meta:     {icon:'≋',  label:'META//'},
+  feed:     {icon:'📡', label:'FEED//'},
+};
+
+let pinnedApps = loadPinnedApps();
+let appsMenuOpen = false;
+let ctxTarget = null; // app id for context menu
+let longPressTimer = null;
+
+function loadPinnedApps(){
+  try {
+    const raw = localStorage.getItem(DESKTOP_SAVE_KEY);
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  return [...DEFAULT_PINS];
+}
+function savePinnedApps(){
+  try { localStorage.setItem(DESKTOP_SAVE_KEY, JSON.stringify(pinnedApps)); } catch(e){}
+}
+
+// ── Apps menu ──
+function toggleAppsMenu(e){
+  e.stopPropagation();
+  appsMenuOpen = !appsMenuOpen;
+  const dropdown = document.getElementById('apps-dropdown');
+  const btn = document.getElementById('apps-btn');
+  dropdown.classList.toggle('show', appsMenuOpen);
+  btn.classList.toggle('open', appsMenuOpen);
+  // Position under the button
+  const rect = btn.getBoundingClientRect();
+  dropdown.style.left = rect.left + 'px';
+  if(appsMenuOpen) updateAppsMenuPinStates();
+}
+
+function closeAppsMenu(){
+  appsMenuOpen = false;
+  document.getElementById('apps-dropdown')?.classList.remove('show');
+  document.getElementById('apps-btn')?.classList.remove('open');
+}
+
+function appsLaunch(appId){
+  closeAppsMenu();
+  if(appId === 'nano-new'){
+    // Open a blank nano
+    openApp('nano-scratch');
+    return;
+  }
+  openApp(appId);
+}
+
+function updateAppsMenuPinStates(){
+  document.querySelectorAll('.apps-item').forEach(item => {
+    const appId = item.dataset.app;
+    if(!appId) return;
+    const pinBtn = item.querySelector('.apps-pin-btn');
+    const isPinned = pinnedApps.includes(appId);
+    item.classList.toggle('pinned', isPinned);
+    if(pinBtn) pinBtn.textContent = isPinned ? 'PINNED' : 'PIN';
+  });
+}
+
+// ── Pin system ──
+function togglePin(appId){
+  const idx = pinnedApps.indexOf(appId);
+  if(idx >= 0){
+    pinnedApps.splice(idx, 1);
+  } else {
+    pinnedApps.push(appId);
+  }
+  savePinnedApps();
+  renderDesktopIcons();
+  updateAppsMenuPinStates();
+}
+
+// ── Desktop icons ──
+function renderDesktopIcons(){
+  const container = document.getElementById('dicons');
+  if(!container) return;
+  container.innerHTML = '';
+
+  pinnedApps.forEach(appId => {
+    const meta = APP_META[appId];
+    if(!meta) return;
+
+    const div = document.createElement('div');
+    div.className = 'dico';
+    div.id = `dico-${appId}`;
+    div.innerHTML = `<div class="dico-g">${meta.icon}</div><div class="dico-l">${meta.label}</div>`;
+
+    // Double-click to open
+    div.addEventListener('dblclick', () => openApp(appId));
+    // Single tap on mobile / click on desktop also opens (for accessibility)
+    div.addEventListener('click', (e) => { if(e.detail === 1) openApp(appId); });
+
+    // Right-click context menu (desktop)
+    div.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      showCtxMenu(appId, e.clientX, e.clientY);
+    });
+
+    // Long-press (mobile)
+    div.addEventListener('touchstart', (e) => {
+      longPressTimer = setTimeout(() => {
+        const t = e.touches[0];
+        showCtxMenu(appId, t.clientX, t.clientY);
+      }, 600);
+    }, {passive:true});
+    div.addEventListener('touchend', () => clearTimeout(longPressTimer));
+    div.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+
+    container.appendChild(div);
+  });
+
+  // Update badge IDs for dynamically rendered icons
+  updateBadges();
+}
+
+// ── Context menu ──
+function showCtxMenu(appId, x, y){
+  ctxTarget = appId;
+  const menu = document.getElementById('ctx-menu');
+  const openLabel = document.getElementById('ctx-open');
+  if(openLabel) openLabel.textContent = `Open ${APP_META[appId]?.label || appId}`;
+  menu.style.left = Math.min(x, window.innerWidth - 180) + 'px';
+  menu.style.top  = Math.min(y, window.innerHeight - 80) + 'px';
+  menu.classList.add('show');
+}
+
+function hideCtxMenu(){
+  document.getElementById('ctx-menu')?.classList.remove('show');
+  ctxTarget = null;
+}
+
+function ctxOpen(){
+  if(ctxTarget) openApp(ctxTarget);
+  hideCtxMenu();
+}
+
+function ctxUnpin(){
+  if(ctxTarget) togglePin(ctxTarget);
+  hideCtxMenu();
+}
+
+// Close menus on click away
+document.addEventListener('click', (e) => {
+  if(!e.target.closest('#apps-dropdown') && !e.target.closest('#apps-btn')) closeAppsMenu();
+  if(!e.target.closest('#ctx-menu')) hideCtxMenu();
+});
+
+// ══════════════════════════════════════════════
+// NOTIFICATION BADGES — M8b
+// ══════════════════════════════════════════════
+
+// Track unseen counts — incremented when state changes, cleared when app is opened
+let unseenIntel = 0;
+let unseenMission = 0;  // objectives newly completed
+let newMarketTools = 0; // tools in market not yet viewed
+
+function setBadge(id, count){
+  // Set on element by ID (taskbar buttons, dicos)
+  const el = document.getElementById(id);
+  if(el){
+    if(count > 0) el.setAttribute('data-badge', count > 99 ? '99+' : String(count));
+    else el.removeAttribute('data-badge');
+  }
+  // Also set on apps-dropdown item (data-app attribute)
+  const appId = id.replace('tbtn-','').replace('dico-','');
+  const aitem = document.querySelector(`#apps-dropdown .apps-item[data-app="${appId}"]`);
+  if(aitem){
+    if(count > 0) aitem.setAttribute('data-badge', count > 99 ? '99+' : String(count));
+    else aitem.removeAttribute('data-badge');
+  }
+}
+
+function updateBadges(){
+  const unreadMail = getAllMails().filter(m=>m.unread).length;
+  setBadge('aitem-mail',    unreadMail);
+  setBadge('dico-mail',     unreadMail);
+  setBadge('aitem-intel',   unseenIntel);
+  setBadge('aitem-mission', unseenMission);
+  setBadge('dico-mission',  unseenMission);
+  setBadge('aitem-board',   unseenMission);
+  setBadge('aitem-forge',   newMarketTools);
+
+  // APPS button shows sum of all badges
+  const total = unreadMail + unseenIntel + unseenMission + newMarketTools;
+  const appsBtn = document.getElementById('apps-btn');
+  if(appsBtn){
+    if(total > 0) appsBtn.setAttribute('data-badge', total > 99 ? '99+' : String(total));
+    else appsBtn.removeAttribute('data-badge');
+  }
+
+  if(typeof isMobileMode!=='undefined' && isMobileMode) updateMobStatus();
+}
+
+// ══════════════════════════════════════════════
 // NOTIFICATION
 // ══════════════════════════════════════════════
 let notifTimeout=null;
@@ -4205,6 +6075,8 @@ function notify(msg,type='info'){
   el.className=type; el.style.display='block';
   if(notifTimeout)clearTimeout(notifTimeout);
   notifTimeout=setTimeout(()=>{el.style.display='none';},3500);
+  // M7.5 — refresh mobile status badge on notifications
+  if(typeof isMobileMode!=='undefined' && isMobileMode) updateMobStatus();
 }
 
 // ══════════════════════════════════════════════
@@ -4229,7 +6101,257 @@ function resolveNode(arg){
 // ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
-window.onload=()=>runBoot();
+window.onload=()=>{ applyFontSize(currentFontScale); runBoot(); };
+
+// iOS Safari ignores maximum-scale — prevent zoom on input focus via JS
+// Resets viewport scale to 1 on every input focus
+document.addEventListener('focusin', e => {
+  if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT'){
+    const vp = document.querySelector('meta[name=viewport]');
+    if(vp) vp.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, interactive-widget=resizes-content';
+  }
+});
+
+// ══════════════════════════════════════════════
+// MOBILE SHELL — bottom nav + full-screen apps
+// ══════════════════════════════════════════════
+
+const MOB_BREAKPOINT = 600;
+let isMobileMode = false;
+let mobActiveApp = 'terminal';
+let mobMoreOpen = false;
+let mobTermHistory = [];
+let mobHistIdx = -1;
+
+function checkMobileMode(){
+  return window.innerWidth <= MOB_BREAKPOINT;
+}
+
+function launchMobileShell(){
+  isMobileMode = true;
+  document.getElementById('desktop').style.display = 'none';
+  const shell = document.getElementById('mob-shell');
+  shell.style.display = 'flex';
+  // Start clock
+  startMobClock();
+  // Open terminal by default
+  mobOpenApp('terminal');
+  // Update status elements
+  updateMobStatus();
+}
+
+function startMobClock(){
+  // Reuse ticks from main clock
+  setInterval(updateMobStatus, 1000);
+}
+
+function updateMobStatus(){
+  const h=String(Math.floor(ticks/3600)).padStart(2,'0');
+  const m=String(Math.floor((ticks%3600)/60)).padStart(2,'0');
+  const s=String(ticks%60).padStart(2,'0');
+  const clk = document.getElementById('mob-clk');
+  if(clk) clk.textContent = `${h}:${m}:${s}`;
+
+  const aliasEl = document.getElementById('mob-alias');
+  if(aliasEl) aliasEl.textContent = currentUser;
+
+  const connEl = document.getElementById('mob-conn');
+  if(connEl){
+    connEl.textContent = connectedNode ? NETWORK[connectedNode]?.label : 'OFFLINE';
+    connEl.style.color = connectedNode ? 'var(--amber)' : 'var(--text3)';
+  }
+  const traceEl = document.getElementById('mob-trace');
+  if(traceEl){
+    traceEl.textContent = traceActive ? `TRACE:${Math.floor(traceLevel)}%` : '—';
+    traceEl.style.color = traceLevel > 70 ? 'var(--red)' : traceLevel > 40 ? 'var(--amber)' : 'var(--text3)';
+  }
+  // Mail badge
+  const unread = getAllMails().filter(m=>m.unread).length;
+  const badge = document.getElementById('mnav-mail-badge');
+  if(badge){
+    badge.style.display = unread > 0 ? 'flex' : 'none';
+    badge.textContent = unread > 9 ? '9+' : String(unread);
+  }
+}
+
+function mobOpenApp(appId){
+  mobMoreOpen = false;
+  document.getElementById('mob-more-drawer').style.display = 'none';
+
+  mobActiveApp = appId;
+  const panel = document.getElementById('mob-app-panel');
+  panel.innerHTML = '';
+
+  // Update nav active state
+  document.querySelectorAll('.mob-nav-btn').forEach(btn => btn.classList.remove('active'));
+  const navBtn = document.getElementById(`mnav-${appId}`);
+  if(navBtn) navBtn.classList.add('active');
+
+  // Build app content
+  if(appId === 'terminal'){
+    buildMobTerminal(panel);
+  } else {
+    // All other apps — render using existing buildX functions
+    // but in a full-screen container
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'flex:1;overflow:hidden;display:flex;flex-direction:column;height:100%;';
+    panel.appendChild(wrap);
+    buildApp(appId, wrap);
+  }
+}
+
+// ── Mobile terminal ──
+function buildMobTerminal(panel){
+  panel.innerHTML = `
+<div id="mob-term-out"></div>
+<div id="mob-quickbar">
+  <button class="mob-quick-btn" onclick="mobQuick('ls')">ls</button>
+  <button class="mob-quick-btn" onclick="mobQuick('cd ~')">~</button>
+  <button class="mob-quick-btn" onclick="mobQuick('scan GATEWAY')">scan</button>
+  <button class="mob-quick-btn" onclick="mobQuick('connect GATEWAY')">connect</button>
+  <button class="mob-quick-btn" onclick="mobQuick('disconnect')">disconnect</button>
+  <button class="mob-quick-btn" onclick="mobQuick('status')">status</button>
+  <button class="mob-quick-btn" onclick="mobQuick('nodes')">nodes</button>
+  <button class="mob-quick-btn" onclick="mobQuick('help')">help</button>
+  <button class="mob-quick-btn" onclick="mobQuick('exfil ')">exfil</button>
+  <button class="mob-quick-btn" onclick="mobQuick('rm-logs')">rm-logs</button>
+</div>
+<div id="mob-term-input-bar">
+  <span id="mob-term-prompt">${getPrompt()}</span>
+  <input id="mob-term-inp" spellcheck="false" autocomplete="off"
+    autocapitalize="none" autocorrect="off"
+    placeholder="type command...">
+</div>`;
+
+  // Wire input
+  const inp = document.getElementById('mob-term-inp');
+  inp.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      const cmd = inp.value.trim();
+      inp.value = '';
+      if(cmd){ mobTermHistory.unshift(cmd); mobHistIdx = -1; }
+      mobPrintCmd(cmd);
+      if(cmd) runMobCmd(cmd);
+      // Scroll output
+      const out = document.getElementById('mob-term-out');
+      if(out) setTimeout(()=>{ out.scrollTop = out.scrollHeight; }, 50);
+    } else if(e.key === 'ArrowUp'){
+      mobHistIdx = Math.min(mobHistIdx+1, mobTermHistory.length-1);
+      inp.value = mobTermHistory[mobHistIdx] || '';
+      e.preventDefault();
+    } else if(e.key === 'ArrowDown'){
+      mobHistIdx = Math.max(mobHistIdx-1, -1);
+      inp.value = mobHistIdx >= 0 ? mobTermHistory[mobHistIdx] : '';
+      e.preventDefault();
+    }
+  });
+
+  // Tap output area focuses input
+  document.getElementById('mob-term-out')?.addEventListener('click', ()=>{
+    document.getElementById('mob-term-inp')?.focus();
+  });
+
+  // Print welcome
+  mobPrint('NULL//TRACE OS v0.7 — MOBILE', 'cyan');
+  mobPrint(`Identity: ${currentUser}`, 'ok');
+  mobPrint(`Type 'help' for commands`, 'dim');
+  mobPrint('', 'blank');
+
+  inp.focus();
+}
+
+function mobPrint(txt, cls='out'){
+  const out = document.getElementById('mob-term-out'); if(!out) return;
+  const el = document.createElement('div');
+  el.className = `tl ${cls}`;
+  el.textContent = txt || ' ';
+  out.appendChild(el);
+  out.scrollTop = out.scrollHeight;
+}
+
+function mobPrintCmd(cmd){
+  mobPrint(`${getPrompt()}${cmd}`, 'cmd');
+}
+
+function mobQuick(cmd){
+  const inp = document.getElementById('mob-term-inp');
+  if(inp){ inp.value = cmd; inp.focus(); }
+  // If no trailing space (complete command), run it
+  if(!cmd.endsWith(' ')){
+    inp.value = '';
+    mobPrintCmd(cmd);
+    runMobCmd(cmd);
+  }
+}
+
+// Route commands — reuse desktop engine but redirect output to mobile terminal
+function runMobCmd(raw){
+  // Temporarily redirect pline to mobile output
+  const origPline = window._mobPlineActive;
+  window._mobPlineActive = true;
+  activeTermWin = 'mob'; // special sentinel
+
+  // Patch tPLine to write to mob-term-out when in mobile mode
+  runCmd(raw);
+
+  // Update prompt
+  const promptEl = document.getElementById('mob-term-prompt');
+  if(promptEl) promptEl.textContent = getPrompt();
+
+  window._mobPlineActive = false;
+  activeTermWin = 'terminal';
+}
+
+function mobToggleMore(){
+  mobMoreOpen = !mobMoreOpen;
+  const drawer = document.getElementById('mob-more-drawer');
+  drawer.style.display = mobMoreOpen ? 'block' : 'none';
+  const btn = document.getElementById('mnav-more');
+  if(btn) btn.classList.toggle('active', mobMoreOpen);
+}
+
+// buildApp handles both desktop (bodyOverride=undefined, uses wbody-id)
+// and mobile (bodyOverride=element passed directly)
+function buildApp(id, bodyOverride){
+  const body = bodyOverride || document.getElementById(`wbody-${id}`);
+  if(!body) return;
+  if(id==='terminal'||id.startsWith('terminal-'))buildTerminal(body,id);
+  else if(id==='netmap')buildNetmap(body);
+  else if(id==='mail')buildMail(body);
+  else if(id==='phish')buildPhish(body);
+  else if(id==='exfil')buildExfil(body);
+  else if(id==='mission')buildMission(body);
+  else if(id==='board')buildBoard(body);
+  else if(id==='feed')buildFeed(body);
+  else if(id==='secmon')buildSecmon(body);
+  else if(id==='sysmon')buildSysmon(body);
+  else if(id==='intel')buildIntel(body);
+  else if(id==='meta')buildMeta(body);
+  else if(id==='forge')buildForge(body);
+  else if(id.startsWith('nano-'))buildNano(body,id);
+  else if(id.startsWith('note-'))buildNote(body,id);
+}
+
+// Mobile routing is inlined directly into tPLine, notify, renderMailList below
+// (no wrapper pattern — avoids infinite recursion from double-definition)
+
+// ── Window resize handler — switch modes ──
+window.addEventListener('resize', ()=>{
+  const shouldBeMobile = checkMobileMode();
+  if(shouldBeMobile && !isMobileMode){
+    // Switch to mobile
+    document.getElementById('desktop').style.display = 'none';
+    document.getElementById('mob-shell').style.display = 'flex';
+    isMobileMode = true;
+    mobOpenApp(mobActiveApp || 'terminal');
+  } else if(!shouldBeMobile && isMobileMode){
+    // Switch back to desktop
+    document.getElementById('mob-shell').style.display = 'none';
+    document.getElementById('desktop').style.display = 'flex';
+    isMobileMode = false;
+  }
+});
+
 </script>
 </body>
 </html>
