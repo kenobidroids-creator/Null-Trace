@@ -879,19 +879,23 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 <div id="scanlines"></div>
 
 <!-- BOOT -->
-<div id="boot"><div id="blines"></div><div id="bbar"><div id="bbar-lbl">LOADING NULL//TRACE OS v0.7...</div><div id="bbar-t"><div id="bbar-f"></div></div></div></div>
+<div id="boot"><div id="blines"></div><div id="bbar"><div id="bbar-lbl">LOADING NULL//TRACE OS v1.0...</div><div id="bbar-t"><div id="bbar-f"></div></div></div></div>
 
 <!-- LOGIN -->
 <div id="login">
   <div class="ll">NULL//TRACE</div>
-  <div class="lv">OS v0.9.0 — M9 BUILD</div>
+  <div class="lv">OS v1.0 — OPERATOR BUILD</div>
   <div class="lbox">
     <div class="lf"><label class="llbl">ALIAS</label><input class="li" id="lu" type="text" value="ghost_0x1" autocomplete="off" spellcheck="false" tabindex="1"></div>
     <div class="lf"><label class="llbl">PASSPHRASE</label><input class="li" id="lp" type="password" autocomplete="off" tabindex="2"></div>
     <button class="lb" id="lbtn" tabindex="3">AUTHENTICATE ›</button>
     <div class="le" id="le"></div>
   </div>
-  <div class="lh">ghost_0x1 / null1234</div>
+  <div class="lh" style="margin-top:12px;line-height:2;">
+    <span style="color:var(--cyan);letter-spacing:1px;">OPERATOR</span> &nbsp;ghost_0x1 / null1234<br>
+    <span style="color:var(--green);letter-spacing:1px;">TRAINEE &nbsp;</span> &nbsp;trainee &nbsp;&nbsp; / learn
+    <div style="font-size:11px;color:var(--text3);margin-top:6px;">New to hacking? Log in as trainee for guided training.</div>
+  </div>
 </div>
 
 <!-- DESKTOP -->
@@ -1432,10 +1436,26 @@ function doLogin(){
   const u=document.getElementById('lu').value.trim();
   const p=document.getElementById('lp').value;
   const err=document.getElementById('le');
-  if(u==='ghost_0x1'&&p==='null1234'){
-    currentUser=u; cwd=`/home/${u}`;
+
+  if(u==='trainee' && p==='learn'){
+    // ── TRAINING MODE ──
+    err.textContent='INITIALISING TRAINING PROTOCOL...'; err.style.color='var(--green)';
+    currentUser='trainee'; cwd='/home/trainee';
+    setTimeout(()=>{
+      document.getElementById('login').style.display='none';
+      initTrainingMode();
+      launchDesktopTraining();
+    }, 800);
+
+  } else if(u==='ghost_0x1'&&p==='null1234'){
+    // ── OPERATOR MODE ──
     err.textContent='AUTHENTICATING...'; err.style.color='var(--cyan)';
-    setTimeout(()=>{document.getElementById('login').style.display='none'; launchDesktop();},700);
+    setTimeout(()=>{
+      initRunState();
+      document.getElementById('login').style.display='none';
+      launchDesktop();
+    },700);
+
   } else {
     err.textContent='✗ AUTHENTICATION FAILED';
     err.style.color='var(--red)';
@@ -1449,19 +1469,16 @@ function doLogin(){
 // ══════════════════════════════════════════════
 function launchDesktop(){
   if(checkMobileMode()){
-    // Mobile — use full-screen shell instead of floating windows
     document.getElementById('desktop').style.display='none';
     launchMobileShell();
     startClock();
     const aliasEl=document.getElementById('sb-alias');
     if(aliasEl) aliasEl.querySelector('span').textContent=currentUser;
     setTimeout(()=>initProceduralOrg(),1200);
-    // M8a — fire triggers on mobile
     setTimeout(()=>{ fireSpectrTrigger('first_boot'); checkRunBasedTriggers(); startGhostPresence(); }, 2000);
-    setTimeout(()=>updateBadges(), 1500); // M8b — initial badges
+    setTimeout(()=>updateBadges(), 1500);
     return;
   }
-  // Desktop mode — normal window manager
   const d=document.getElementById('desktop');
   d.style.display='flex'; d.classList.add('fade-in');
   document.getElementById('sb-alias').querySelector('span').textContent=currentUser;
@@ -1471,6 +1488,23 @@ function launchDesktop(){
   setTimeout(()=>initProceduralOrg(), 1200);
   setTimeout(()=>{ fireSpectrTrigger('first_boot'); checkRunBasedTriggers(); startGhostPresence(); }, 2000);
   setTimeout(()=>updateBadges(), 1500);
+}
+
+function launchDesktopTraining(){
+  const d=document.getElementById('desktop');
+  d.style.display='flex'; d.classList.add('fade-in');
+  document.getElementById('sb-alias').querySelector('span').textContent='trainee';
+  document.getElementById('sb-node').querySelector('span').textContent='—';
+  startClock();
+  setTimeout(()=>openApp('terminal'), 400);
+  setTimeout(()=>{
+    renderNetmap();
+    refreshMission();
+    refreshBoard();
+    updateBadges();
+  }, 600);
+  // SPECTR training greeting fires after terminal is ready
+  setTimeout(()=>trainingReact('login'), 1200);
 }
 let ticks=0;
 function startClock(){
@@ -1514,10 +1548,12 @@ const WDEFS={
 let termCount=0;
 function openApp(id){
   // M8b — clear badge when app is opened
-  if(id==='mail'){    setBadge('aitem-mail',0);    setBadge('dico-mail',0); }
+  if(id==='mail'){    setBadge('aitem-mail',0);    setBadge('dico-mail',0);
+    if(trainingMode) setTimeout(()=>trainingReact('opened_mail'), 1500); }
   if(id==='intel'){   unseenIntel=0;    setBadge('aitem-intel',0); }
   if(id==='mission'){ unseenMission=0;  setBadge('aitem-mission',0); setBadge('dico-mission',0); setBadge('aitem-board',0); }
-  if(id==='board'){   unseenMission=0;  setBadge('aitem-board',0);   setBadge('aitem-mission',0); }
+  if(id==='board'){   unseenMission=0;  setBadge('aitem-board',0);   setBadge('aitem-mission',0);
+    if(trainingMode) setTimeout(()=>trainingReact('opened_board'), 1500); }
   if(id==='forge'){   newMarketTools=0; setBadge('aitem-forge',0); }
   // Multiple terminal instances — each gets a unique id
   if(id==='terminal'){
@@ -1810,7 +1846,7 @@ const ALL_COMMANDS=['help','clear','pwd','ls','cd','cat','mkdir','touch','rm',
   'whoami','status','ifconfig','scan','connect','disconnect','crack','exfil',
   'rm-logs','fw-unlock','secstate','nodes','history','uname','date','echo',
   'man','sudo','exit','reboot','open','nano','note','phish','impersonate',
-  'login','logout','fontsize','proxy','difficulty','sound','newterm'];
+  'login','logout','fontsize','proxy','difficulty','sound','newterm','tutorial'];
 
 let tabSuggestions=[], tabIdx=-1;
 
@@ -4552,6 +4588,7 @@ function acceptContract(contractId){
     notify(`Contract accepted: ${contract.codename}`, 'ok');
     // SPECTR notes it
     if(META.runCount <= 2) setTimeout(()=>pline(`// SPECTR: OP-VORTEX. Classic entry point. Don't get comfortable.`,'ghost'), 3000);
+    if(trainingMode) trainingReact('accepted_contract');
     return;
   }
 
@@ -6075,6 +6112,270 @@ function checkRunBasedTriggers(){
 }
 
 // ══════════════════════════════════════════════
+// TRAINING MODE
+// ══════════════════════════════════════════════
+
+let trainingMode = false;
+let trainingStep = 0; // tracks progress through the guided sequence
+let trainingComplete = false;
+
+// Training network — two nodes, simple linear structure
+const TRAINING_NETWORK = {
+  'TRAIN-GATE': {
+    label:'TRAIN-GATE', ip:'10.0.0.1', tier:'public',
+    services:[{port:22,svc:'ssh',ver:'OpenSSH 8.0'},{port:80,svc:'http',ver:'Apache 2.4'}],
+    os:'Ubuntu 22.04 — Training Sandbox', security:'LOW',
+    firewall:false, links:['TRAIN-SRV'], traceRate:0.1,
+    desc:'Training gateway — entry point for this exercise.',
+    fs:{
+      '/': {t:'d'}, '/home': {t:'d'}, '/etc': {t:'d'}, '/var': {t:'d'}, '/tmp': {t:'d'},
+      '/home/trainee': {t:'d'},
+      '/home/trainee/welcome.txt': {t:'f', content:`Welcome to the training sandbox.\n\nThis system is configured for training purposes.\nNo real data is at risk.\n\nYour objective: locate CONFIDENTIAL.txt on TRAIN-SRV\nand exfiltrate it.\n\nHint: you'll need credentials to access TRAIN-SRV.\nCheck the files on this node carefully.\n\n— SPECTR Training Protocol`},
+      '/etc/hosts': {t:'f', content:`127.0.0.1  localhost\n10.0.0.1   TRAIN-GATE\n10.0.0.2   TRAIN-SRV`},
+      '/var/www': {t:'d'},
+      '/var/www/notes.txt': {t:'f', content:`Admin notes\n\nTRAIN-SRV credentials:\n  user: admin\n  pass: training2024\n\nDO NOT leave this file here in production.\nMove credentials to the vault.\n\n— J.K., Sysadmin`},
+      '/tmp/readme': {t:'f', content:`Temporary files. Nothing sensitive here.\nClean up after each session.`},
+    }
+  },
+  'TRAIN-SRV': {
+    label:'TRAIN-SRV', ip:'10.0.0.2', tier:'internal',
+    services:[{port:22,svc:'ssh',ver:'OpenSSH 8.0'},{port:3306,svc:'mysql',ver:'8.0'}],
+    os:'Ubuntu 22.04 — Training Sandbox', security:'LOW',
+    firewall:true,
+    firewallCred:{user:'admin', pass:'training2024', hint:'Credentials found on TRAIN-GATE in /var/www/notes.txt'},
+    links:['TRAIN-GATE'], traceRate:0.15,
+    desc:'Training server — target system for this exercise.',
+    fs:{
+      '/': {t:'d'}, '/home': {t:'d'}, '/var': {t:'d'}, '/var/data': {t:'d'},
+      '/home/admin': {t:'d'},
+      '/home/admin/notes.txt': {t:'f', content:`Personal notes\n\nRemember to move CONFIDENTIAL.txt to secure storage.\nIt's currently in /var/data/ — not ideal.\n\nAlso: update the gateway password. J.K. left it in plain text again.`},
+      '/var/data': {t:'d'},
+      '/var/data/CONFIDENTIAL.txt': {t:'f', exfil:'high', content:`CONFIDENTIAL — TRAINING EXERCISE\n\nThis file is your objective.\nExfiltrate it to complete the training.\n\nIn a real operation this would contain:\n  - Financial records\n  - Employee credentials\n  - Strategic documents\n\nExfil command: exfil CONFIDENTIAL.txt\n\n[TRAINING DATA — NOT REAL]`},
+    }
+  }
+};
+
+// SPECTR trainer — reacts to player actions during training
+function trainingReact(action, data={}){
+  if(!trainingMode || trainingComplete) return;
+
+  const reactions = {
+    'login': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Training protocol active.',c:'ghost'},
+      {t:'// SPECTR: I\'ll walk you through this.',c:'ghost'},
+      {t:'',c:'blank'},
+      {t:'Your objective is on TRAIN-SRV.',c:'dim'},
+      {t:'Start by checking your mail — type: open mail',c:'warn'},
+      {t:'',c:'blank'},
+    ],
+    'opened_mail': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Good. Now you know what you\'re here for.',c:'ghost'},
+      {t:'// SPECTR: Open the contract board — type: open board',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'opened_board': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Accept the training contract.',c:'ghost'},
+      {t:'// SPECTR: That loads your objectives into MISSION//.',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'accepted_contract': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Objectives loaded.',c:'ghost'},
+      {t:'// SPECTR: First step — learn the network.',c:'ghost'},
+      {t:'// SPECTR: Type: nodes',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'nodes': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Two nodes. Gateway is your entry.',c:'ghost'},
+      {t:'// SPECTR: Always scan before you connect.',c:'ghost'},
+      {t:'// SPECTR: Type: scan TRAIN-GATE',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'scan': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: That tells you what\'s running.',c:'ghost'},
+      {t:'// SPECTR: Open ports are your way in.',c:'ghost'},
+      {t:'// SPECTR: Connect — type: connect TRAIN-GATE',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'connect': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: You\'re in. Trace is running — move.',c:'ghost'},
+      {t:'// SPECTR: List the filesystem — type: ls',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'ls': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Read everything. Credentials hide in plain text.',c:'ghost'},
+      {t:'// SPECTR: Try: cat /var/www/notes.txt',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'found_creds': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: There it is.',c:'ghost'},
+      {t:'// SPECTR: Credentials in a notes file. Classic.',c:'ghost'},
+      {t:'// SPECTR: Disconnect first — type: disconnect',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'disconnect_1': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Good. Now use those credentials.',c:'ghost'},
+      {t:'// SPECTR: TRAIN-SRV has a firewall. Bypass it:',c:'ghost'},
+      {t:'// SPECTR: fw-unlock TRAIN-SRV admin training2024',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'fw_unlock': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Firewall down.',c:'ghost'},
+      {t:'// SPECTR: Connect to the server — type: connect TRAIN-SRV',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'connect_srv': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: You\'re on the target system.',c:'ghost'},
+      {t:'// SPECTR: Find the objective — type: ls /var/data',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'found_target': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: That\'s it.',c:'ghost'},
+      {t:'// SPECTR: Exfiltrate — type: exfil CONFIDENTIAL.txt',c:'ghost'},
+      {t:'// SPECTR: Or navigate there first: cd /var/data',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'exfil': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: File secured.',c:'ghost'},
+      {t:'// SPECTR: Delete the logs before you leave.',c:'ghost'},
+      {t:'// SPECTR: Type: rm-logs',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'rm_logs': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: Good. No trace left behind.',c:'ghost'},
+      {t:'// SPECTR: Disconnect — type: disconnect',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'complete': [
+      {t:'',c:'blank'},
+      {t:'████████████████████████████████████████',c:'ok'},
+      {t:'█                                      █',c:'ok'},
+      {t:'█   TRAINING COMPLETE                  █',c:'ok'},
+      {t:'█                                      █',c:'ok'},
+      {t:'████████████████████████████████████████',c:'ok'},
+      {t:'',c:'blank'},
+      {t:'// SPECTR: You know the basics now.',c:'ghost'},
+      {t:'// SPECTR: scan → connect → read → exfil → disconnect',c:'ghost'},
+      {t:'// SPECTR: That\'s the chain. Everything else is variation.',c:'ghost'},
+      {t:'',c:'blank'},
+      {t:'Ready for the real thing?',c:'cyan'},
+      {t:'Log out and back in as ghost_0x1 / null1234',c:'warn'},
+      {t:'Your real operator account is waiting.',c:'dim'},
+      {t:'',c:'blank'},
+      {t:"Type 'logout' to return to the login screen.",c:'info'},
+      {t:'',c:'blank'},
+    ],
+  };
+
+  const lines = reactions[action];
+  if(!lines) return;
+  setTimeout(()=>{ plines(lines); scrollT(); }, 800);
+}
+
+function initTrainingMode(){
+  trainingMode = true;
+  trainingStep = 0;
+  trainingComplete = false;
+
+  // Register training nodes
+  NETWORK['TRAIN-GATE'] = TRAINING_NETWORK['TRAIN-GATE'];
+  NETWORK['TRAIN-SRV']  = TRAINING_NETWORK['TRAIN-SRV'];
+  NODE_POS['TRAIN-GATE'] = {x:280, y:180};
+  NODE_POS['TRAIN-SRV']  = {x:280, y:320};
+  nodeSecState['TRAIN-GATE']  = 'NOMINAL';
+  nodeSecState['TRAIN-SRV']   = 'NOMINAL';
+  nodeSecEvents['TRAIN-GATE'] = [];
+  nodeSecEvents['TRAIN-SRV']  = [];
+  firewallUnlocked['TRAIN-GATE'] = true;
+  firewallUnlocked['TRAIN-SRV']  = false;
+
+  // Load training objectives
+  OBJECTIVES.length = 0;
+  OBJECTIVES.push(
+    {id:'t-scan',    text:'Scan TRAIN-GATE to identify open services',       done:false, hint:'Type: scan TRAIN-GATE'},
+    {id:'t-connect', text:'Connect to TRAIN-GATE',                            done:false, hint:'Type: connect TRAIN-GATE'},
+    {id:'t-creds',   text:'Find admin credentials on TRAIN-GATE',             done:false, hint:'Type: cat /var/www/notes.txt'},
+    {id:'t-fwunlock',text:'Bypass the firewall on TRAIN-SRV',                 done:false, hint:'Type: fw-unlock TRAIN-SRV admin training2024'},
+    {id:'t-exfil',   text:'Exfiltrate CONFIDENTIAL.txt from TRAIN-SRV',       done:false, hint:'Navigate to /var/data and type: exfil CONFIDENTIAL.txt'},
+    {id:'t-rmlogs',  text:'Delete session logs (rm-logs)',                     done:false, hint:'Type: rm-logs while connected'},
+    {id:'t-disconnect',text:'Disconnect cleanly',                             done:false, hint:'Type: disconnect'}
+  );
+
+  // Training contract on board
+  contractBoard = [{
+    id:'training-op',
+    codename:'TRAINING PROTOCOL',
+    tier:0,
+    type:'DATA_EXTRACT',
+    client:'SPECTR',
+    target:'Training Sandbox',
+    targetNode:'TRAIN-GATE',
+    desc:'A controlled exercise. Locate and exfiltrate CONFIDENTIAL.txt from TRAIN-SRV. SPECTR will guide you through each step.',
+    payout:0,
+    bonusPayout:0,
+    intel:['Entry: TRAIN-GATE (10.0.0.1) — no auth required','Target: TRAIN-SRV (10.0.0.2) — firewalled','Objective file: /var/data/CONFIDENTIAL.txt'],
+    objectives:[],
+    isAxiom:false,
+    accepted:false,
+    completed:false,
+  }];
+
+  // Training mail from SPECTR
+  MAILS.push({
+    id:9999, from:'SPECTR', subj:'Training Protocol — Read This First',
+    time:'00:00', unread:true, isSpectr:true,
+    body:`Operator.\n\nThis is a controlled training environment.\nNothing here is real. No one is watching. No consequences.\n\nYou have one objective:\nLocate and exfiltrate CONFIDENTIAL.txt from TRAIN-SRV.\n\nHere's what you need to know:\n\nYou are an operator. You hack into networks,\nsteal data, and exit without being traced.\n\nThe trace meter is your enemy.\nIf it hits 100%, your session burns.\n\nTools are your advantage.\nCredentials are your skeleton keys.\nLogs are your liability.\n\nStart with the contract board.\nAccept the training contract.\nFollow your objectives.\n\nI'll be watching.\n\n— S`
+  });
+
+  refreshMailList();
+  refreshBoard();
+  updateBadges();
+}
+
+function cleanupTrainingMode(){
+  delete NETWORK['TRAIN-GATE'];
+  delete NETWORK['TRAIN-SRV'];
+  delete NODE_POS['TRAIN-GATE'];
+  delete NODE_POS['TRAIN-SRV'];
+  delete nodeSecState['TRAIN-GATE'];
+  delete nodeSecState['TRAIN-SRV'];
+  delete nodeSecEvents['TRAIN-GATE'];
+  delete nodeSecEvents['TRAIN-SRV'];
+  delete firewallUnlocked['TRAIN-GATE'];
+  delete firewallUnlocked['TRAIN-SRV'];
+  trainingMode = false;
+}
+
+// Mark a training objective done by id
+function markTrainingObj(id){
+  if(!trainingMode) return;
+  const obj = OBJECTIVES.find(o=>o.id===id);
+  if(obj && !obj.done){
+    obj.done = true;
+    refreshMission();
+    // Check if all training objectives done
+    if(OBJECTIVES.every(o=>o.done) && !trainingComplete){
+      trainingComplete = true;
+      trainingReact('complete');
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
 // SOUND DESIGN — Web Audio API
 // ══════════════════════════════════════════════
 let audioCtx = null;
@@ -6322,6 +6623,41 @@ function runCmd(raw){
     proxy:(args)=>cmdProxy(args),
     sound:()=>toggleSound(),
     newterm:()=>{ openApp('terminal'); pline('[+] New terminal opened','ok'); },
+    logout:()=>{
+      if(trainingMode) cleanupTrainingMode();
+      // Reset desktop and return to login
+      Object.keys(WINS).forEach(id=>closeApp(id));
+      document.getElementById('desktop').style.display='none';
+      document.getElementById('login').style.display='flex';
+      document.getElementById('lu').value='ghost_0x1';
+      document.getElementById('lp').value='';
+      document.getElementById('le').textContent='';
+      ticks=0; connectedNode=null;
+      pline('Logged out.','dim');
+    },
+    tutorial:()=>{
+      plines([
+        {t:'',c:'blank'},
+        {t:'── QUICK START ───────────────────────────',c:'cyan'},
+        {t:'',c:'blank'},
+        {t:'  1.  open board       — see available contracts',c:'out'},
+        {t:'  2.  open mail        — read your briefing',c:'out'},
+        {t:'  3.  nodes            — list network nodes',c:'out'},
+        {t:'  4.  scan GATEWAY     — probe the entry node',c:'out'},
+        {t:'  5.  connect GATEWAY  — establish connection',c:'out'},
+        {t:'  6.  ls               — list files on node',c:'out'},
+        {t:'  7.  cat [file]       — read a file',c:'out'},
+        {t:'  8.  exfil [file]     — steal a file',c:'out'},
+        {t:'  9.  disconnect       — exit cleanly',c:'out'},
+        {t:'',c:'blank'},
+        {t:"  fw-unlock help       — firewall bypass guide",c:'dim'},
+        {t:"  proxy help           — proxy setup guide",c:'dim'},
+        {t:"  difficulty           — check threat level",c:'dim'},
+        {t:'',c:'blank'},
+        {t:'── Type any command to begin. ─────────────',c:'dim'},
+        {t:'',c:'blank'},
+      ]);
+    },
     difficulty:()=>{
       const d = getDifficultyProfile();
       const dl = getDifficultyLabel();
@@ -6473,6 +6809,11 @@ function ls(args){
     }
   });
   pline('','blank');
+  // Training reactions — SPECTR guides based on which node you're on
+  if(trainingMode){
+    if(connectedNode==='TRAIN-GATE') trainingReact('ls');
+    if(connectedNode==='TRAIN-SRV')  trainingReact('found_target');
+  }
 }
 function cd(args){
   if(!args[0]||args[0]==='~'){cwd=connectedNode?'/':'/home/'+currentUser;return;}
@@ -6489,6 +6830,11 @@ function cat(args){
   pline('','blank');
   fs[target].content.split('\n').forEach(l=>pline(l||' ','data'));
   pline('','blank');
+  // Training — detect reading the creds file on TRAIN-GATE
+  if(trainingMode && connectedNode==='TRAIN-GATE' && target.includes('notes.txt')){
+    markTrainingObj('t-creds');
+    trainingReact('found_creds');
+  }
 
   // M9b — track files read for Archivist achievement
   META.filesRead = (META.filesRead||0) + 1;
@@ -6565,6 +6911,7 @@ function listNodes(){
     pline(`  ${conn} ${n.label.padEnd(14)} ${n.ip.padEnd(14)} ${fw}`,'out');
   });
   pline('','blank');
+  if(trainingMode) trainingReact('nodes');
 }
 
 function ifconfig(){
@@ -6673,6 +7020,7 @@ function scan(args){
     pline(`[*] Scan saved → ~/intel/${id}.scan`,'dim');
     // M4 — add to intel DB
     addIntel('nodes',{key:n.ip,val:`${n.label} — ${n.os} (${n.security})`});
+    if(trainingMode) trainingReact('scan');
     scrollT();
     refreshNetmap();
   },900);
@@ -6699,6 +7047,7 @@ function fwUnlock(args){
       {t:'',c:'blank'},
     ]);
     notify(`Firewall bypassed: ${n.label}`,'ok'); sfx('fw_unlock');
+    if(trainingMode){ markTrainingObj('t-fwunlock'); trainingReact('fw_unlock'); }
     refreshNetmap();
   } else {
     plines([{t:'[!] FIREWALL: credentials rejected',c:'err'},{t:'[!] ALERT: Failed auth attempt logged',c:'err'},{t:'',c:'blank'}]);
@@ -6763,8 +7112,12 @@ function connect(args){
     checkSecOnConnect(id);
     runNodesHit.add(id); // M6 — track for run stats
     if(runNodesHit.size === 1) fireSpectrTrigger('first_connect'); // M8a
-    // M3 — inline objective check for EXEC-TERM access
     if(id==='EXEC-TERM') setTimeout(()=>{ if(connectedNode==='EXEC-TERM') markObjective('access'); },900);
+    // Training reactions
+    if(trainingMode){
+      if(id==='TRAIN-GATE'){ markTrainingObj('t-connect'); trainingReact('connect'); }
+      if(id==='TRAIN-SRV') { trainingReact('connect_srv'); }
+    }
     refreshNetmap();
     scrollT();
   },800);
@@ -6794,6 +7147,13 @@ function disconnect(){
   checkCleanObjective();
   refreshNetmap();
   saveRunState(); // M8c — autosave on disconnect
+  if(trainingMode){
+    const wasGate = old.label === 'TRAIN-GATE';
+    markTrainingObj('t-disconnect');
+    if(wasGate) trainingReact('disconnect_1');
+    else if(trainingComplete){ /* already reacted */ }
+    else trainingReact('rm_logs');
+  }
 }
 
 // ── CRACK ──
@@ -6877,6 +7237,7 @@ function cmdExfil(args){
       {t:'',c:'blank'},
     ]);
     notify(`Exfil: ${fname} (${(fdata.exfil||'low').toUpperCase()})`,fdata.exfil==='high'?'ok':'info'); sfx('exfil');
+    if(trainingMode){ markTrainingObj('t-exfil'); trainingReact('exfil'); }
     runExfilCount++; // M6 — track for run stats
     // M8c — log for FEED// story generation
     if(proceduralOrg && connectedNode==='PROC-ORG')
@@ -6917,6 +7278,7 @@ function rmLogs(){
     ]);
     notify(`Logs deleted: ${n.label}`,'ok');
     checkCleanObjective();
+    if(trainingMode){ markTrainingObj('t-rmlogs'); trainingReact('rm_logs'); }
     scrollT();
   },600);
 }
