@@ -90,7 +90,7 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .wb{width:9px;height:9px;border-radius:50%;border:none;cursor:pointer;transition:opacity .1s;}
 .wb.cl{background:var(--rdim);}.wb.mn{background:var(--adim);}.wb.mx{background:var(--gdim);}
 .wb:hover{opacity:.75;}
-.wt{flex:1;font-size:15px;letter-spacing:2px;color:var(--text3);text-align:center;}
+.wt{flex:1;font-size:13px;letter-spacing:1px;color:var(--text3);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px;}
 /* ── NOTIFICATION BADGES ── */
 .tab{background:transparent;border:1px solid transparent;color:var(--text2);font-family:var(--mono);font-size:15px;padding:2px 7px;cursor:pointer;letter-spacing:1px;transition:all .1s;position:relative;}
 
@@ -153,8 +153,19 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .crack-fill{height:100%;background:var(--amber);transition:width .1s;}
 
 /* NET MAP */
-.netmap-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);}
-#netmap-svg{width:100%;height:100%;}
+.netmap-wrap{flex:1;position:relative;overflow:hidden;background:#050810;}
+#netmap-svg{width:100%;height:100%;cursor:grab;}
+#netmap-svg.panning{cursor:grabbing;}
+.netmap-legend-bg{position:absolute;bottom:4px;left:6px;width:210px;height:22px;background:#060a14;border:1px solid #1a2444;border-radius:2px;z-index:9;pointer-events:none;}
+.netmap-legend{position:absolute;bottom:8px;left:10px;display:flex;gap:16px;pointer-events:none;z-index:10;}
+.netmap-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3);font-family:var(--mono);}
+.netmap-legend-swatch{width:8px;height:8px;flex-shrink:0;}
+.netmap-hint{position:absolute;bottom:8px;right:10px;font-size:10px;color:var(--text3);font-family:var(--mono);pointer-events:none;opacity:.6;}
+/* ── M10 — MAP CITY POLISH ── */
+@keyframes pulse-conn {
+  0%,100%{stroke-opacity:.9;stroke-width:1.5;}
+  50%{stroke-opacity:.4;stroke-width:1;}
+}
 .node-group{cursor:pointer;}
 .node-group:hover .node-rect{filter:brightness(1.3);}
 .node-label{font-family:var(--mono);font-size:13px;fill:var(--text2);text-anchor:middle;}
@@ -284,6 +295,13 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .spectr-hdr-from{font-size:12px;color:var(--purple);letter-spacing:2px;margin-bottom:2px;}
 .spectr-hdr-subj{font-size:14px;color:var(--text);margin-bottom:2px;}
 .spectr-hdr-meta{font-size:12px;color:var(--text3);}
+/* ── NULL//VOID mail — distinct from SPECTR ── */
+.void-hdr{padding:10px 14px;border-bottom:1px solid rgba(248,81,73,.3);background:rgba(248,81,73,.05);margin-bottom:8px;}
+.void-hdr-from{font-size:12px;color:var(--red);letter-spacing:3px;margin-bottom:2px;opacity:.7;}
+.void-hdr-subj{font-size:14px;color:var(--text);margin-bottom:2px;font-family:var(--mono);}
+.void-hdr-meta{font-size:12px;color:var(--text3);}
+.void-body{color:var(--text2);line-height:2;font-family:var(--mono);font-size:14px;white-space:pre-wrap;opacity:.9;}
+.mail-list-item.void{border-left:2px solid var(--red);}
 .tl.ghost{color:var(--purple);opacity:.85;font-style:italic;}
 .feed-wrap{padding:10px;overflow-y:auto;height:100%;}
 .feed-item{border-left:2px solid var(--border2);padding:8px 12px;margin-bottom:10px;}
@@ -383,6 +401,24 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .alias-history-item{padding:4px 6px;border-left:2px solid var(--border);margin-bottom:3px;font-size:15px;color:var(--text3);}
 .alias-history-item.current{border-color:var(--cyan);color:var(--text2);}
 .alias-history-item.burned{border-color:var(--red);}
+/* ── META TABS ── */
+.meta-tabs{display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid var(--border);}
+.meta-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text3);font-family:var(--mono);font-size:13px;padding:4px 10px;cursor:pointer;letter-spacing:1px;margin-bottom:-1px;}
+.meta-tab:hover{color:var(--text2);}
+.meta-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+/* ── ACHIEVEMENT CARDS ── */
+.ach-grid{display:flex;flex-direction:column;gap:6px;}
+.ach-card{padding:8px 10px;border:1px solid var(--border);background:var(--bg3);position:relative;}
+.ach-card.unlocked{border-color:var(--cyan3);background:var(--cglow);}
+.ach-card.locked{opacity:.55;}
+.ach-icon{font-size:16px;margin-right:8px;}
+.ach-name{font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;}
+.ach-card.locked .ach-name{color:var(--text3);}
+.ach-desc{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.5;}
+.ach-hint{font-size:11px;color:var(--text3);margin-top:3px;font-style:italic;}
+.ach-run{font-size:11px;color:var(--cyan);position:absolute;top:8px;right:10px;}
+.ach-progress{font-size:11px;color:var(--text3);margin-top:2px;}
+.ach-header{display:flex;align-items:center;margin-bottom:2px;}
 /* Run number badge in taskbar */
 #tb-run{font-size:15px;color:var(--text3);}
 #tb-run span{color:var(--amber);}
@@ -848,7 +884,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 <!-- LOGIN -->
 <div id="login">
   <div class="ll">NULL//TRACE</div>
-  <div class="lv">OS v0.8.0 — M8 BUILD</div>
+  <div class="lv">OS v0.9.0 — M9 BUILD</div>
   <div class="lbox">
     <div class="lf"><label class="llbl">ALIAS</label><input class="li" id="lu" type="text" value="ghost_0x1" autocomplete="off" spellcheck="false" tabindex="1"></div>
     <div class="lf"><label class="llbl">PASSPHRASE</label><input class="li" id="lp" type="password" autocomplete="off" tabindex="2"></div>
@@ -901,7 +937,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
       <div>
         <div class="apps-col-hdr">SOCIAL</div>
         <div class="apps-item" data-app="phish"   onclick="appsLaunch('phish')">  <span class="apps-item-icon">✉</span><span class="apps-item-name">PHISH//</span>   <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('phish')">PIN</span></div>
-        <div class="apps-item" data-app="nano"    onclick="appsLaunch('nano-new')"><span class="apps-item-icon">✏</span><span class="apps-item-name">NANO//</span>    <span class="apps-pin-btn" onclick="event.stopPropagation();togglePin('nano')">PIN</span></div>
       </div>
     </div>
     <div class="apps-footer">Right-click desktop icons to unpin · Click PIN to add to desktop</div>
@@ -994,7 +1029,7 @@ let socialObjectivesDone = {}; // track social eng objectives separately
 let traceLevel = 0;
 let traceActive = false;
 let traceTimer = null;
-let traceRate = 0.35;
+let traceRate = 0.28;
 let sessionStart = 0;
 let rep = 0;
 let termHistory = [], histIdx = -1;
@@ -1044,9 +1079,11 @@ function escalateSecurity(nodeId,reason,newState){
     }
     pline('','blank');
     scrollT();
-    if(traceActive) traceRate=NETWORK[nodeId].traceRate*SEC_TRACE_MULT[newState];
+    if(traceActive) traceRate=NETWORK[nodeId].traceRate*getSecTraceMult(newState);
   }
   generateAdminAlert(nodeId,newState,reason);
+  applyTopologySecEffect(nodeId, newState); // M8d — FLAT topology shares escalation
+  trackGhostRun(newState); // M9b — ghost run tracking
   refreshNetmap();
   refreshSecmon();
   notify(`${NETWORK[nodeId].label}: ${newState}`,newState==='NOMINAL'?'info':newState==='SUSPICIOUS'?'warn':'err');
@@ -1058,7 +1095,7 @@ function checkSecOnConnect(nodeId){
   const s=getSecState(nodeId);
   if(v>=3&&s==='NOMINAL') escalateSecurity(nodeId,'Multiple connection attempts detected','SUSPICIOUS');
   else if(v>=2&&s==='SUSPICIOUS') escalateSecurity(nodeId,'Repeated intrusion — incident response triggered','INCIDENT');
-  if(traceActive) traceRate=NETWORK[nodeId].traceRate*SEC_TRACE_MULT[getSecState(nodeId)];
+  if(traceActive) traceRate=NETWORK[nodeId].traceRate*getSecTraceMult(getSecState(nodeId));
 }
 
 function checkSecOnFailedAuth(nodeId){
@@ -1268,7 +1305,7 @@ const NETWORK = {
     os: 'Ubuntu 22.04 (hardened)', security: 'CRITICAL', firewall: true,
     firewallCred: {user:'rchen', pass:'AX-EXEC-7f3a9b2c1d', hint:'Token found in /root/.mysql_history on DB-SRV or /etc/postfix/main.cf on MAIL-SRV'},
     links: ['DB-SRV'],
-    traceRate: 1.1,
+    traceRate: 0.75,
     desc: 'CFO executive terminal. Highest-security node. Primary mission objective.',
     fs: {
       '/':{t:'d'},'/home':{t:'d'},'/home/rchen':{t:'d'},
@@ -1297,7 +1334,7 @@ const LFS = {
   '/home/ghost_0x1/intel/exfil':{t:'d'},
   '/home/ghost_0x1/logs':{t:'d'},
   '/home/ghost_0x1/logs/ops.log':{t:'f',content:`[00:00:01] OS initialized — ghost_0x1\n[00:00:02] Contract received: OP-VORTEX\n[00:00:03] Target network: Axiom Corp\n[00:00:04] Awaiting operator action`},
-  '/home/ghost_0x1/README.md':{t:'f',content:`NULL//TRACE v0.7 — OPERATOR REFERENCE\n\nFILESYSTEM:\n  ls [path]         list directory contents\n  cd [path]         change directory (.. to go up)\n  cat [file]        read file contents\n  mkdir [name]      create directory\n  touch [name]      create file\n  rm [name]         remove file or empty directory\n  pwd               print working directory\n  nano [file]       open text editor (^S save, ^N sticky)\n  note [file]       pin file as sticky note\n\nSYSTEM:\n  whoami            current identity\n  ifconfig          network interfaces\n  status            connection & system status\n  uname             kernel info\n  history           command history\n  clear             clear terminal\n\nNETWORK:\n  nodes             list all network nodes\n  scan [host]       probe target for open services\n  connect [host]    connect to remote host\n  disconnect        close active connection\n  fw-unlock [node] [user] [pass]\n  secstate          security state of all nodes\n\nOPERATIONS:\n  crack [file]      run password cracker\n  exfil [file]      exfiltrate file to vault\n  rm-logs           delete session logs on node\n\nSHORTCUTS:\n  open [app]        open any app (mail, netmap, intel...)\n  Ctrl+Space        command palette\n  Ctrl+T            new terminal window\n  Tab               autocomplete command or filename`},
+  '/home/ghost_0x1/README.md':{t:'f',content:`NULL//TRACE v0.9 — OPERATOR REFERENCE\n\nFILESYSTEM:\n  ls [path]         list directory contents\n  cd [path]         change directory (.. to go up)\n  cat [file]        read file contents\n  mkdir [name]      create directory\n  touch [name]      create file\n  rm [name]         remove file or empty directory\n  pwd               print working directory\n  nano [file]       open text editor (^S save, ^N sticky)\n  note [file]       pin file as sticky note\n\nSYSTEM:\n  whoami            current identity\n  ifconfig          network interfaces\n  status            connection & system status\n  uname             kernel info\n  history           command history\n  clear             clear terminal\n\nNETWORK:\n  nodes             list all network nodes\n  scan [host]       probe target for open services\n  connect [host]    connect to remote host\n  disconnect        close active connection\n  fw-unlock [node] [user] [pass]\n  secstate          security state of all nodes\n\nOPERATIONS:\n  crack [file]      run password cracker\n  exfil [file]      exfiltrate file to vault\n  rm-logs           delete session logs on node\n\nSHORTCUTS:\n  open [app]        open any app (mail, netmap, intel...)\n  Ctrl+Space        command palette\n  Alt+T         new terminal window\n  Tab               autocomplete command or filename`},
 };
 
 // ══════════════════════════════════════════════
@@ -1346,7 +1383,7 @@ const BOOTLINES = [
   {t:'[  OK  ] Admin alert system online',c:'ok',d:1060},
   {t:'[  OK  ] Exfil vault initialized',c:'ok',d:1160},
   {t:'',c:'',d:1260},
-  {t:'NULL//TRACE v0.7 :: ALL SYSTEMS NOMINAL',c:'cyan',d:1340},
+  {t:'NULL//TRACE v0.9 :: ALL SYSTEMS NOMINAL',c:'cyan',d:1340},
 ];
 
 function runBoot(){
@@ -1460,18 +1497,18 @@ const WINS={};
 let zCnt=10, focusedWin=null;
 const WDEFS={
   terminal:{title:'TERM// — NULL//TRACE',w:680,h:440,x:100,y:50},
-  netmap:  {title:'NET//MAP — AXIOM CORP',w:560,h:420,x:340,y:60},
+  netmap:  {title:'NET//MAP',w:560,h:420,x:340,y:60},
   mail:    {title:'MAIL// — INBOX',       w:580,h:400,x:160,y:110},
-  exfil:   {title:'EXFIL// — VAULT',      w:360,h:320,x:280,y:140},
-  mission: {title:'MISSION// — ACTIVE CONTRACT',w:380,h:440,x:420,y:70},
-  board:   {title:'BOARD// — CONTRACT BOARD',   w:480,h:460,x:130,y:70},
-  feed:    {title:'FEED// — WORLD NEWS',        w:460,h:460,x:150,y:75},
-  secmon:  {title:'SEC//MON — SECURITY',  w:340,h:420,x:460,y:90},
-  sysmon:  {title:'SYS// — MONITOR',      w:300,h:360,x:300,y:90},
-  phish:   {title:'PHISH// — SOCIAL ENGINEERING', w:620,h:460,x:130,y:65},
+  exfil:   {title:'EXFIL//',      w:360,h:320,x:280,y:140},
+  mission: {title:'MISSION//',w:380,h:440,x:420,y:70},
+  board:   {title:'BOARD//',   w:480,h:460,x:130,y:70},
+  feed:    {title:'FEED//',        w:460,h:460,x:150,y:75},
+  secmon:  {title:'SEC//MON',  w:340,h:420,x:460,y:90},
+  sysmon:  {title:'SYS//',      w:300,h:360,x:300,y:90},
+  phish:   {title:'PHISH//', w:620,h:460,x:130,y:65},
   forge:   {title:'FORGE// — TOOL ECOSYSTEM',     w:560,h:480,x:145,y:60},
-  meta:    {title:'META// — PERSISTENT PROGRESS',  w:380,h:460,x:150,y:70},
-  intel:   {title:'INTEL// — DATABASE',   w:400,h:440,x:120,y:80},
+  meta:    {title:'META//',  w:380,h:460,x:150,y:70},
+  intel:   {title:'INTEL//',   w:400,h:440,x:120,y:80},
 };
 
 let termCount=0;
@@ -1638,20 +1675,56 @@ function buildTerminal(body, winId='terminal'){
   const s=document.getElementById(oid);
   s.style.cssText+=';scroll-behavior:smooth;';
 
-  const isFirst=winId==='terminal';
+  const isFirst = winId==='terminal';
+  const isFirstEver = (META.runCount === 0) && !META.tutorialDone;
+
   tPrintTo(winId,[
     {t:'╔═══════════════════════════════════════════╗',c:'cyan'},
-    {t:'║   NULL//TRACE OS v0.8  —  M8 BUILD        ║',c:'cyan'},
-    {t:'║   SPECTR ONLINE                           ║',c:'cyan'},
+    {t:'║   NULL//TRACE OS v1.0  —  OPERATOR BUILD  ║',c:'cyan'},
+    {t:'║   SPECTR ONLINE  ·  ALL SYSTEMS NOMINAL   ║',c:'cyan'},
     {t:'╚═══════════════════════════════════════════╝',c:'cyan'},
     {t:'',c:'blank'},
     {t:`Identity: ${currentUser}`,c:'ok'},
-    {t:`Ctrl+Space: command palette  |  Ctrl+T: new terminal`,c:'info'},
-    {t:`Check MAIL// — you have a message waiting`,c:'warn'},
-    {t:`Open BOARD// for contracts  |  MISSION// for objectives`,c:'dim'},
-    {t:`Type 'help' for all commands`,c:'dim'},
+    {t:`Ctrl+Space: command palette  |  Alt+T: new terminal`,c:'info'},
     {t:'',c:'blank'},
   ]);
+
+  if(isFirstEver && isFirst){
+    // ── First-run tutorial sequence ──
+    setTimeout(()=>{
+      tPrintTo(winId,[
+        {t:'── FIRST RUN DETECTED ────────────────────',c:'dim'},
+        {t:'',c:'blank'},
+        {t:'You have a message waiting in MAIL//.',c:'warn'},
+        {t:'Read it — it has your first contract briefing.',c:'dim'},
+        {t:'',c:'blank'},
+        {t:'QUICK START:',c:'cyan'},
+        {t:'  1.  open board       — see available contracts',c:'out'},
+        {t:'  2.  open mail        — read your briefing',c:'out'},
+        {t:'  3.  nodes            — list network nodes',c:'out'},
+        {t:'  4.  scan GATEWAY     — probe the entry node',c:'out'},
+        {t:'  5.  connect GATEWAY  — establish connection',c:'out'},
+        {t:'  6.  ls               — list files on node',c:'out'},
+        {t:'  7.  cat [file]       — read a file',c:'out'},
+        {t:'  8.  exfil [file]     — steal a file',c:'out'},
+        {t:'  9.  disconnect       — exit cleanly',c:'out'},
+        {t:'',c:'blank'},
+        {t:"  Type 'help' for all commands",c:'dim'},
+        {t:"  Type 'difficulty' to see your threat level",c:'dim'},
+        {t:"  Type 'proxy status' to check your cover",c:'dim'},
+        {t:'',c:'blank'},
+        {t:'── SPECTR is watching. Don\'t get traced. ──',c:'ghost'},
+        {t:'',c:'blank'},
+      ]);
+    }, 400);
+  } else {
+    tPrintTo(winId,[
+      {t:`Check MAIL// — you have messages waiting`,c:'warn'},
+      {t:`Open BOARD// for contracts  |  MISSION// for objectives`,c:'dim'},
+      {t:`Type 'help' for all commands`,c:'dim'},
+      {t:'',c:'blank'},
+    ]);
+  }
 
   const inp=document.getElementById(iid);
   inp.addEventListener('keydown', e=>onTermKey(e, winId));
@@ -1737,7 +1810,7 @@ const ALL_COMMANDS=['help','clear','pwd','ls','cd','cat','mkdir','touch','rm',
   'whoami','status','ifconfig','scan','connect','disconnect','crack','exfil',
   'rm-logs','fw-unlock','secstate','nodes','history','uname','date','echo',
   'man','sudo','exit','reboot','open','nano','note','phish','impersonate',
-  'login','logout','fontsize','proxy'];
+  'login','logout','fontsize','proxy','difficulty','sound','newterm'];
 
 let tabSuggestions=[], tabIdx=-1;
 
@@ -1809,7 +1882,7 @@ function hideSuggest(winId){
 // M4 — COMMAND PALETTE (Ctrl+Space)
 // ══════════════════════════════════════════════
 const PALETTE_ITEMS=[
-  {icon:'❯_', name:'New Terminal',       hint:'Ctrl+T',       action:()=>openApp('terminal')},
+  {icon:'❯_', name:'New Terminal',       hint:'Alt+T',       action:()=>openApp('terminal')},
   {icon:'⬡',  name:'NET//MAP',           hint:'network map',  action:()=>openApp('netmap')},
   {icon:'@',  name:'MAIL//',             hint:'inbox',        action:()=>openApp('mail')},
   {icon:'✉',  name:'PHISH//',            hint:'social eng',   action:()=>openApp('phish')},
@@ -1879,7 +1952,7 @@ document.addEventListener('keydown', e=>{
     else closePalette();
   }
   // Ctrl+T — new terminal
-  if(e.ctrlKey && e.key==='t' && !e.target.closest('#cmdpal')){
+  if(e.altKey && e.key==='t' && !e.target.closest('#cmdpal')){
     e.preventDefault();
     openApp('terminal');
   }
@@ -2081,14 +2154,14 @@ function refreshIntel(){
 // ══════════════════════════════════════════════
 // M4 — PROCEDURAL ORG GENERATOR
 // ══════════════════════════════════════════════
-const INDUSTRIES=['FINTECH','PHARMA','LEGAL','LOGISTICS','DEFENSE','MEDIA'];
-const FIRST=['Alex','Jordan','Morgan','Casey','Riley','Drew','Taylor','Sam','Jamie','Chris'];
-const LAST=['Chen','Novak','Osei','Müller','Patel','Rivera','Walsh','Tanaka','Kowalski','Okafor'];
+const INDUSTRIES=['FINTECH','PHARMA','LEGAL','LOGISTICS','DEFENSE','MEDIA','HEALTHCARE','ENERGY','BIOTECH','AEROSPACE','INTELLIGENCE','CYBERSECURITY','CONSULTING','INFRASTRUCTURE'];
+const FIRST=['Alex','Jordan','Morgan','Casey','Riley','Drew','Taylor','Sam','Jamie','Chris','Avery','Quinn','Blake','Sage','Reese','Finley','Logan','Parker','Skyler','Rowan','Dana','Hayden','Emery','Remy'];
+const LAST=['Chen','Novak','Osei','Müller','Patel','Rivera','Walsh','Tanaka','Kowalski','Okafor','Reyes','Fischer','Nakamura','Dubois','Nguyen','Petrov','Abara','Lindqvist','Yamamoto','Alves','Khoury','Strömberg','Obi','Ferreira'];
 const ROLES=['CEO','CFO','CTO','IT Admin','DevOps','HR Director','Legal Counsel','Security Analyst'];
-const HOBBIES=['cycling','chess','hiking','photography','cooking','gaming','gardening','running'];
-const PETS=['Max','Luna','Bella','Charlie','Mochi','Socks','Bruno','Nala'];
-const ADJECTIVES=['Secure','Digital','Global','Advanced','Premier','Unified','Core','Apex'];
-const NOUNS=['Systems','Solutions','Group','Corp','Industries','Partners','Labs','Dynamics'];
+const HOBBIES=['cycling','chess','hiking','photography','cooking','gaming','gardening','running','climbing','painting','woodworking','birdwatching','fishing','yoga','martial arts','brewing','volunteering','astronomy'];
+const PETS=['Max','Luna','Bella','Charlie','Mochi','Socks','Bruno','Nala','Pixel','Ghost','Cipher','Shadow','Biscuit','Mango','Raven','Zephyr','Sparky','Atlas'];
+const ADJECTIVES=['Secure','Digital','Global','Advanced','Premier','Unified','Core','Apex','Vortex','Sentinel','Cascade','Meridian','Axiom','Nexus','Vertex','Cipher','Helix','Stratum','Onyx','Quantum'];
+const NOUNS=['Systems','Solutions','Group','Corp','Industries','Partners','Labs','Dynamics','Networks','Technologies','Ventures','Holdings','Collective','Alliance','Bureau','Syndicate','Works','Associates','Foundry','Operators'];
 
 function seedRandom(seed){
   let s=seed;
@@ -2103,7 +2176,7 @@ function genOrg(seed=Date.now()){
   const name=`${pick(ADJECTIVES)} ${pick(NOUNS)}`;
   const domain=name.toLowerCase().replace(/\s+/g,'')+'.corp';
   const ip=`10.${20+Math.floor(rng()*200)}.${Math.floor(rng()*255)}.1`;
-  const secLevel=pick(['LOW','NOMINAL','HIGH']);
+  const secLevel = getDifficultySecLevel(rng); // M9a — difficulty-scaled
 
   // Generate 4-5 employees
   const empCount=4+Math.floor(rng()*2);
@@ -2124,24 +2197,112 @@ function genOrg(seed=Date.now()){
     employees.push({fname,lname,role,email:`${fname.toLowerCase()[0]}${lname.toLowerCase()}@${domain}`,hobby,pet,birthYear,password});
   }
 
-  // Generate seeded filesystem
-  const ceo=employees[0], it=employees.find(e=>e.role==='IT Admin')||employees[1];
-  const fs={
-    '/':{t:'d'},'/home':{t:'d'},'/etc':{t:'d'},'/var':{t:'d'},'/var/log':{t:'d'},
-    '/etc/network.conf':{t:'f',content:`# ${name.toUpperCase()} NETWORK\nhostname: ${domain}\ngateway: ${ip}\nsecurity: ${secLevel}`},
-    '/var/log/access.log':{t:'f',exfil:'low',content:`[LOG] Session from unknown IP\n[LOG] Auth attempt: ${it.email}\n[LOG] File access: /home/${it.fname.toLowerCase()}/passwords.txt`},
+  // ── M9c — RICH FILESYSTEM ──
+  // Role-specific files, red herrings, dead drops, industry flavor
+  const ceo=employees[0];
+  const it=employees.find(e=>e.role==='IT Admin')||employees[1];
+  const devops=employees.find(e=>e.role==='DevOps')||employees[2];
+  const hr=employees.find(e=>e.role==='HR Director')||employees[employees.length-1];
+  const cfr=employees.find(e=>e.role==='CFO')||employees[1];
+
+  // Industry-specific file flavors
+  const industryFiles = {
+    'Finance':     ['wire_transfers.log','audit_trail.csv','risk_assessment.pdf.txt','trading_algo.py'],
+    'Healthcare':  ['patient_index.db.txt','hipaa_compliance.doc.txt','drug_trial_data.csv','incident_report.txt'],
+    'Technology':  ['source_code.tar.gz.txt','api_keys.env','deployment_keys.txt','roadmap_Q4.md'],
+    'Legal':       ['case_files_index.txt','client_registry.csv','settlement_terms.doc.txt','billing_records.csv'],
+    'Government':  ['classified_index.txt','contractor_list.csv','budget_allocation.xlsx.txt','clearance_roster.txt'],
+    'Energy':      ['facility_access.log','grid_topology.txt','maintenance_schedule.csv','emergency_protocols.txt'],
+    'Retail':      ['customer_database.csv','inventory_system.txt','payment_processor.conf','supplier_contracts.txt'],
+    'Education':   ['student_records.db.txt','staff_credentials.csv','network_topology.txt','research_data.txt'],
   };
-  employees.forEach(emp=>{
+  const iFiles = industryFiles[industry] || industryFiles['Technology'];
+  const iFile1 = iFiles[Math.floor(rng()*iFiles.length)];
+  const iFile2 = iFiles[(Math.floor(rng()*iFiles.length)+1)%iFiles.length];
+
+  // Lore fragments — hints at the fourth faction and other operators
+  const loreFragments = [
+    `Received another anonymous contract request. No attribution, no contact.\nPayout is double market rate.\nI asked legal — they said don't ask questions.\n\nWe completed it. The network access was already half-open when we got there.\nSomeone else had been in.`,
+    `IT flagged unusual read patterns on /var/secure last Tuesday.\nNo breach confirmed. No lateral movement detected.\nBut the timing matches the ${name} incident in sector 4.\n\nWe've seen this signature before.`,
+    `Third party audit completed.\nAuditors noted "pre-existing unauthorized access paths" in the infrastructure.\nThey couldn't determine origin or duration.\n\nWe've requested a full forensic sweep. ETA unknown.`,
+    `Memo from the board: do not discuss the Q2 incident externally.\nCounsel has advised silence pending investigation.\nThe data accessed has been isolated.\n\nFor the record: we don't know who or what GHOST-7 is.`,
+  ];
+  const loreIdx = Math.floor(rng()*loreFragments.length);
+  const hasLore = rng() > 0.4; // 60% chance of lore file this org
+
+  // Red herring passwords (look real, don't work)
+  const fakePass1 = `${pick(PETS)}${1990+Math.floor(rng()*20)}`;
+  const fakePass2 = `${pick(['admin','root','backup','test'])}${Math.floor(rng()*9999)}`;
+
+  const fs={
+    '/':{t:'d'},'/home':{t:'d'},'/etc':{t:'d'},'/var':{t:'d'},
+    '/var/log':{t:'d'},'/var/www':{t:'d'},'/opt':{t:'d'},'/tmp':{t:'d'},
+    '/etc/hostname':{t:'f',content:domain},
+    '/etc/network.conf':{t:'f',content:`# ${name.toUpperCase()} NETWORK\nhostname: ${domain}\ngateway: ${ip}\nsecurity_tier: ${secLevel}\ncontact: ${it.email}`},
+    '/etc/passwd':{t:'f',exfil:'med',content:employees.map(e=>`${e.fname.toLowerCase()}:x:100${employees.indexOf(e)}:100${employees.indexOf(e)}:${e.fname} ${e.lname}:/home/${e.fname.toLowerCase()}:/bin/bash`).join('\n')},
+    '/var/log/access.log':{t:'f',exfil:'low',content:`[${new Date().toISOString().split('T')[0]}] AUTH ${it.email} — SUCCESS\n[${new Date().toISOString().split('T')[0]}] AUTH unknown@external — FAILED (3 attempts)\n[${new Date().toISOString().split('T')[0]}] FILE /var/secure/${iFile1} READ\n[${new Date().toISOString().split('T')[0]}] AUTH ${ceo.email} — SUCCESS\n[${new Date().toISOString().split('T')[0]}] FILE /home/${ceo.fname.toLowerCase()}/CONFIDENTIAL.txt READ`},
+    '/var/log/auth.log':{t:'f',exfil:'low',content:`sshd: Accepted password for ${it.fname.toLowerCase()} from 10.0.0.47\nsshd: Failed password for root from 10.0.0.47 (3 times)\nsshd: Accepted publickey for ${devops?.fname.toLowerCase()||'deploy'} from 10.10.0.1\n# password hint: ${it.fname.toLowerCase()} uses ${it.pet} in password`},
+    '/tmp/.bash_history':{t:'f',content:`ssh ${ceo.fname.toLowerCase()}@${ip}\nsudo cat /etc/shadow\nls /home/${ceo.fname.toLowerCase()}\ncat /var/secure/${iFile1}\nexit`},
+  };
+
+  // ── Employee home directories ──
+  employees.forEach((emp,idx)=>{
     const dir=`/home/${emp.fname.toLowerCase()}`;
     fs[dir]={t:'d'};
-    fs[`${dir}/notes.txt`]={t:'f',content:`Personal notes — ${emp.fname} ${emp.lname}\nRole: ${emp.role}\n\nTodo:\n- update password (still using ${emp.pet}${emp.birthYear})\n- call ${employees[(employees.indexOf(emp)+1)%employees.length].fname} about the thing\n\nReminder: ${emp.hobby} on Saturday`};
-    fs[`${dir}/.credentials`]={t:'f',exfil:'high',content:`# ${emp.fname} ${emp.lname} — ${emp.role}\nemail: ${emp.email}\npassword: ${emp.password}\nrecovery: ${emp.pet} / ${emp.birthYear}`};
+
+    // Everyone gets a .bash_history
+    fs[`${dir}/.bash_history`]={t:'f',content:`cd /home/${emp.fname.toLowerCase()}\nls -la\ncat notes.txt\nssh ${employees[(idx+1)%employees.length].fname.toLowerCase()}@${ip}\npasswd\nclear`};
+
+    // Role-specific files
+    if(emp.role === 'CEO'){
+      fs[`${dir}/notes.txt`]={t:'f',content:`${emp.fname} — personal notes\n\n- Board call Thursday — prep acquisition deck\n- ${cfr?.fname||'Finance team'} flagged the ${iFile2} discrepancy\n- DO NOT discuss externally\n\nMemo to self: change password. IT keeps asking.\nCurrent one is embarrassing (${emp.pet}... I know)`};
+      fs[`${dir}/strategy_2024.txt`]={t:'f',exfil:'high',content:`${name.toUpperCase()} — STRATEGIC DIRECTION\n\nPriority 1: ${pick(ADJECTIVES)} ${pick(NOUNS)} acquisition (Q${1+Math.floor(rng()*3)})\nPriority 2: ${industry} vertical expansion\nPriority 3: Infrastructure hardening (post-incident)\n\nRevenue target: $${10+Math.floor(rng()*90)}M\nGrowth assumption: ${5+Math.floor(rng()*25)}%\n\nCLASSIFIED — BOARD EYES ONLY`};
+      // Red herring — old password that was rotated
+      fs[`${dir}/.old_credentials`]={t:'f',content:`# OLD — DO NOT USE\n# Rotated after Q2 security review\nuser: ${emp.email}\npass: ${fakePass1}\n\n# New credentials in password manager`};
+
+    } else if(emp.role === 'IT Admin'){
+      fs[`${dir}/notes.txt`]={t:'f',content:`IT Ops log — ${emp.fname}\n\nPending:\n- Patch schedule for ${domain} servers\n- Investigate auth.log anomalies (see /var/log/auth.log)\n- REMIND CEO TO CHANGE PASSWORD\n\nPersonal: ${emp.hobby} this weekend, need to feed ${emp.pet}`};
+      fs[`${dir}/server_inventory.txt`]={t:'f',exfil:'med',content:`${name.toUpperCase()} — SERVER INVENTORY\n\n${ip}\t\tGATEWAY\t\tNominal\n${ip.replace('.1','.10')}\tMAIL-SRV\tNominal\n${ip.replace('.1','.20')}\tDB-SRV\t\tPatched\n${ip.replace('.1','.30')}\tFILE-SRV\tDEPRECATED\n\nAdmin creds in keepass — ask ${emp.fname}`};
+      // IT admin has actual credentials — harder to find, split across files
+      fs[`${dir}/.ssh/config`]={t:'f',exfil:'high',content:`Host ${domain}-mgmt\n  HostName ${ip}\n  User ${emp.fname.toLowerCase()}\n  # password: ${emp.password}`};
+
+    } else if(emp.role === 'DevOps'){
+      fs[`${dir}/notes.txt`]={t:'f',content:`Deploy notes — ${emp.fname}\n\n$(date) — pushed hotfix to prod\nMonitor for 24h — if stable, close ticket\n\nReminder: rotate the API keys in .env\nThey've been the same since ${emp.birthYear+30}\n\nPersonal: ${emp.pet} has a vet appt`};
+      fs[`${dir}/.env`]={t:'f',exfil:'high',content:`# ${name} deployment config\n# TODO: move to secrets manager\nDB_HOST=${ip.replace('.1','.20')}\nDB_USER=${emp.fname.toLowerCase()}\nDB_PASS=${emp.password}\nAPI_SECRET=${emp.pet.toUpperCase()}_${emp.birthYear}_PROD\nDEBUG=false`};
+      fs[`${dir}/deploy.sh`]={t:'f',content:`#!/bin/bash\n# Deploy script — ${domain}\necho "Deploying to ${ip}..."\nssh ${emp.fname.toLowerCase()}@${ip} "cd /opt/app && git pull && systemctl restart app"\necho "Done"`};
+
+    } else if(emp.role === 'CFO'){
+      fs[`${dir}/notes.txt`]={t:'f',content:`${emp.fname} — finance notes\n\nQ${1+Math.floor(rng()*4)} close — Friday\nAudit firm has questions about the ${iFile1}\nI'm not signing off until legal reviews\n\nPersonal password hint: ${emp.pet} + year I graduated`};
+      fs[`${dir}/${iFile1}`]={t:'f',exfil:'high',content:`${name.toUpperCase()} — ${iFile1.toUpperCase().replace(/_/g,' ')}\n\nPERIOD: Q${1+Math.floor(rng()*4)} ${new Date().getFullYear()}\nSTATUS: DRAFT — DO NOT DISTRIBUTE\n\nThis document contains sensitive financial information.\nUnauthorized access is a federal offense.\n\n[REDACTED — ${Math.floor(rng()*9999999)} records]`};
+
+    } else if(emp.role === 'HR Director'){
+      fs[`${dir}/notes.txt`]={t:'f',content:`HR notes — ${emp.fname}\n\nPerformance reviews due EOW\n${employees[1].fname} ${employees[1].lname} — needs PIP. See file.\nIT keeps complaining about password policy compliance.\n\nConfidential: ${ceo.fname} asked me to keep the Q2 incident off the record.\nI told him that's not how this works.\n\n(personal) ${emp.pet} chewed through another charger`};
+      fs[`${dir}/staff_notes.txt`]={t:'f',exfil:'med',content:`CONFIDENTIAL — HR\n\n${employees.map(e=>`${e.fname} ${e.lname} — ${e.role}\n  Email: ${e.email}\n  Status: Active\n  Note: password policy non-compliant`).join('\n\n')}`};
+      // Red herring — looks like credentials, is just HR data
+      fs[`${dir}/credentials_template.txt`]={t:'f',content:`# Employee onboarding credential template\n# DO NOT STORE REAL PASSWORDS HERE\nusername: firstname.lastname\npassword: ${fakePass2} (default, must change on first login)\nThis file is a template only.`};
+    } else {
+      // Generic employee
+      fs[`${dir}/notes.txt`]={t:'f',content:`Notes — ${emp.fname}\n\nMeeting with ${employees[0].fname} on Thursday\nDon't forget: ${emp.hobby}\n${emp.pet} needs food\n\npassword reminder: ${emp.password.substring(0,3)}...`};
+    }
   });
-  // Add a high-value target file
+
+  // ── High-value target file (CEO home) ──
   fs[`/home/${ceo.fname.toLowerCase()}/CONFIDENTIAL.txt`]={
     t:'f',exfil:'high',
-    content:`CONFIDENTIAL — ${name.toUpperCase()}\n\nQ${1+Math.floor(rng()*4)} Financial Summary\n\nRevenue: $${(10+Math.floor(rng()*90))}M\nProjected growth: ${5+Math.floor(rng()*25)}%\n\nStrategic targets:\n- ${pick(ADJECTIVES)} ${pick(NOUNS)} acquisition\n- ${industry} market expansion\n\nThis document is strictly confidential.\n— ${ceo.fname} ${ceo.lname}, ${ceo.role}`
+    content:`CONFIDENTIAL — ${name.toUpperCase()}\n\nQ${1+Math.floor(rng()*4)} Financial Summary — BOARD ONLY\n\nRevenue:          $${10+Math.floor(rng()*90)}M\nProjected growth: ${5+Math.floor(rng()*25)}%\nEBITDA:           $${3+Math.floor(rng()*30)}M\n\nStrategic targets:\n  — ${pick(ADJECTIVES)} ${pick(NOUNS)} (acquisition, Q${1+Math.floor(rng()*3)})\n  — ${industry} vertical expansion\n  — Infrastructure hardening (post-incident, see IT report)\n\nThis document is strictly confidential.\nUnauthorized disclosure is a criminal offense.\n— ${ceo.fname} ${ceo.lname}, ${ceo.role}`
   };
+
+  // ── Industry-specific shared files ──
+  fs['/var/www']={t:'d'};
+  fs[`/var/www/${iFile2}`]={t:'f',exfil:'med',content:`${name.toUpperCase()} — ${iFile2.toUpperCase().replace(/_/g,' ')}\nGenerated: ${new Date().toISOString().split('T')[0]}\n\n[INTERNAL — DO NOT PUBLISH]\n\nAccess restricted to: ${ceo.email}, ${cfr?.email||it.email}\n\n[DATA REDACTED — ${Math.floor(rng()*999999)} records]`};
+
+  // ── Lore dead drop ── (60% chance)
+  if(hasLore){
+    fs['/opt/.system_notes']={t:'f',exfil:'low',content:`# system maintenance log\n# ${domain}\n\n${loreFragments[loreIdx]}`};
+  }
+
+  // ── IT Admin shared notes (where creds leak) ──
+  fs['/var/www/notes.txt']={t:'f',content:`Dev notes — ${it.fname} ${it.lname}\n\nServer status: all nominal\nLast patched: ${new Date().toISOString().split('T')[0]}\n\nTEMP: using ${it.pet}${it.birthYear} until I set up the vault\nDO NOT LEAVE THIS HERE — delete after vault is up\n\nContacts:\n  CEO: ${ceo.email}\n  DevOps: ${devops?.email||employees[2].email}`};
 
   return {seed,name,domain,industry,ip,secLevel,employees,fs};
 }
@@ -2150,56 +2311,41 @@ function genOrg(seed=Date.now()){
 let proceduralOrg=null;
 
 function initProceduralOrg(){
-  proceduralOrg=genOrg(runSeed);  // seeded for consistency per session
+  proceduralOrg=genOrg(runSeed);
   const org=proceduralOrg;
-  // Register as a new network node
-  NETWORK[`PROC-ORG`]={
-    label:org.name.substring(0,12).toUpperCase().replace(/\s/g,'-'),
-    ip:org.ip,
-    tier:'public',
-    services:[{port:22,svc:'ssh',ver:'OpenSSH 8.0'},{port:80,svc:'http',ver:'Apache 2.4'},{port:443,svc:'https',ver:'nginx 1.18'}],
-    os:`Ubuntu 20.04 — ${org.industry}`,
-    security:org.secLevel,
-    firewall:false,
-    links:['GATEWAY'],
-    traceRate:0.3,
-    desc:`Procedurally generated org: ${org.name}. Industry: ${org.industry}.`,
-    fs:org.fs,
-  };
-  firewallUnlocked['PROC-ORG']=true;
-  nodeSecState['PROC-ORG']='NOMINAL';
-  nodeSecEvents['PROC-ORG']=[];
-  NODE_POS['PROC-ORG']={x:140,y:340};
-  NETWORK['GATEWAY'].links.push('PROC-ORG');
 
-  // M5a — build trust graph on org generation
+  // M8d — assign topology before building network
+  org.topology = pickTopology(org);
+  const topoNodes = buildTopologyNetwork(org);
+  const entryId = topoNodes[0];
+
+  // M5a — build trust graph
   proceduralOrg.trustGraph = buildTrustGraph(org.employees);
-  // M8c — generate contract board now that proc org is ready
+  // M8c — generate contract board
   setTimeout(()=>{ generateContractBoard(); refreshBoard(); }, 100);
-  // Stamp each employee with awareness level seeded by role
+  // Stamp awareness levels
+  const diffProfile = getDifficultyProfile(); // M9a
   org.employees.forEach(e=>{
-    const awarenessMap={
-      'Security Analyst':'HIGH','CTO':'HIGH',
-      'CFO':'MED','CEO':'MED','IT Admin':'MED',
-      'DevOps':'LOW','HR Director':'LOW','Legal Counsel':'LOW',
-    };
-    e.awareness = awarenessMap[e.role] || AWARENESS_LEVELS[Math.floor(Math.random()*3)];
+    e.awareness = applyAwarenessBoost(e.role, diffProfile.awarenessBoost);
   });
 
-  // Add intel entries for the org
+  // Add intel entries
   org.employees.forEach(e=>{
     addIntel('employees',{key:e.email,val:`${e.fname} ${e.lname} — ${e.role}`});
   });
 
-  // Add M4 contract mail
+  // M8d — topology intel
+  addIntel('nodes',{key:'TOPOLOGY', val:`${org.topology} — ${getTopologyDesc(org.topology).split('—')[0].trim()}`});
+
+  // Contract mail
   MAILS.push({
     id:99,from:'NULL-SIGNAL-HANDLER',
     subj:`NEW CONTRACT: ${org.name} — intel extraction`,
     time:'00:05',unread:true,
-    body:`Operator,\n\nNew target added to your network map.\n\nOrg: ${org.name}\nIndustry: ${org.industry}\nEntry: ${org.ip} (PROC-ORG)\nSecurity: ${org.secLevel}\n\nObjective:\nLocate and exfiltrate CONFIDENTIAL.txt\nfrom the CEO home directory.\n\nThis org was procedurally generated.\nEmployee passwords are seeded from\npersonal data — read their notes.\n\nPayout: 3,600 cr\n— NULL SIGNAL HANDLER`
+    body:`Operator,\n\nNew target added to your network map.\n\nOrg: ${org.name}\nIndustry: ${org.industry}\nEntry: ${org.ip} (${NETWORK[entryId]?.label})\nSecurity: ${org.secLevel}\nTopology: ${org.topology}\n\n${getTopologyDesc(org.topology)}\n\nObjective:\nLocate and exfiltrate CONFIDENTIAL.txt\nfrom the target network.\n\nPayout: 3,600 cr\n— NULL SIGNAL HANDLER`
   });
 
-  // M5a — social engineering contract
+  // Social engineering mail
   MAILS.push({
     id:100, from:'NULL-SIGNAL-HANDLER',
     subj:'CAPABILITY UNLOCKED: Social Engineering',
@@ -2209,13 +2355,13 @@ function initProceduralOrg(){
 
   refreshNetmap();
   refreshMailList();
-  notify(`New target: ${org.name}`,'info');
+  notify(`New target: ${org.name} [${org.topology}]`,'info');
 
   // Add to command palette
   PALETTE_ITEMS.push({
     icon:'⬡', name:`Connect: ${org.name.substring(0,16)}`,
-    hint:`${org.ip}`,
-    action:()=>{ openApp('terminal'); focusWin('terminal'); setTimeout(()=>{ const i=document.getElementById(`tinp-${activeTermWin}`); if(i){i.value=`connect PROC-ORG`;i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));} },100); }
+    hint:`${org.ip} — ${org.topology}`,
+    action:()=>{ openApp('terminal'); focusWin('terminal'); setTimeout(()=>{ const i=document.getElementById(`tinp-${activeTermWin}`); if(i){i.value=`connect ${entryId}`;i.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',bubbles:true}));} },100); }
   });
 }
 
@@ -2354,6 +2500,85 @@ Cheers,
     goodFor:['DevOps','HR Director','Legal Counsel'],
     badFor:['Security Analyst','CTO','CEO'],
     baseScore:70,
+    requiresPersonalData:true,
+  },
+  {
+    id:'sec-audit',
+    name:'Security Audit Notice',
+    pretextRole:'Security Analyst',
+    subject:'[MANDATORY] Annual Security Compliance Audit — Action Required',
+    body:`{name},
+
+Our annual security compliance audit begins this week.
+
+You are required to verify your access credentials
+through the compliance portal before Friday EOD.
+Failure to comply will result in temporary account suspension.
+
+Compliance portal: https://compliance.{company_domain}/verify
+
+This is a mandatory process for all staff.
+Contact the security team if you have questions.
+
+— Information Security Team
+{company}`,
+    goodFor:['CEO','CFO','Legal Counsel','HR Director'],
+    badFor:['Security Analyst','IT Admin'],
+    baseScore:65,
+    requiresPersonalData:false,
+  },
+  {
+    id:'vendor-invoice',
+    name:'Vendor Invoice',
+    pretextRole:'CFO',
+    subject:'Invoice #INV-{token} — Payment Required',
+    body:`Hello {firstname},
+
+Please find attached invoice #INV-2024-{token} for services
+rendered in the previous quarter.
+
+Total due: $14,750.00
+Due date: {year}-12-31
+
+To approve payment or query this invoice, please log in
+to the vendor portal using your company credentials:
+
+Portal: https://vendor-pay.ext/login/{token}
+
+Please action this before month end.
+
+Regards,
+Accounts Receivable`,
+    goodFor:['CFO','HR Director','Legal Counsel'],
+    badFor:['Security Analyst','CTO','DevOps'],
+    baseScore:55,
+    requiresPersonalData:false,
+  },
+  {
+    id:'hr-benefits',
+    name:'HR Benefits Update',
+    pretextRole:'HR Director',
+    subject:'Action Required: Update Your Benefits Selection by Friday',
+    body:`Hi {firstname},
+
+This is a reminder that the annual benefits enrollment
+window closes this Friday.
+
+Your current selections will lapse if you do not
+re-confirm your preferences before the deadline.
+
+Please log in to the HR portal to review and confirm:
+https://benefits.{company_domain}/enroll
+
+If you have any questions about your options,
+feel free to reach out directly.
+
+Thanks,
+{peer_name}
+People & Culture`,
+    goodFor:['DevOps','Legal Counsel','CEO','CFO'],
+    badFor:['Security Analyst','HR Director'],
+    baseScore:68,
     requiresPersonalData:true,
   },
 ];
@@ -2559,6 +2784,9 @@ function onPhishSuccess(target, template, subject, body){
   if(target.awareness === 'HIGH') fireSpectrTrigger('phish_high_awareness');
   // M8c — log for FEED//
   logFeedAction('phish_success', {orgName: proceduralOrg?.name});
+  // M9b — achievements
+  achieveNoPhish = false;
+  if(target.awareness === 'HIGH') unlockAchievement('high_awareness_phish');
 
   // Inject success mail into their inbox on mail server
   adminAlerts.push({
@@ -2760,10 +2988,10 @@ const TOOL_CATALOG = [
   { id:'scan_basic',    name:'PortScan Basic',    cat:'SCANNER', tier:1, cost:0,    owned:true,
     desc:'Default port scanner. Identifies open services on target nodes.',
     effect:'Scan speed: standard', stat:{scanSpeed:1.0} },
-  { id:'scan_stealth',  name:'GhostScan',         cat:'SCANNER', tier:2, cost:600,  owned:false,
+  { id:'scan_stealth',  name:'GhostScan',         cat:'SCANNER', tier:2, cost:1500,  owned:false,
     desc:'Low-noise scanner. Reduces trace bump on scan by 50%.',
     effect:'Scan trace: -50%', stat:{scanTrace:0.5} },
-  { id:'scan_deep',     name:'DeepProbe v2',       cat:'SCANNER', tier:3, cost:1400, owned:false,
+  { id:'scan_deep',     name:'DeepProbe v2',       cat:'SCANNER', tier:3, cost:3000, owned:false,
     desc:'Reveals hidden services, internal IPs, and OS fingerprints missed by basic scan.',
     effect:'Reveals hidden services + OS detail', stat:{scanDepth:2} },
 
@@ -2771,13 +2999,13 @@ const TOOL_CATALOG = [
   { id:'crack_basic',   name:'PassCrack v1',       cat:'CRACKER', tier:1, cost:0,    owned:true,
     desc:'Basic dictionary cracker. Slow but reliable on weak passwords.',
     effect:'Crack speed: 1x', stat:{crackSpeed:1.0} },
-  { id:'crack_v2',      name:'PassCrack v2',        cat:'CRACKER', tier:2, cost:800,  owned:false,
+  { id:'crack_v2',      name:'PassCrack v2',        cat:'CRACKER', tier:2, cost:8000,  owned:false,
     desc:'Improved cracker with pattern analysis. 60% faster on personal-data passwords.',
     effect:'Crack speed: 1.6x', stat:{crackSpeed:1.6} },
   { id:'crack_gpu',     name:'GPUForce',            cat:'CRACKER', tier:3, cost:1800, owned:false,
     desc:'GPU-accelerated. Near-instant on weak passwords. Very noisy.',
     effect:'Crack speed: 4x  |  +15% trace on use', stat:{crackSpeed:4.0, crackTrace:1.15} },
-  { id:'passwd_dict',   name:'PersonaDict',         cat:'CRACKER', tier:2, cost:700,  owned:false,
+  { id:'passwd_dict',   name:'PersonaDict',         cat:'CRACKER', tier:2, cost:3200,  owned:false,
     desc:'Custom wordlist seeded from gathered personal data. Synergises with PassCrack v2.',
     effect:'+30% crack success on personal passwords', stat:{crackBonus:1.3} },
 
@@ -2785,7 +3013,7 @@ const TOOL_CATALOG = [
   { id:'exfil_basic',   name:'DataPull v1',         cat:'EXFIL',   tier:1, cost:0,    owned:true,
     desc:'Basic file exfiltration. Noisy — adds +6% trace per file.',
     effect:'Exfil trace bump: +6%', stat:{exfilTrace:6} },
-  { id:'exfil_quiet',   name:'QuietPull',            cat:'EXFIL',   tier:2, cost:900,  owned:false,
+  { id:'exfil_quiet',   name:'QuietPull',            cat:'EXFIL',   tier:2, cost:4500,  owned:false,
     desc:'Throttled transfer. Much quieter — reduces trace bump to +2% per file.',
     effect:'Exfil trace bump: +2%', stat:{exfilTrace:2} },
   { id:'exfil_burst',   name:'BurstPull',            cat:'EXFIL',   tier:3, cost:1600, owned:false,
@@ -2802,7 +3030,7 @@ const TOOL_CATALOG = [
   { id:'proxy_v2',      name:'ProxyChain v2',         cat:'STEALTH', tier:2, cost:700,  owned:false,
     desc:'Three-hop chain. Significantly slows trace rate.',
     effect:'Trace rate: -25%', stat:{traceRate:0.75} },
-  { id:'logscrub',      name:'LogScrub Auto',         cat:'STEALTH', tier:2, cost:1000, owned:false,
+  { id:'logscrub',      name:'LogScrub Auto',         cat:'STEALTH', tier:2, cost:5000, owned:false,
     desc:'Auto-deletes session logs on disconnect. No need to manually rm-logs.',
     effect:'Auto rm-logs on disconnect', stat:{autoLogScrub:true} },
   { id:'tracekill',     name:'TraceKill',             cat:'STEALTH', tier:3, cost:2200, owned:false,
@@ -2975,9 +3203,11 @@ function useTraceKill(){
   if(tk) tk.uses = (tk.uses||1) - 1;
   // Find the stat tracker
   getActiveStats().traceKillUsed = true;
+  const traceLevelAtUse = traceLevel; // M9b — capture before reset
   traceLevel = 0;
   updateTraceUI();
   fireSpectrTrigger('first_tracekill'); // M8a
+  if(traceLevelAtUse > 85) unlockAchievement('tracekill_clutch'); // M9b
   plines([{t:'',c:'blank'},{t:'[+] TRACEKILL ACTIVATED — trace reset to 0%',c:'ok'},{t:'',c:'blank'}]);
   notify('TraceKill used — trace reset','ok');
   refreshForge();
@@ -3137,12 +3367,14 @@ const META_DEFAULTS = {
   bestRep: 0,
   bestRunNodes: 0,
   bestRunExfil: 0,
-  aliasHistory: [],        // [{alias, outcome, rep, cause, runNum}]
+  aliasHistory: [],
   factionRep: { 'NULL SIGNAL': 0, 'GHOST PROTOCOL': 0, 'BAZAAR': 0 },
   unlockedTools: ['basic_scanner','basic_cracker','basic_exfil'],
   unlockedAliasCount: 0,
   totalDeaths: 0,
   totalCompletions: 0,
+  achievements: {},       // M9b — {id: {unlockedAt, runNum}}
+  filesRead: 0,           // M9b — total files cat'd across career
 };
 
 function loadMeta(){
@@ -3163,6 +3395,233 @@ function resetMeta(){
 }
 
 // ══════════════════════════════════════════════
+// M9b — ACHIEVEMENT SYSTEM
+// ══════════════════════════════════════════════
+
+const ACHIEVEMENTS = [
+  {
+    id: 'first_blood',
+    name: 'First Blood',
+    desc: 'Complete your first objective.',
+    hint: 'Complete any objective.',
+    icon: '◈',
+    color: 'ok',
+  },
+  {
+    id: 'first_exfil',
+    name: 'Data Thief',
+    desc: 'Successfully exfiltrate your first file.',
+    hint: 'Exfil any file from a connected node.',
+    icon: '↑',
+    color: 'ok',
+  },
+  {
+    id: 'ghost_run',
+    name: 'Ghost Operator',
+    desc: 'Complete a full run without ever triggering SUSPICIOUS state.',
+    hint: 'Stay clean for an entire run.',
+    icon: '◎',
+    color: 'cyan',
+    spectrReaction: true,
+  },
+  {
+    id: 'social_only',
+    name: 'Silver Tongue',
+    desc: 'Exfiltrate a file by logging in with phished credentials only — no exploit.',
+    hint: 'Use phishing to gain access, then exfil.',
+    icon: '✉',
+    color: 'purple',
+  },
+  {
+    id: 'high_awareness_phish',
+    name: 'Social Engineer',
+    desc: 'Successfully phish a HIGH awareness target.',
+    hint: 'HIGH awareness targets resist most templates.',
+    icon: '⚡',
+    color: 'amber',
+  },
+  {
+    id: 'tracekill_clutch',
+    name: 'Last Second',
+    desc: 'Use TraceKill when trace level is above 85%.',
+    hint: 'Let trace climb before hitting the kill switch.',
+    icon: '◉',
+    color: 'err',
+  },
+  {
+    id: 'rm_logs_all',
+    name: 'Clean Room',
+    desc: 'Delete logs on 3 or more nodes in a single run.',
+    hint: 'rm-logs after visiting each node.',
+    icon: '✓',
+    color: 'ok',
+  },
+  {
+    id: 'no_phish_run',
+    name: 'Pure Tech',
+    desc: 'Complete a run without sending any phishing emails.',
+    hint: 'Technical exploits only — no social engineering.',
+    icon: '⊘',
+    color: 'cyan',
+  },
+  {
+    id: 'flat_network',
+    name: 'Bulldozer',
+    desc: 'Trigger INCIDENT on a FLAT topology org — alerting the entire network.',
+    hint: 'FLAT networks share security state.',
+    icon: '█',
+    color: 'err',
+  },
+  {
+    id: 'all_contracts',
+    name: 'Overachiever',
+    desc: 'Complete every contract on the board in a single run.',
+    hint: 'Accept and complete all available contracts.',
+    icon: '≋',
+    color: 'amber',
+  },
+  {
+    id: 'five_runs',
+    name: 'Survivor',
+    desc: 'Complete 5 runs.',
+    hint: 'Keep coming back.',
+    icon: '5',
+    color: 'ok',
+  },
+  {
+    id: 'ten_runs',
+    name: 'Veteran',
+    desc: 'Complete 10 runs.',
+    hint: 'Ten aliases. Ten stories.',
+    icon: 'X',
+    color: 'cyan',
+    spectrReaction: true,
+  },
+  {
+    id: 'ghost_tier',
+    name: 'Ghost',
+    desc: 'Reach GHOST difficulty tier (run 10+).',
+    hint: 'Survive long enough.',
+    icon: '👻',
+    color: 'purple',
+    spectrReaction: true,
+  },
+  {
+    id: 'lore_reader',
+    name: 'Archivist',
+    desc: 'Read 10 or more files across your career.',
+    hint: 'cat everything you find.',
+    icon: '📄',
+    color: 'dim',
+  },
+  {
+    id: 'speed_run',
+    name: 'Blitz',
+    desc: 'Complete all objectives in under 10 minutes.',
+    hint: 'Fast and clean.',
+    icon: '⚡',
+    color: 'amber',
+  },
+];
+
+// Per-run achievement tracking state (reset each run)
+let achieveGhostRun = true;   // flips false if SUSPICIOUS ever triggered
+let achieveNoPhish  = true;   // flips false if any phish sent
+let achieveSocialOnly = false; // flips true if login via phished creds then exfil
+
+// Unlock an achievement — safe to call multiple times
+function unlockAchievement(id){
+  if(!META.achievements) META.achievements = {};
+  if(META.achievements[id]) return; // already unlocked
+  const def = ACHIEVEMENTS.find(a => a.id === id);
+  if(!def) return;
+
+  META.achievements[id] = { unlockedAt: Date.now(), runNum: runNumber };
+  saveMeta(META);
+
+  // Notify player
+  notify(`ACHIEVEMENT: ${def.name}`, 'ok');
+  sfx('achievement');
+  setTimeout(()=>{
+    pline('', 'blank');
+    pline(`  ★ ACHIEVEMENT UNLOCKED: ${def.name}`, 'ok');
+    pline(`    ${def.desc}`, 'dim');
+    pline('', 'blank');
+    scrollT();
+  }, 500);
+
+  // SPECTR reacts to select achievements
+  if(def.spectrReaction){
+    const reactions = {
+      ghost_run:   { subj:'Noted.', body:`Clean run.\n\nNo alerts. No traces. No noise.\n\nThat's the standard. Don't let it become the exception.\n\n— S` },
+      ten_runs:    { subj:'Still here.', body:`Ten runs.\n\nI've worked with operators who didn't make it past three.\nYou're still operational.\n\nThat means something.\n\nDon't get sentimental about it.\n\n— S` },
+      ghost_tier:  { subj:'You know what this means.', body:`GHOST tier.\n\nI told you there were no second chances.\nYou're still here anyway.\n\nThe fourth source has been quiet lately.\nI don't know if that's good.\n\nWatch the FEED.\n\n— S` },
+    };
+    const r = reactions[id];
+    if(r) setTimeout(()=>injectSpectrMail(r.subj, r.body), 8000);
+  }
+
+  refreshMeta();
+  refreshBoard();
+}
+
+// Central check — call after any state change
+function checkAchievements(){
+  if(!META.achievements) META.achievements = {};
+
+  // Objective-based
+  if(OBJECTIVES.some(o=>o.done))                        unlockAchievement('first_blood');
+  if(runExfilCount >= 1)                                unlockAchievement('first_exfil');
+
+  // Career stats
+  if(META.totalCompletions >= 5)                        unlockAchievement('five_runs');
+  if(META.totalCompletions >= 10)                       unlockAchievement('ten_runs');
+  if((META.filesRead||0) >= 10)                         unlockAchievement('lore_reader');
+
+  // Difficulty tier
+  const prof = getDifficultyProfile();
+  if(prof.name === 'GHOST')                             unlockAchievement('ghost_tier');
+
+  // Log cleanup
+  const logsClean = Object.values(logsDeleted).filter(Boolean).length;
+  if(logsClean >= 3)                                    unlockAchievement('rm_logs_all');
+
+  // All contracts complete
+  if(contractBoard.length > 0 &&
+     contractBoard.every(c => c.completed || c.isAxiom))unlockAchievement('all_contracts');
+
+  // Speed run — under 10 minutes (600 ticks)
+  if(OBJECTIVES.length > 0 && OBJECTIVES.every(o=>o.done) &&
+     (ticks - runStartTime) < 600)                      unlockAchievement('speed_run');
+
+  // Flat network chaos
+  if(proceduralOrg?.topology === 'FLAT' &&
+     Object.keys(NETWORK).filter(id=>id.startsWith('PROC-'))
+       .some(id => nodeSecState[id] === 'INCIDENT' || nodeSecState[id] === 'LOCKDOWN'))
+                                                        unlockAchievement('flat_network');
+}
+
+// Called from escalateSecurity — track ghost run validity
+function trackGhostRun(newState){
+  if(['SUSPICIOUS','INCIDENT','LOCKDOWN'].includes(newState)){
+    achieveGhostRun = false;
+  }
+}
+
+// Called on clean run complete
+function checkGhostRun(){
+  if(achieveGhostRun) unlockAchievement('ghost_run');
+  if(achieveNoPhish)  unlockAchievement('no_phish_run');
+}
+
+// Reset per-run tracking
+function resetAchieveTracking(){
+  achieveGhostRun  = true;
+  achieveNoPhish   = true;
+  achieveSocialOnly = false;
+}
+
+// ══════════════════════════════════════════════
 // M6 — RUN STATE
 // ══════════════════════════════════════════════
 
@@ -3176,8 +3635,8 @@ let runRepEarned = 0;
 let currentAlias = '';
 
 // Alias generator — cyberpunk handles
-const ALIAS_PREFIXES = ['ghost','null','zero','phantom','vector','cipher','dark','void','static','neon','binary','rogue'];
-const ALIAS_SUFFIXES = ['0x1','_3r','_7','_k','_n','_v2','_rx','_ex','_9','__','_00','_fx'];
+const ALIAS_PREFIXES = ['ghost','null','zero','phantom','vector','cipher','dark','void','static','neon','binary','rogue','frost','echo','shade','drift','pulse','flux','trace','wire','node','byte','shard','prism','wraith','glitch','seraph','nexus','onyx','cobalt'];
+const ALIAS_SUFFIXES = ['0x1','_3r','_7','_k','_n','_v2','_rx','_ex','_9','__','_00','_fx','_z','_m','_alpha','_null','_0','_ix','_77','_rz','_hex','_2k','_sw','_q'];
 function generateAlias(){
   const p = ALIAS_PREFIXES[Math.floor(Math.random()*ALIAS_PREFIXES.length)];
   const s = ALIAS_SUFFIXES[Math.floor(Math.random()*ALIAS_SUFFIXES.length)];
@@ -3284,6 +3743,7 @@ function triggerRunComplete(){
 
   META.runCount++;
   META.totalCompletions++;
+  if(!META.tutorialDone) META.tutorialDone = true; // M_TUT
   // M8a — SPECTR notes a clean run
   fireSpectrTrigger('first_clean_run');
   META.totalRep += runRepFinal;
@@ -3373,8 +3833,12 @@ function startNewRun(){
   initRunState();
 
   // Regenerate proc org with new seed
-  delete NETWORK['PROC-ORG'];
-  delete NODE_POS['PROC-ORG'];
+  // M8d — clean up all topology nodes
+  Object.keys(NETWORK).filter(id=>id.startsWith('PROC-')).forEach(id=>{
+    delete NETWORK[id]; delete NODE_POS[id];
+    delete nodeSecState[id]; delete nodeSecEvents[id]; delete firewallUnlocked[id];
+  });
+  NETWORK['GATEWAY'].links = NETWORK['GATEWAY'].links.filter(l=>!l.startsWith('PROC-'));
   proceduralOrg = null;
 
   // Update UI
@@ -3393,6 +3857,8 @@ function startNewRun(){
 // M6 — META// APP
 // ══════════════════════════════════════════════
 
+let metaActiveTab = 'overview';
+
 function buildMeta(body){
   body.innerHTML=`<div class="meta-wrap" id="meta-inner"></div>`;
   refreshMeta();
@@ -3402,7 +3868,51 @@ function refreshMeta(){
   const el = document.getElementById('meta-inner'); if(!el) return;
   const m = META;
 
-  let html = `
+  const tabs = `
+  <div class="meta-tabs">
+    <button class="meta-tab ${metaActiveTab==='overview'?'active':''}"   onclick="metaActiveTab='overview';refreshMeta()">OVERVIEW</button>
+    <button class="meta-tab ${metaActiveTab==='achievements'?'active':''}" onclick="metaActiveTab='achievements';refreshMeta()">ACHIEVEMENTS</button>
+  </div>`;
+
+  if(metaActiveTab === 'achievements'){
+    const unlocked = m.achievements || {};
+    const total = ACHIEVEMENTS.length;
+    const done  = Object.keys(unlocked).length;
+
+    const cards = ACHIEVEMENTS.map(a => {
+      const u = unlocked[a.id];
+      const colorVar = {ok:'var(--green)',cyan:'var(--cyan)',amber:'var(--amber)',
+                        purple:'var(--purple)',err:'var(--red)',dim:'var(--text3)'}[a.color]||'var(--text2)';
+      if(u){
+        return `<div class="ach-card unlocked">
+          <div class="ach-header">
+            <span class="ach-icon" style="color:${colorVar}">${a.icon}</span>
+            <span class="ach-name">${a.name}</span>
+          </div>
+          <div class="ach-desc">${a.desc}</div>
+          <div class="ach-run">run #${u.runNum}</div>
+        </div>`;
+      } else {
+        return `<div class="ach-card locked">
+          <div class="ach-header">
+            <span class="ach-icon">▢</span>
+            <span class="ach-name">${a.name}</span>
+          </div>
+          <div class="ach-hint">${a.hint}</div>
+        </div>`;
+      }
+    }).join('');
+
+    el.innerHTML = tabs + `
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;letter-spacing:1px;">
+      ${done} / ${total} UNLOCKED
+    </div>
+    <div class="ach-grid">${cards}</div>`;
+    return;
+  }
+
+  // OVERVIEW tab
+  el.innerHTML = tabs + `
   <div class="meta-section">
     <div class="meta-section-hdr">CURRENT RUN</div>
     <div class="meta-row"><span class="meta-key">Alias</span><span class="meta-val highlight">${currentAlias||currentUser}</span></div>
@@ -3410,6 +3920,7 @@ function refreshMeta(){
     <div class="meta-row"><span class="meta-key">Credits this run</span><span class="meta-val good">${rep} cr</span></div>
     <div class="meta-row"><span class="meta-key">Nodes hit</span><span class="meta-val">${runNodesHit.size}</span></div>
     <div class="meta-row"><span class="meta-key">Files exfiltrated</span><span class="meta-val">${runExfilCount}</span></div>
+    <div class="meta-row"><span class="meta-key">Difficulty</span><span class="meta-val ${getDifficultyLabel().color}">${getDifficultyLabel().name}</span></div>
   </div>
 
   <div class="meta-section">
@@ -3419,7 +3930,8 @@ function refreshMeta(){
     <div class="meta-row"><span class="meta-key">Deaths</span><span class="meta-val warn">${m.totalDeaths}</span></div>
     <div class="meta-row"><span class="meta-key">Total credits</span><span class="meta-val">${m.totalRep} cr</span></div>
     <div class="meta-row"><span class="meta-key">Best run</span><span class="meta-val good">${m.bestRep} cr</span></div>
-    <div class="meta-row"><span class="meta-key">Best nodes hit</span><span class="meta-val">${m.bestRunNodes}</span></div>
+    <div class="meta-row"><span class="meta-key">Files read</span><span class="meta-val">${m.filesRead||0}</span></div>
+    <div class="meta-row"><span class="meta-key">Achievements</span><span class="meta-val highlight">${Object.keys(m.achievements||{}).length}/${ACHIEVEMENTS.length}</span></div>
   </div>
 
   <div class="meta-section">
@@ -3442,17 +3954,9 @@ function refreshMeta(){
     </div>`).join('')}
   </div>
 
-  <div class="meta-section">
-    <div class="meta-section-hdr">UNLOCKED TOOLS</div>
-    ${m.unlockedTools.map(t=>`<div class="meta-row"><span class="meta-key">✓</span><span class="meta-val">${t}</span></div>`).join('')}
-    <div style="font-size:8px;color:var(--text3);margin-top:4px;">More tools unlock in M7 — Tool Ecosystem</div>
-  </div>
-
   <div style="margin-top:8px;">
     <button onclick="resetMeta()" style="background:transparent;border:1px solid var(--border);color:var(--text3);font-family:var(--mono);font-size:9px;padding:4px 8px;cursor:pointer;letter-spacing:1px;">RESET META PROGRESS</button>
   </div>`;
-
-  el.innerHTML = html;
 }
 
 // ══════════════════════════════════════════════
@@ -3532,6 +4036,7 @@ function cmdLogin(args){
 
     // Mark social objective
     markSocialObjective('login-stolen');
+    achieveSocialOnly = true; // M9b — flag: logged in via stolen/phished creds
     scrollT();
   } else {
     pline(`[!] LOGIN FAILED — invalid credentials for ${username}`,'err');
@@ -3876,6 +4381,11 @@ const CONTRACT_CODENAMES = [
   'ASHEN PROXY','NULL VECTOR','PHANTOM ROOT','COLD SIGNAL','VOID TRACE',
   'AMBER GHOST','SEVERED NODE','DARK LATTICE','OPEN CIRCUIT','MIRROR FLOOD',
   'COPPER SHROUD','LOST PACKET','BLIND RELAY','ECHO FRACTURE','STEEL WHISPER',
+  'FROZEN GATE','PALE SIGNAL','NIGHT CIPHER','BURIED KEY','DEAD CHANNEL',
+  'SILVER THREAT','ROGUE PACKET','GLASS SPINE','EMBER TRACE','HOLLOW WIRE',
+  'SILENT BURN','DARK TRANSIT','GHOST RELAY','COLD LATTICE','MIRROR GATE',
+  'PHANTOM BURN','IRON SIGNAL','VOID CIRCUIT','ASHEN RELAY','BROKEN GHOST',
+  'NULL EPOCH','AMBER SPINE','SEVERED BURN','STATIC ROOT',
 ];
 
 const CONTRACT_CLIENTS = ['NULL SIGNAL','GHOST PROTOCOL','BAZAAR','[REDACTED]'];
@@ -3890,14 +4400,10 @@ function generateContractBoard(){
   const factionRep = META?.factionRep?.['NULL SIGNAL'] || 0;
   const runNum = META?.runCount || 0;
 
-  // Tier weights based on progression
-  const tierPool = runNum < 3
-    ? [1,1,2]           // early: two T1s, one T2
-    : runNum < 6
-    ? [1,2,2,3]         // mid: mixed
-    : runNum < 10
-    ? [2,2,3,3]         // experienced: T2-T3
-    : [2,3,3,4];        // veteran: T3-T4
+  // M9a — use difficulty profile for tier pool
+  const diffProfile = getDifficultyProfile();
+  const tierPool = diffProfile.contractTiers;
+  const timePressure = diffProfile.timePressure;
 
   contractBoard = [];
   const usedNames = new Set();
@@ -3918,8 +4424,8 @@ function generateContractBoard(){
     target: 'Axiom Industries Corp',
     targetNode: 'AXIOM',
     desc: 'Corporate intelligence extraction from Axiom Industries. Locate exec auth token, access EXEC-TERM, exfiltrate acquisition plan.',
-    payout: 4200,
-    bonusPayout: 800,
+    payout: 2800,
+    bonusPayout: 600,
     intel: ['Entry: GATEWAY (192.168.1.1) — no auth required','Credentials scattered across internal nodes','Exec token needed for final node access'],
     objectives: OBJECTIVES.map(o => ({...o, done: false})),
     isAxiom: true,
@@ -3940,7 +4446,7 @@ function generateContract(tier, usedNames){
   const client = tier >= 3 ? pick(CONTRACT_CLIENTS) : pick(['NULL SIGNAL','GHOST PROTOCOL']);
 
   // Payout by tier
-  const payoutRanges = {1:[800,1200], 2:[2000,3000], 3:[4000,6000], 4:[8000,12000]};
+  const payoutRanges = {1:[600,900],  2:[1500,2200], 3:[3000,4500], 4:[6000,9000]};
   const [minP, maxP] = payoutRanges[tier];
   const payout = Math.floor(rng() * (maxP - minP) + minP);
   const bonus  = Math.floor(payout * 0.2);
@@ -4097,6 +4603,7 @@ function checkContractCompletion(){
     (document.getElementById('tb-rep').querySelector('span').textContent = rep);
 
   notify(`CONTRACT COMPLETE: ${contract.codename} — +${contract.payout} cr`, 'ok');
+  sfx('contract_complete');
   refreshBoard();
 
   // SPECTR notes completion
@@ -4190,12 +4697,12 @@ function logFeedAction(type, data={}){
 const WORLD_EVENT_TEMPLATES = [
   { tag:'zeroday', weight:3,
     gen:()=>({
-      headline:`Critical Vulnerability Disclosed in ${pick(['OpenSSL','Apache','SSH daemon','Linux kernel','DNS resolver'])}`,
+      headline:`Critical Vulnerability Disclosed in ${pick(['OpenSSL','Apache','SSH daemon','Linux kernel','DNS resolver','Kubernetes','nginx','VMware ESXi','Cisco IOS','Windows SMB'])}`,
       body:`Security researchers published details of a critical vulnerability affecting widely-deployed infrastructure. The flaw allows remote code execution without authentication. Patch available; exploitation observed in the wild.`,
     })},
   { tag:'agency', weight:3,
     gen:()=>({
-      headline:`Joint Advisory: Phishing Campaigns Targeting ${pick(['Finance Sector','Healthcare Networks','Legal Firms','Government Contractors','Tech Companies'])}`,
+      headline:`Joint Advisory: Phishing Campaigns Targeting ${pick(['Finance Sector','Healthcare Networks','Legal Firms','Government Contractors','Tech Companies','Energy Infrastructure','Defense Contractors','Pharmaceutical Industry'])}`,
       body:`Federal agencies issued a joint advisory warning organizations of sophisticated phishing campaigns. Attackers are using targeted lures with personal data. Staff training and MFA are recommended mitigations.`,
     })},
   { tag:'breach', weight:4,
@@ -4208,43 +4715,96 @@ const WORLD_EVENT_TEMPLATES = [
       headline:`Credential Database Surfaced on Dark Web Forums`,
       body:`A cache of credentials attributed to ${domain} appeared on underground forums. The dataset contains email addresses and password hashes. Affected users are advised to rotate credentials immediately.`,
     })},
+  { tag:'zeroday', weight:2,
+    gen:()=>({
+      headline:`${pick(['Nation-state','APT','Criminal'])} Group Exploiting Unpatched ${pick(['VPN Appliances','Exchange Servers','Firewall Firmware','Remote Access Tools','Industrial Controllers'])}`,
+      body:`Intelligence agencies confirmed active exploitation of a known vulnerability by a sophisticated threat actor. Organizations are urged to apply patches immediately and audit access logs for indicators of compromise.`,
+    })},
+  { tag:'agency', weight:2,
+    gen:()=>({
+      headline:`Authorities Warn of Escalating ${pick(['Ransomware','Data Extortion','Supply Chain','Insider Threat','AI-Assisted'])} Activity`,
+      body:`Law enforcement agencies published guidance following a surge in targeted intrusions. Victims span multiple sectors. Attribution remains unconfirmed. Indicators of compromise have been shared with sector partners.`,
+    })},
+  { tag:'breach', weight:3,
+    gen:(org)=>({
+      headline:`${org} Executive Credentials Weaponized in Targeted Attack`,
+      body:`A targeted intrusion against ${org} leveraged compromised executive credentials to access financial systems. The attack bypassed multi-factor authentication through a social engineering vector. Investigation is ongoing.`,
+    })},
+  { tag:'leaked', weight:2,
+    gen:()=>({
+      headline:`Internal Memos from ${pick(['Unnamed Defense Contractor','Anonymous Financial Firm','Redacted Government Agency','Unidentified Infrastructure Operator'])} Published Anonymously`,
+      body:`A collection of internal documents appeared on an anonymous sharing platform. The materials reference operational security failures, internal audit findings, and unresolved network anomalies. Source and authenticity unverified.`,
+    })},
+  { tag:'agency', weight:2,
+    gen:()=>({
+      headline:`Regulators Fine ${pick(['Major Bank','Healthcare Network','Logistics Provider','Cloud Provider','Telecom Operator'])} Over Security Failures`,
+      body:`Regulatory authorities imposed significant penalties following a compliance audit that revealed inadequate access controls, unpatched systems, and insufficient incident response documentation. The organization has 90 days to remediate.`,
+    })},
+  { tag:'zeroday', weight:2,
+    gen:()=>({
+      headline:`Researchers Discover ${pick(['Backdoor','Persistence Mechanism','Zero-Click Exploit','Firmware Rootkit','Supply Chain Implant'])} in Widely-Used ${pick(['Network Equipment','Security Software','Development Tool','Cloud SDK','Open Source Library'])}`,
+      body:`A security research team disclosed a covert capability embedded in commercial software. The mechanism allows persistent access without authentication. Vendor response is pending. All versions prior to the latest release are considered vulnerable.`,
+    })},
 ];
 
 // Player-action triggered story templates
 const ACTION_STORY_TEMPLATES = {
   'exfil': (data) => ({
-    tag:'breach', delay: 2 + Math.floor(Math.random()*3), // appears 2-4 runs later
+    tag:'breach', delay: 2 + Math.floor(Math.random()*3),
     headline:`${data.orgName||'Unnamed Corp'} Confirms Data Breach`,
     body:`${data.orgName||'A regional firm'} in the ${data.industry||'technology'} sector confirmed that an attacker exfiltrated internal documents. The company discovered the breach through anomalous network activity. No threat actor has been identified.`,
+  }),
+  'exfil_alt': (data) => ({
+    tag:'leaked', delay: 3 + Math.floor(Math.random()*2),
+    headline:`${data.orgName||'Corporate Target'} Internal Files Surface Online`,
+    body:`Documents attributed to ${data.orgName||'an unnamed organization'} appeared on a data aggregation site. The files include financial projections, personnel records, and operational planning materials. The organization has not confirmed the breach.`,
   }),
   'phish_success': (data) => ({
     tag:'leaked', delay: 1 + Math.floor(Math.random()*2),
     headline:`Employee Credentials from ${data.orgName||'Corporate Target'} Circulating Online`,
     body:`Login credentials belonging to staff at ${data.orgName||'an unnamed organization'} have appeared in underground markets. The credentials appear to have been obtained through a social engineering attack. The organization has been notified.`,
   }),
+  'phish_success_alt': (data) => ({
+    tag:'agency', delay: 2,
+    headline:`${data.orgName||'Organization'} Staff Report Targeted Phishing Campaign`,
+    body:`Multiple employees at ${data.orgName||'a regional organization'} filed reports with security teams after receiving sophisticated phishing emails containing personal information. Security awareness training has been mandated. An investigation is underway.`,
+  }),
   'death': (data) => ({
     tag:'arrested', delay: 1,
     headline:`Federal Authorities Charge Operator Known as "${data.alias||'unknown'}"`,
     body:`Federal authorities have charged an individual operating under the alias "${data.alias||'unknown'}" with multiple counts of computer fraud. The operator was identified following a traced network session. Sentencing is pending.`,
+  }),
+  'death_alt': (data) => ({
+    tag:'arrested', delay: 2,
+    headline:`Alias "${data.alias||'unknown'}" Linked to String of Corporate Intrusions`,
+    body:`Investigators have connected the operator identity "${data.alias||'unknown'}" to unauthorized access incidents affecting multiple organizations. Digital forensics identified consistent tools and tradecraft. The individual has not been publicly identified.`,
   }),
   'incident_triggered': (data) => ({
     tag:'agency', delay: 1,
     headline:`${data.orgName||'Target Organization'} Activates Incident Response Protocol`,
     body:`${data.orgName||'An organization'} activated its incident response team following detection of unauthorized access. External forensics firm engaged. Law enforcement has been notified. The intrusion is described as "sophisticated."`,
   }),
+  'incident_triggered_alt': (data) => ({
+    tag:'breach', delay: 2,
+    headline:`${data.orgName||'Unnamed Organization'} Takes Systems Offline Following Security Incident`,
+    body:`${data.orgName||'An organization'} took key internal systems offline after detecting anomalous activity. Staff were locked out of email and internal platforms as a precaution. Recovery timeline has not been communicated.`,
+  }),
 };
 
 function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
 function maybeGenerateFeedStory(actionType, data){
-  const template = ACTION_STORY_TEMPLATES[actionType];
+  // M10b — randomly pick alt variant for more variety
+  const altKey = actionType + '_alt';
+  const useAlt = Math.random() > 0.5 && ACTION_STORY_TEMPLATES[altKey];
+  const templateKey = useAlt ? altKey : actionType;
+  const template = ACTION_STORY_TEMPLATES[templateKey];
   if(!template) return;
   if(Math.random() > 0.7) return; // 70% chance a story generates
   const story = template(data);
   story.run = runNumber + (story.delay||1);
   story.date = generateFeedDate();
   story.id = Date.now() + Math.random();
-  // Don't show it yet — queue for future run
   if(!META.pendingFeedStories) META.pendingFeedStories = [];
   META.pendingFeedStories.push(story);
   saveMeta(META);
@@ -4316,6 +4876,370 @@ function renderFeed(){
 
 function refreshFeed(){
   if(document.getElementById('feed-inner')) renderFeed();
+}
+
+// ══════════════════════════════════════════════
+// M9a — DIFFICULTY SCALING
+// ══════════════════════════════════════════════
+
+function getDifficultyProfile(){
+  const runs  = META?.runCount || 0;
+  const rep   = META?.factionRep?.['NULL SIGNAL'] || 0;
+
+  // Run-based tier
+  let tier;
+  if(runs < 3)       tier = 0; // Rookie
+  else if(runs < 6)  tier = 1; // Operator
+  else if(runs < 10) tier = 2; // Veteran
+  else               tier = 3; // Ghost
+
+  // Rep modifier — high rep means targets are on alert
+  const repMod = rep > 2000 ? 2 : rep > 800 ? 1 : 0;
+  const effectiveTier = Math.min(3, tier + Math.floor(repMod / 2));
+
+  const profiles = [
+    { // Tier 0 — Rookie (runs 1-2)
+      name:          'ROOKIE',
+      traceBase:     0.22,
+      traceMulti:    1.0,
+      secLevelPool:  ['LOW','LOW','NOMINAL'],
+      awarenessBoost: 0,     // no adjustment to role awareness
+      incidentSpeed:  1.0,   // normal escalation
+      timePressure:   false,
+      contractTiers:  [1,1,2],
+      hint:          'Early targets. Low security. Learn the tools.',
+    },
+    { // Tier 1 — Operator (runs 3-5)
+      name:          'OPERATOR',
+      traceBase:     0.32,
+      traceMulti:    1.15,
+      secLevelPool:  ['NOMINAL','NOMINAL','HIGH'],
+      awarenessBoost: 1,     // MED roles shift up by 1
+      incidentSpeed:  1.2,
+      timePressure:   false,
+      contractTiers:  [1,2,2,3],
+      hint:          'Targets are better defended. Stealth matters more.',
+    },
+    { // Tier 2 — Veteran (runs 6-9)
+      name:          'VETERAN',
+      traceBase:     0.42,
+      traceMulti:    1.35,
+      secLevelPool:  ['NOMINAL','HIGH','HIGH'],
+      awarenessBoost: 2,     // LOW roles become MED, MED become HIGH
+      incidentSpeed:  1.5,
+      timePressure:   true,
+      contractTiers:  [2,2,3,3],
+      hint:          'Security teams are active. Expect faster incident response.',
+    },
+    { // Tier 3 — Ghost (runs 10+)
+      name:          'GHOST',
+      traceBase:     0.55,
+      traceMulti:    1.6,
+      secLevelPool:  ['HIGH','HIGH','CRITICAL'],
+      awarenessBoost: 3,     // all roles shift HIGH
+      incidentSpeed:  2.0,
+      timePressure:   true,
+      contractTiers:  [2,3,3,4],
+      hint:          'Elite targets. Your reputation precedes you. No margin for error.',
+    },
+  ];
+
+  const profile = profiles[effectiveTier];
+  profile.effectiveTier = effectiveTier;
+  profile.runs = runs;
+  profile.rep  = rep;
+  return profile;
+}
+
+// Apply awareness boost from difficulty to an employee
+function applyAwarenessBoost(role, boost){
+  const chain = ['LOW','MED','HIGH'];
+  const base = {
+    'Security Analyst':'HIGH','CTO':'HIGH',
+    'CFO':'MED','CEO':'MED','IT Admin':'MED',
+    'DevOps':'LOW','HR Director':'LOW','Legal Counsel':'LOW',
+  };
+  const baseLevel = base[role] || 'LOW';
+  if(boost === 0) return baseLevel;
+  const idx = Math.min(chain.length-1, chain.indexOf(baseLevel) + Math.ceil(boost/2));
+  return chain[idx];
+}
+
+// Get a scaled security level from the current difficulty pool
+function getDifficultySecLevel(rng){
+  const profile = getDifficultyProfile();
+  const pool = profile.secLevelPool;
+  return pool[Math.floor(rng() * pool.length)];
+}
+
+// Get scaled trace base rate
+function getDifficultyTraceBase(){
+  return getDifficultyProfile().traceBase;
+}
+
+// Display current difficulty in status/sysmon
+function getDifficultyLabel(){
+  const p = getDifficultyProfile();
+  const colors = {ROOKIE:'ok', OPERATOR:'warn', VETERAN:'err', GHOST:'err'};
+  return {name: p.name, hint: p.hint, color: colors[p.name] || 'out'};
+}
+
+// ── Wire difficulty into SEC_TRACE_MULT ──
+// Higher tiers make incident responses faster
+function getSecTraceMult(state){
+  const base = {NOMINAL:1.0, SUSPICIOUS:1.6, INCIDENT:2.8, LOCKDOWN:5.0};
+  const speed = getDifficultyProfile().incidentSpeed;
+  return (base[state] || 1.0) * speed;
+}
+
+// ══════════════════════════════════════════════
+// M8d — NETWORK TOPOLOGIES
+// ══════════════════════════════════════════════
+
+const TOPOLOGY_TYPES = ['FLAT','SEGMENTED','HUB_SPOKE','MESH'];
+
+// Pick topology deterministically from org seed
+function pickTopology(org){
+  const idx = Math.abs(org.seed || 0) % TOPOLOGY_TYPES.length;
+  return TOPOLOGY_TYPES[idx];
+}
+
+// Build the multi-node network for a proc org based on its topology
+// Registers nodes in NETWORK and positions in NODE_POS
+// Returns array of node IDs created
+function buildTopologyNetwork(org){
+  const topo = org.topology;
+  const name = org.name.substring(0,10).toUpperCase().replace(/\s/g,'-');
+  const baseIp = org.ip.replace(/\.\d+$/, '');
+  const secLevel = org.secLevel || 'NOMINAL';
+  const diffBase = getDifficultyTraceBase(); // M9a — scales with runs
+  const traceBase = secLevel === 'HIGH' || secLevel === 'CRITICAL' ? diffBase * 1.4
+                  : secLevel === 'NOMINAL' ? diffBase
+                  : diffBase * 0.7;
+
+  // Clean up any existing proc org nodes
+  Object.keys(NETWORK).filter(id=>id.startsWith('PROC-')).forEach(id=>{
+    delete NETWORK[id];
+    delete nodeSecState[id];
+    delete nodeSecEvents[id];
+    delete firewallUnlocked[id];
+  });
+  // Purge ALL PROC- positions — only the active topology should set them
+  Object.keys(NODE_POS).filter(id=>id.startsWith('PROC-')).forEach(id=>{
+    delete NODE_POS[id];
+  });
+  // Remove proc org links from GATEWAY
+  NETWORK['GATEWAY'].links = NETWORK['GATEWAY'].links.filter(l=>!l.startsWith('PROC-'));
+
+  const nodes = [];
+
+  const mkNode = (id, label, ip, tier, fw, links, traceRate, extraServices=[])=>({
+    label, ip, tier,
+    services:[
+      {port:22,svc:'ssh',ver:'OpenSSH 8.0'},
+      {port:443,svc:'https',ver:'nginx 1.18'},
+      ...extraServices
+    ],
+    os:`Ubuntu 22.04 — ${org.industry}`,
+    security: secLevel,
+    firewall: fw,
+    links,
+    traceRate,
+    desc:`${label} — ${org.name}`,
+    fs: id === 'PROC-ENTRY' ? org.fs : buildSubFs(org, id),
+  });
+
+  if(topo === 'FLAT'){
+    // All nodes on same subnet, no firewalls, shared security
+    nodes.push('PROC-ENTRY','PROC-WS1','PROC-WS2','PROC-SRV');
+    NETWORK['PROC-ENTRY'] = mkNode('PROC-ENTRY', `${name}-NET`,   `${baseIp}.1`, 'public',   false, ['GATEWAY','PROC-WS1','PROC-WS2','PROC-SRV'], traceBase);
+    NETWORK['PROC-WS1']   = mkNode('PROC-WS1',   `${name}-WS1`,  `${baseIp}.2`, 'internal', false, ['PROC-ENTRY','PROC-WS2'], traceBase * 0.8);
+    NETWORK['PROC-WS2']   = mkNode('PROC-WS2',   `${name}-WS2`,  `${baseIp}.3`, 'internal', false, ['PROC-ENTRY','PROC-WS1'], traceBase * 0.8);
+    NETWORK['PROC-SRV']   = mkNode('PROC-SRV',   `${name}-SRV`,  `${baseIp}.4`, 'internal', false, ['PROC-ENTRY'], traceBase * 1.2, [{port:3306,svc:'mysql',ver:'8.0'}]);
+    NODE_POS['PROC-ENTRY'] = {x:130,y:435};
+    NODE_POS['PROC-WS1']   = {x:60, y:345};
+    NODE_POS['PROC-WS2']   = {x:200,y:345};
+    NODE_POS['PROC-SRV']   = {x:310,y:435};
+    // Flat topology: CONFIDENTIAL.txt is on PROC-SRV
+    NETWORK['PROC-SRV'].fs[`/var/data/CONFIDENTIAL.txt`] = {t:'f',exfil:'high',content:`CONFIDENTIAL — ${org.name}\n\nThis file contains sensitive operational data.\nExfiltration target confirmed.\n\n[DATA REDACTED]`};
+
+  } else if(topo === 'SEGMENTED'){
+    // Linear chain — must traverse tiers in order
+    nodes.push('PROC-DMZ','PROC-INT','PROC-EXEC');
+    NETWORK['PROC-DMZ']  = mkNode('PROC-DMZ',  `${name}-DMZ`,  `${baseIp}.10`, 'public',   false, ['GATEWAY'], traceBase, [{port:80,svc:'http',ver:'Apache 2.4'}]);
+    NETWORK['PROC-INT']  = mkNode('PROC-INT',  `${name}-INT`,  `${baseIp}.20`, 'internal', true,  ['PROC-DMZ'], traceBase * 1.3);
+    NETWORK['PROC-EXEC'] = mkNode('PROC-EXEC', `${name}-EXEC`, `${baseIp}.30`, 'exec',     true,  ['PROC-INT'], traceBase * 1.8, [{port:5432,svc:'postgres',ver:'14.0'}]);
+    // Firewall creds — found by exploring previous tier
+    NETWORK['PROC-INT'].firewallCred  = {user: org.employees[1]?.email.split('@')[0]||'admin', pass: org.employees[1]?.password||'admin123', hint:`Credentials in ${name}-DMZ /etc/network.conf`};
+    NETWORK['PROC-EXEC'].firewallCred = {user: org.employees[0]?.email.split('@')[0]||'root',  pass: org.employees[0]?.password||'root123',  hint:`Credentials in ${name}-INT /home/admin/.ssh/config`};
+    NODE_POS['PROC-DMZ']  = {x:560,y:400};
+    NODE_POS['PROC-INT']  = {x:560,y:290};
+    NODE_POS['PROC-EXEC'] = {x:560,y:180};
+    // Plant credentials in filesystems
+    NETWORK['PROC-DMZ'].fs['/etc/network.conf'] = {t:'f',exfil:'med',content:`# Network config — ${org.name}\ngateway=${baseIp}.1\n# admin: ${NETWORK['PROC-INT'].firewallCred.user} / ${NETWORK['PROC-INT'].firewallCred.pass}`};
+    NETWORK['PROC-EXEC'].fs = buildSubFs(org,'PROC-EXEC');
+    NETWORK['PROC-EXEC'].fs[`/root/CONFIDENTIAL.txt`] = {t:'f',exfil:'high',content:`CONFIDENTIAL — ${org.name}\n\nExecutive data. Eyes only.\n\n[DATA REDACTED]`};
+    if(!NETWORK['PROC-INT'].fs) NETWORK['PROC-INT'].fs = buildSubFs(org,'PROC-INT');
+    NETWORK['PROC-INT'].fs['/home/admin/.ssh/config'] = {t:'f',exfil:'med',content:`Host exec\n  HostName ${baseIp}.30\n  User ${NETWORK['PROC-EXEC'].firewallCred.user}\n  # pass: ${NETWORK['PROC-EXEC'].firewallCred.pass}`};
+
+  } else if(topo === 'HUB_SPOKE'){
+    // Central hub — must compromise hub first, then reach any spoke
+    nodes.push('PROC-HUB','PROC-SP1','PROC-SP2','PROC-SP3');
+    NETWORK['PROC-HUB'] = mkNode('PROC-HUB', `${name}-HUB`, `${baseIp}.1`,  'internal', false, ['GATEWAY','PROC-SP1','PROC-SP2','PROC-SP3'], traceBase * 1.4, [{port:8080,svc:'mgmt',ver:'1.0'}]);
+    NETWORK['PROC-SP1'] = mkNode('PROC-SP1', `${name}-DB`,  `${baseIp}.11`, 'internal', true,  ['PROC-HUB'], traceBase,       [{port:3306,svc:'mysql',ver:'8.0'}]);
+    NETWORK['PROC-SP2'] = mkNode('PROC-SP2', `${name}-HR`,  `${baseIp}.12`, 'internal', true,  ['PROC-HUB'], traceBase * 0.9);
+    NETWORK['PROC-SP3'] = mkNode('PROC-SP3', `${name}-EXEC`,`${baseIp}.13`, 'exec',     true,  ['PROC-HUB'], traceBase * 1.6);
+    // Hub-spoke: firewall creds for spokes are on the hub
+    const sp1cred = {user:org.employees[2]?.email.split('@')[0]||'dbuser', pass:org.employees[2]?.password||'db123', hint:`Found in ${name}-HUB /etc/spoke-access`};
+    const sp3cred = {user:org.employees[0]?.email.split('@')[0]||'exec',   pass:org.employees[0]?.password||'exec123', hint:`Found in ${name}-HUB /root/.credentials`};
+    NETWORK['PROC-SP1'].firewallCred = sp1cred;
+    NETWORK['PROC-SP2'].firewallCred = {user:org.employees[3]?.email.split('@')[0]||'hr', pass:org.employees[3]?.password||'hr123', hint:`Found in ${name}-HUB /etc/spoke-access`};
+    NETWORK['PROC-SP3'].firewallCred = sp3cred;
+    NETWORK['PROC-HUB'].fs['/etc/spoke-access'] = {t:'f',exfil:'high',content:`# Spoke access credentials\n${sp1cred.user}:${sp1cred.pass} -> ${baseIp}.11\n${NETWORK['PROC-SP2'].firewallCred.user}:${NETWORK['PROC-SP2'].firewallCred.pass} -> ${baseIp}.12`};
+    NETWORK['PROC-HUB'].fs['/root/.credentials'] = {t:'f',exfil:'high',content:`exec_user=${sp3cred.user}\nexec_pass=${sp3cred.pass}\nhost=${baseIp}.13`};
+    NETWORK['PROC-SP3'].fs['/root/CONFIDENTIAL.txt'] = {t:'f',exfil:'high',content:`CONFIDENTIAL — ${org.name}\n\nExecutive files.\n\n[DATA REDACTED]`};
+    NODE_POS['PROC-HUB'] = {x:560,y:265};
+    NODE_POS['PROC-SP1'] = {x:560,y:160};
+    NODE_POS['PROC-SP2'] = {x:560,y:350};
+    NODE_POS['PROC-SP3'] = {x:560,y:435};
+
+  } else { // MESH
+    // Multiple paths, all nodes interconnected, shared trace multiplier
+    nodes.push('PROC-A','PROC-B','PROC-C','PROC-D');
+    NETWORK['PROC-A'] = mkNode('PROC-A', `${name}-A`, `${baseIp}.1`,  'public',   false, ['GATEWAY','PROC-B','PROC-C'], traceBase);
+    NETWORK['PROC-B'] = mkNode('PROC-B', `${name}-B`, `${baseIp}.2`,  'internal', false, ['PROC-A','PROC-C','PROC-D'], traceBase * 0.9);
+    NETWORK['PROC-C'] = mkNode('PROC-C', `${name}-C`, `${baseIp}.3`,  'internal', false, ['PROC-A','PROC-B','PROC-D'], traceBase * 1.1);
+    NETWORK['PROC-D'] = mkNode('PROC-D', `${name}-D`, `${baseIp}.4`,  'exec',     true,  ['PROC-B','PROC-C'],          traceBase * 1.5);
+    NETWORK['PROC-D'].firewallCred = {user:org.employees[0]?.email.split('@')[0]||'exec', pass:org.employees[0]?.password||'exec123', hint:`Credential fragments split across PROC-B and PROC-C logs`};
+    NETWORK['PROC-B'].fs['/var/log/auth.log'] = {t:'f',exfil:'med',content:`AUTH LOG\n...\nAccepted password for ${NETWORK['PROC-D'].firewallCred.user} from 10.0.0.1\nPassword hint: ${NETWORK['PROC-D'].firewallCred.pass.substring(0,4)}****`};
+    NETWORK['PROC-C'].fs['/tmp/.session'] = {t:'f',exfil:'med',content:`session_token=${NETWORK['PROC-D'].firewallCred.pass}\nexpires=never\nuser=${NETWORK['PROC-D'].firewallCred.user}`};
+    NETWORK['PROC-D'].fs['/var/secure/CONFIDENTIAL.txt'] = {t:'f',exfil:'high',content:`CONFIDENTIAL — ${org.name}\n\nRestricted data.\n\n[DATA REDACTED]`};
+    NODE_POS['PROC-A'] = {x:175,y:435};
+    NODE_POS['PROC-B'] = {x:90, y:355};
+    NODE_POS['PROC-C'] = {x:265,y:355};
+    NODE_POS['PROC-D'] = {x:175,y:275};
+  }
+
+  // Register all nodes in security state
+  nodes.forEach(id=>{
+    nodeSecState[id]  = 'NOMINAL';
+    nodeSecEvents[id] = [];
+    firewallUnlocked[id] = !NETWORK[id].firewall;
+  });
+
+  // Entry node connects to GATEWAY
+  const entryId = nodes[0];
+  NETWORK['GATEWAY'].links.push(entryId);
+
+  // Store topology metadata on org
+  org.topology     = topo;
+  org.topologyNodes = nodes;
+  org.entryNodeId  = entryId;
+
+  // Legacy PROC-ORG alias → entry node for backward compat
+  NETWORK['PROC-ORG'] = NETWORK[entryId];
+  NODE_POS['PROC-ORG'] = NODE_POS[entryId];
+  nodeSecState['PROC-ORG']  = 'NOMINAL';
+  nodeSecEvents['PROC-ORG'] = [];
+  firewallUnlocked['PROC-ORG'] = true;
+
+  return nodes;
+}
+
+// Build a minimal filesystem for non-entry nodes
+function buildSubFs(org, nodeId){
+  const vfs = {};
+  // Root and required parent directories must exist for ls to work
+  vfs['/'] = {t:'d'};
+  vfs['/home'] = {t:'d'};
+  vfs['/var'] = {t:'d'};
+  vfs['/var/log'] = {t:'d'};
+  vfs['/etc'] = {t:'d'};
+  vfs['/tmp'] = {t:'d'};
+
+  // Pick employee deterministically (use nodeId hash, not Math.random)
+  const idx = nodeId.split('').reduce((a,c)=>a+c.charCodeAt(0),0) % org.employees.length;
+  const emp = org.employees[idx];
+  if(emp){
+    const dir = `/home/${emp.fname.toLowerCase()}`;
+    vfs[dir] = {t:'d'};
+    vfs[`${dir}/.bash_history`] = {t:'f', content:`ssh ${org.employees[0]?.email.split('@')[0]}@${org.ip}\ncat /etc/passwd\nsudo su`};
+    vfs[`${dir}/notes.txt`]      = {t:'f', content:`Personal notes — ${emp.fname}\nPassword hint: ${emp.pet||'see email'}\nBirthday: ${emp.birthYear||'unknown'}`};
+  }
+  vfs['/var/log/syslog'] = {t:'f', exfil:'low', content:`System log — ${nodeId}\n[INFO] Service started\n[INFO] Auth module loaded\n[INFO] Remote session accepted`};
+  vfs['/etc/hostname']   = {t:'f', content:nodeId.toLowerCase()};
+  vfs['/etc/passwd']     = {t:'f', exfil:'med', content:`root:x:0:0:root:/root\n${emp?.email?.split('@')[0]||'admin'}:x:1000:1000:${emp?.fname||'Admin'}:/home/${emp?.fname?.toLowerCase()||'admin'}`};
+  vfs['/tmp/.session']   = {t:'f', exfil:'low', content:`node=${nodeId}\nconnected=1`};
+  return vfs;
+}
+
+// ── Topology routing enforcement ──
+// Returns true if player can connect to targetId given current topology
+function topologyCanConnect(targetId){
+  if(!proceduralOrg || !proceduralOrg.topology) return true;
+  if(!targetId.startsWith('PROC-')) return true; // Axiom nodes always free
+  if(targetId === 'PROC-ORG') return true;
+
+  const topo = proceduralOrg.topology;
+  const nodes = proceduralOrg.topologyNodes || [];
+
+  if(topo === 'FLAT'){
+    // Any node reachable from any other — no restrictions
+    return true;
+  }
+
+  if(topo === 'SEGMENTED'){
+    // Must traverse linearly: ENTRY → INT → EXEC
+    const order = ['PROC-DMZ','PROC-INT','PROC-EXEC'];
+    const targetIdx = order.indexOf(targetId);
+    if(targetIdx <= 0) return true; // entry always accessible
+    const prevId = order[targetIdx - 1];
+    // Can only connect if previous tier has been visited
+    return (nodeSecEvents[prevId]?.length > 0) || runNodesHit.has(prevId);
+  }
+
+  if(topo === 'HUB_SPOKE'){
+    // Must go through hub — spokes only accessible after hub visited
+    if(targetId === 'PROC-HUB') return true;
+    const hubVisited = runNodesHit.has('PROC-HUB');
+    if(!hubVisited){
+      return false; // Can't reach spoke without hub
+    }
+    return true;
+  }
+
+  if(topo === 'MESH'){
+    // All nodes accessible once any adjacent node visited
+    return true;
+  }
+
+  return true;
+}
+
+// ── Topology security scope ──
+// FLAT topology: escalation on any node triggers all nodes
+function applyTopologySecEffect(nodeId, newState){
+  if(!proceduralOrg?.topology) return;
+  if(proceduralOrg.topology !== 'FLAT') return;
+  if(!nodeId.startsWith('PROC-')) return;
+  // FLAT: all proc nodes share security state
+  proceduralOrg.topologyNodes?.forEach(id=>{
+    if(id !== nodeId && nodeSecState[id] !== 'LOCKDOWN'){
+      if(['SUSPICIOUS','INCIDENT'].includes(newState)){
+        nodeSecState[id] = newState;
+      }
+    }
+  });
+}
+
+// ── Topology description for scan output ──
+function getTopologyDesc(topo){
+  return {
+    FLAT:      'FLAT NETWORK — all nodes on shared subnet. No internal firewalls. Security alerts are org-wide.',
+    SEGMENTED: 'SEGMENTED — tiered DMZ/INT/EXEC zones. Must traverse linearly. Each tier is isolated.',
+    HUB_SPOKE: 'HUB-SPOKE — central hub required. All spokes firewalled. Compromise hub first.',
+    MESH:      'MESH — multiple redundant paths. Route around detection. Shared trace multiplier.',
+  }[topo] || 'Unknown topology';
 }
 
 // ══════════════════════════════════════════════
@@ -4733,14 +5657,284 @@ someone who lasts and someone who doesn't.
 — S`,
     style: 'spectr',
   },
+
+  // ── Tier transitions — M9a difficulty scaling ──
+  'tier_operator': {
+    condition: () => (META?.runCount || 0) >= 2,
+    delay: 4000,
+    subject: 'Noted.',
+    body: `You've survived the early runs.
+
+The targets are getting smarter.
+So should you.
+
+Security teams are training.
+Awareness levels are rising.
+What worked in run one won't
+work the same way now.
+
+Check your tools. Check your approach.
+Adapt or burn.
+
+— S`,
+    style: 'spectr',
+  },
+
+  'tier_veteran': {
+    condition: () => (META?.runCount || 0) >= 5,
+    delay: 4000,
+    subject: 'Pattern detected.',
+    body: `Six runs.
+
+You're leaving patterns.
+Not in the logs — I scrub those.
+In the method. The timing.
+The nodes you hit first.
+
+They're starting to notice.
+Not you specifically.
+A shape. A style.
+
+Change something.
+
+— S`,
+    style: 'spectr',
+  },
+
+  'tier_ghost': {
+    condition: () => (META?.runCount || 0) >= 9,
+    delay: 5000,
+    subject: 'GHOST.',
+    body: `Ten runs.
+
+Most operators don't make it this far.
+The ones who do usually think
+that means something.
+
+It doesn't.
+
+GHOST tier. The targets are prepared.
+The networks are hardened.
+The security teams are looking for you.
+
+No margin. No second chances.
+No more easy contracts.
+
+You wanted to know how deep this goes.
+
+Keep moving.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── M9d — FOURTH FACTION ARC ──
+
+  'fourth_faction_contact': {
+    condition: () => (META?.runCount || 0) >= 11,
+    delay: 8000,
+    subject: currentAlias || 'operator',
+    body: `You don't know me.
+
+That's intentional.
+
+I've been watching your work for a while.
+Not the runs SPECTR routes to you —
+the other ones. The patterns. The method.
+
+You're careful. You're consistent.
+You're exactly what we need.
+
+SPECTR is a handler. A middleman.
+The contracts they route are real
+but the picture they're giving you is incomplete.
+
+There's a project. It's been running
+longer than you've been operational.
+The targets you've been hitting
+are connected. Not by industry. Not by geography.
+
+By what they're building.
+
+I'm not going to tell you what it is.
+Not yet.
+
+What I will tell you:
+the next contract in your queue
+isn't from SPECTR.
+
+It's from us.
+
+You can decline.
+You can tell SPECTR about this message.
+
+Or you can run the contract and see
+what's on the other side.
+
+Your choice.
+
+— [UNSIGNED]`,
+    style: 'void',
+  },
+
+  'spectr_goes_quiet': {
+    condition: () => (META?.runCount || 0) >= 12,
+    delay: 12000,
+    subject: 'Going dark.',
+    body: `Something came up.
+
+I need to go quiet for a bit.
+Don't read into it.
+
+The contracts will keep coming.
+The board will keep refreshing.
+You'll be fine.
+
+Watch the FEED.
+Watch the dead drops in the filesystems.
+
+Not everything I know fits in a message.
+
+I'll be back.
+
+— S`,
+    style: 'spectr',
+  },
+
+  'spectr_returns': {
+    condition: () => (META?.runCount || 0) >= 14,
+    delay: 5000,
+    subject: 'Back.',
+    body: `Still here.
+
+I looked into the unsigned contact.
+I know who they are now.
+
+They call themselves NULL//VOID.
+
+I don't know how long they've been
+running operations parallel to ours.
+I don't know how many operators
+they've recruited this way.
+
+What I know:
+they're not hostile to us.
+They're hostile to the same thing we are.
+
+The project the targets are building —
+I've seen fragments across a dozen orgs
+you've hit over your career.
+It's infrastructure. Deep infrastructure.
+The kind that doesn't announce itself.
+
+I don't have a name for it yet.
+
+Keep running contracts.
+Keep reading the files.
+The answer is in there somewhere.
+
+One more thing:
+NULL//VOID is going to contact you again.
+When they do —
+listen.
+
+— S`,
+    style: 'spectr',
+  },
+
+  // ── Achievement reactions ──
+  'ach_ghost_run': {
+    condition: () => !!(META?.achievements?.ghost_run),
+    delay: 6000,
+    subject: 'Clean.',
+    body: `No alerts. No traces. No noise.
+
+That's the standard.
+Most operators can't hold it for a full run.
+
+You did.
+
+I'm not going to tell you to keep it up.
+You already know.
+
+— S`,
+    style: 'spectr',
+  },
+
+  'ach_archivist': {
+    condition: () => !!(META?.achievements?.lore_reader),
+    delay: 4000,
+    subject: 'You read everything.',
+    body: `I noticed.
+
+Most operators exfil the target and leave.
+You read the notes. The logs. The drafts.
+The files that weren't on the objective list.
+
+That's either discipline or curiosity.
+Either way — you've seen things
+most operators miss.
+
+The dead drops in those filesystems
+aren't accidents.
+
+Someone is leaving a trail.
+I don't know for who.
+
+Keep reading.
+
+— S`,
+    style: 'spectr',
+  },
+
+  'ach_bulldozer': {
+    condition: () => !!(META?.achievements?.flat_network),
+    delay: 3000,
+    subject: 'Subtle.',
+    body: `You triggered INCIDENT on a flat network.
+
+Every node escalated simultaneously.
+The entire org went into lockdown.
+
+I'm not going to lecture you.
+The objective was completed.
+
+But I'm going to note:
+the cleanup team is going to have
+a very interesting Tuesday.
+
+— S`,
+    style: 'spectr',
+  },
 };
 
 // Track which triggers have fired this session + ever
 const spectrFired = new Set(); // fired this session (reset on new run)
 let spectrQueue = [];          // pending delayed messages
 let ghostPresenceTimer = null;
+let ghostSilenced = false;     // M9d — SPECTR goes quiet mechanic
 
-// Ghost presence — rare one-liners injected into active terminal mid-session
+// ── NULL//VOID mail injection — distinct formatting ──
+function injectVoidMail(subject, body){
+  const t = getCurrentTime();
+  const mail = {
+    id: 9500 + MAILS.length,
+    from: '[UNSIGNED]',
+    subj: subject,
+    time: t,
+    unread: true,
+    isAlert: false,
+    isVoid: true,   // distinct from isSpectr
+    body,
+  };
+  adminAlerts.push(mail);
+  refreshMailList();
+  updateBadges();
+  notify('// UNKNOWN: new message', 'warn');
+  sfx('void_mail');
+}
+
+// ── Ghost presence — M9d: silenced after spectr_goes_quiet ──
 const GHOST_LINES = [
   'Still watching.',
   'Move faster.',
@@ -4752,9 +5946,25 @@ const GHOST_LINES = [
   'The trace doesn\'t care how careful you think you are.',
   'There\'s someone else in that network.',
   'I said don\'t get traced.',
+  'The logs don\'t lie. People do.',
+  'That node has been hit before. Recently.',
+  'You\'re louder than you think.',
+  'Check the dead drops.',
+  'They rotated the passwords. Someone tipped them.',
+  'Faster. The window is closing.',
+  'I see you found the notes. Good.',
+  'Don\'t exfil what you don\'t need.',
+  'Three nodes. You only needed two.',
+  'The fourth faction is watching too.',
+  'rm-logs. Every time. No exceptions.',
+  'That credential is about to expire.',
+  'The IT admin is awake. Move.',
+  'Clean exit means nothing if you left the file open.',
 ];
 
 function maybeGhostPresence(){
+  // M9d — SPECTR goes quiet after spectr_goes_quiet trigger fires
+  if(ghostSilenced) return;
   // 15% chance per 3-minute interval of a ghost line appearing
   if(Math.random() > 0.15) return;
   if(!connectedNode) return; // only inject when connected
@@ -4764,10 +5974,7 @@ function maybeGhostPresence(){
     pline(`// SPECTR: ${line}`, 'ghost');
     pline('', 'blank');
     scrollT();
-    if(isMobileMode && mobActiveApp==='terminal') {
-      // mobile already handled by tPLine routing
-    }
-  }, Math.random()*30000 + 10000); // 10-40s delay so it feels ambient
+  }, Math.random()*30000 + 10000);
 }
 
 function startGhostPresence(){
@@ -4781,7 +5988,11 @@ function fireSpectrTrigger(triggerId){
   // Check if globally fired (stored in META)
   if(!META.spectrFired) META.spectrFired = [];
   const globalTriggers = ['first_boot','first_death','five_deaths','run4_hint',
-                          'run7_fragment','first_clean_run'];
+                          'run7_fragment','first_clean_run',
+                          'tier_operator','tier_veteran','tier_ghost',
+                          // M9d — fourth faction arc
+                          'fourth_faction_contact','spectr_goes_quiet','spectr_returns',
+                          'ach_ghost_run','ach_archivist','ach_bulldozer'];
   if(globalTriggers.includes(triggerId) && META.spectrFired.includes(triggerId)) return;
 
   const trigger = SPECTR_TRIGGERS[triggerId];
@@ -4799,6 +6010,13 @@ function fireSpectrTrigger(triggerId){
 
 function injectSpectrMail(triggerId, trigger){
   const t = getCurrentTime();
+
+  // M9d — void style uses a different mail format
+  if(trigger.style === 'void'){
+    injectVoidMail(trigger.subject, trigger.body);
+    return;
+  }
+
   const mail = {
     id: 9000 + MAILS.length + adminAlerts.length,
     from: 'SPECTR',
@@ -4811,15 +6029,154 @@ function injectSpectrMail(triggerId, trigger){
   };
   adminAlerts.push(mail);
   refreshMailList();
-  // Subtle notification — no loud fanfare for SPECTR
-  notify(`// SPECTR: new message`, 'info');
-  // Update mobile badge
+  updateBadges();
+  notify(`// SPECTR: new message`, 'info'); sfx('spectr');
   if(typeof isMobileMode !== 'undefined' && isMobileMode) updateMobStatus();
+
+  // M9d — silence ghost presence after spectr_goes_quiet
+  if(triggerId === 'spectr_goes_quiet'){
+    ghostSilenced = true;
+    setTimeout(()=>{
+      pline('', 'blank');
+      pline('// SPECTR: Going dark. Don\'t look for me.', 'ghost');
+      pline('', 'blank');
+      scrollT();
+    }, 15000);
+  }
+
+  // M9d — restore ghost presence after spectr_returns
+  if(triggerId === 'spectr_returns'){
+    ghostSilenced = false;
+    setTimeout(()=>{
+      pline('', 'blank');
+      pline('// SPECTR: Back.', 'ghost');
+      pline('', 'blank');
+      scrollT();
+    }, 6000);
+  }
 }
 
 // Check run-count based triggers on launch
 function checkRunBasedTriggers(){
   ['run4_hint','run7_fragment'].forEach(id => fireSpectrTrigger(id));
+  // M9a — tier transition messages
+  const runs = META?.runCount || 0;
+  if(runs >= 2)  fireSpectrTrigger('tier_operator');
+  if(runs >= 5)  fireSpectrTrigger('tier_veteran');
+  if(runs >= 9)  fireSpectrTrigger('tier_ghost');
+  // M9d — fourth faction arc
+  if(runs >= 11) fireSpectrTrigger('fourth_faction_contact');
+  if(runs >= 12) fireSpectrTrigger('spectr_goes_quiet');
+  if(runs >= 14) fireSpectrTrigger('spectr_returns');
+  // M9d — achievement reactions (fire if achievement already unlocked)
+  if(META?.achievements?.ghost_run)    fireSpectrTrigger('ach_ghost_run');
+  if(META?.achievements?.lore_reader)  fireSpectrTrigger('ach_archivist');
+  if(META?.achievements?.flat_network) fireSpectrTrigger('ach_bulldozer');
+}
+
+// ══════════════════════════════════════════════
+// SOUND DESIGN — Web Audio API
+// ══════════════════════════════════════════════
+let audioCtx = null;
+let soundEnabled = true;
+
+function getAudioCtx(){
+  if(!audioCtx){
+    try { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){}
+  }
+  return audioCtx;
+}
+
+function playTone(freq, duration, type='sine', vol=0.07, decay=true){
+  if(!soundEnabled) return;
+  const ctx = getAudioCtx(); if(!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    if(decay) gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e){}
+}
+
+function sfx(name){
+  if(!soundEnabled) return;
+  switch(name){
+    // Connection
+    case 'connect':
+      playTone(440, 0.1, 'sine', 0.05);
+      setTimeout(()=>playTone(660, 0.12, 'sine', 0.04), 110);
+      break;
+    case 'disconnect':
+      playTone(330, 0.15, 'sine', 0.05);
+      setTimeout(()=>playTone(220, 0.25, 'sine', 0.04), 130);
+      break;
+    // Operations
+    case 'exfil':
+      playTone(880, 0.07, 'square', 0.03);
+      setTimeout(()=>playTone(1100, 0.1, 'square', 0.025), 75);
+      break;
+    case 'fw_unlock':
+      playTone(440, 0.08, 'square', 0.03);
+      setTimeout(()=>playTone(880, 0.08, 'square', 0.025), 90);
+      setTimeout(()=>playTone(1320, 0.18, 'sine', 0.04), 180);
+      break;
+    case 'crack':
+      for(let i=0;i<3;i++) setTimeout(()=>playTone(300+Math.random()*200, 0.05, 'square', 0.02), i*80);
+      break;
+    // Objectives & feedback
+    case 'objective':
+      playTone(523, 0.1, 'sine', 0.05);
+      setTimeout(()=>playTone(659, 0.1, 'sine', 0.05), 100);
+      setTimeout(()=>playTone(784, 0.2, 'sine', 0.06), 200);
+      break;
+    case 'contract_complete':
+      playTone(440, 0.1, 'sine', 0.05);
+      setTimeout(()=>playTone(554, 0.1, 'sine', 0.05), 100);
+      setTimeout(()=>playTone(659, 0.1, 'sine', 0.05), 200);
+      setTimeout(()=>playTone(880, 0.3, 'sine', 0.07), 300);
+      break;
+    // Trace / danger
+    case 'trace_high':
+      playTone(180 + traceLevel*1.5, 0.1, 'sawtooth', 0.04);
+      break;
+    case 'trace_crit':
+      playTone(90, 0.25, 'sawtooth', 0.07);
+      setTimeout(()=>playTone(110, 0.25, 'sawtooth', 0.07), 280);
+      break;
+    case 'death':
+      playTone(160, 0.4, 'sawtooth', 0.09);
+      setTimeout(()=>playTone(120, 0.5, 'sawtooth', 0.07), 350);
+      setTimeout(()=>playTone(80,  0.8, 'sawtooth', 0.05), 700);
+      break;
+    // SPECTR / lore
+    case 'spectr':
+      playTone(220, 0.25, 'sine', 0.035);
+      setTimeout(()=>playTone(165, 0.35, 'sine', 0.025), 220);
+      break;
+    case 'void_mail':
+      playTone(110, 0.3, 'sawtooth', 0.04);
+      setTimeout(()=>playTone(82, 0.5, 'sine', 0.03), 280);
+      break;
+    // Achievement
+    case 'achievement':
+      [523,659,784,1047].forEach((f,i)=>setTimeout(()=>playTone(f,0.12,'sine',0.05),i*90));
+      break;
+    // Error / warning
+    case 'error':
+      playTone(220, 0.12, 'sawtooth', 0.04);
+      break;
+  }
+}
+
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  notify(soundEnabled ? 'Sound: ON' : 'Sound: OFF', 'info');
+  if(soundEnabled) sfx('connect'); // test beep
 }
 
 // ── PROXY COMMAND ──
@@ -4963,6 +6320,28 @@ function runCmd(raw){
     login:(args)=>cmdLogin(args),
     logout:()=>cmdLogout(),
     proxy:(args)=>cmdProxy(args),
+    sound:()=>toggleSound(),
+    newterm:()=>{ openApp('terminal'); pline('[+] New terminal opened','ok'); },
+    difficulty:()=>{
+      const d = getDifficultyProfile();
+      const dl = getDifficultyLabel();
+      plines([
+        {t:'',c:'blank'},
+        {t:'  DIFFICULTY PROFILE',c:'cyan'},
+        {t:'',c:'blank'},
+        {t:`  Tier:           ${d.name}`,c:dl.color},
+        {t:`  Career runs:    ${d.runs}`,c:'out'},
+        {t:`  Faction rep:    ${d.rep} cr`,c:'out'},
+        {t:'',c:'blank'},
+        {t:`  Trace base:     ${Math.round(d.traceBase*100)}% per tick`,c:'out'},
+        {t:`  Incident speed: ${d.incidentSpeed.toFixed(1)}x`,c:d.incidentSpeed>1?'warn':'ok'},
+        {t:`  Awareness:      +${d.awarenessBoost} level shift`,c:d.awarenessBoost>0?'warn':'ok'},
+        {t:`  Time pressure:  ${d.timePressure?'YES — contracts have deadlines':'none'}`,c:d.timePressure?'warn':'ok'},
+        {t:'',c:'blank'},
+        {t:`  ${d.hint}`,c:'dim'},
+        {t:'',c:'blank'},
+      ]);
+    },
     fontsize:(args)=>cmdFontsize(args),
     impersonate:(args)=>{
       if(!args[0]){pline('Usage: impersonate [email]  — sets FROM for next phish','err');return;}
@@ -5051,7 +6430,7 @@ function help(){
     {t:'  fontsize [xs|sm|md|lg|xl|9-28]  set UI text scale',c:'out'},
     {t:'  fontsize reset           restore default (16px)',c:'out'},
     {t:'  Ctrl+Space               command palette',c:'out'},
-    {t:'  Ctrl+T                   new terminal window',c:'out'},
+    {t:'  Alt+T               new terminal window',c:'out'},
     {t:'  Tab                      autocomplete command or filename',c:'out'},
     {t:'',c:'blank'},
   ]);
@@ -5110,7 +6489,13 @@ function cat(args){
   pline('','blank');
   fs[target].content.split('\n').forEach(l=>pline(l||' ','data'));
   pline('','blank');
-  // Intelligence trigger — check for creds/tokens
+
+  // M9b — track files read for Archivist achievement
+  META.filesRead = (META.filesRead||0) + 1;
+  if(META.filesRead % 5 === 0) saveMeta(META); // save every 5 reads
+  checkAchievements();
+
+  // Intelligence trigger — Axiom Corp hardcoded creds
   const c=fs[target].content;
   if(c.includes('AX-EXEC-'))notify('Intel extracted — exec token found in file','info');
   if(c.includes('Sull1van#2024')){ notify('Credential found: ksullivan','info'); addIntel('credentials',{key:'ksullivan@axiom.corp',val:'Sull1van#2024',hot:true}); }
@@ -5118,6 +6503,40 @@ function cat(args){
   if(c.includes('AX-EXEC-7f3a9b2c1d')){ addIntel('credentials',{key:'rchen exec token',val:'AX-EXEC-7f3a9b2c1d',hot:true}); }
   // M3 — inline objective check for exec token
   if(connectedNode && c.includes('AX-EXEC-7f3a9b2c1d')) markObjective('creds');
+
+  // M9c — proc org credential auto-detection
+  if(proceduralOrg && connectedNode && connectedNode.startsWith('PROC-')){
+    proceduralOrg.employees.forEach(emp => {
+      if(c.includes(emp.password) && c.includes(emp.email)){
+        addIntel('credentials',{key:emp.email, val:emp.password, hot:true});
+        notify(`Credential found: ${emp.fname} ${emp.lname}`,'info');
+      } else if(c.includes(emp.password)){
+        // Password fragment found — note it but don't fully resolve
+        addIntel('credentials',{key:emp.email, val:`possible: ${emp.password.substring(0,4)}****`});
+      }
+    });
+
+    // M9c — lore dead drop detection
+    if(target.includes('.system_notes') || target.includes('system_notes')){
+      notify('Unusual file — logged to INTEL//','info');
+      addIntel('files',{key:'LORE_FRAGMENT', val:`Dead drop found on ${NETWORK[connectedNode]?.label||connectedNode}`});
+      // Queue a FEED story about anomalous access
+      logFeedAction('incident_triggered',{orgName: proceduralOrg.name});
+      pline('','blank');
+      pline('// INTEL: Anomalous system notes detected. Logged.','ghost');
+      pline('','blank');
+    }
+
+    // M9c — .env file credential extraction
+    if(target.endsWith('.env')){
+      const passMatch = c.match(/DB_PASS=(.+)/);
+      const userMatch = c.match(/DB_USER=(.+)/);
+      if(passMatch && userMatch){
+        addIntel('credentials',{key:`${userMatch[1]}@${proceduralOrg.domain}`, val:passMatch[1], hot:true});
+        notify('DB credentials extracted from .env','info');
+      }
+    }
+  }
 }
 function mkdir(args){
   if(!args[0]){pline('mkdir: missing operand','err');return;}
@@ -5187,6 +6606,17 @@ function status(){
     {t:`  Objectives  ${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}`,c:'out'},
     {t:`  Exfil vault ${exfilVault.length} file(s)`,c:'out'},
     {t:'',c:'blank'},
+    {t:'  DIFFICULTY',c:'cyan'},
+    ...( ()=>{
+      const d = getDifficultyProfile();
+      const dl = getDifficultyLabel();
+      return [
+        {t:`  Tier     ${d.name}  (run ${d.runs+1})`,c:dl.color},
+        {t:`  Trace    base ${Math.round(d.traceBase*100)}%/tick  ×${d.incidentSpeed.toFixed(1)} on incident`,c:'out'},
+        {t:`  Hint     ${d.hint}`,c:'dim'},
+      ];
+    })(),
+    {t:'',c:'blank'},
     {t:'  PROXY',c:'cyan'},
     ...( ()=>{
       const proxyTool = loadout.filter(Boolean).map(id=>TOOL_CATALOG.find(t=>t.id===id)).find(t=>t?.cat==='STEALTH'&&t?.stat?.traceRate);
@@ -5222,6 +6652,12 @@ function scan(args){
       {t:`Tier       ${n.tier.toUpperCase()}`,c:'data'},
       {t:`Security   ${n.security}`,c:n.security==='LOW'?'ok':n.security==='NOMINAL'?'warn':n.security==='HIGH'?'err':'err'},
       {t:`Firewall   ${n.firewall?(firewallUnlocked[id]?'BYPASSED':'ACTIVE — requires credentials'):'none'}`,c:n.firewall&&!firewallUnlocked[id]?'err':'ok'},
+      // M8d — show topology for proc org nodes
+      ...(id.startsWith('PROC-') && proceduralOrg?.topology ? [
+        {t:'',c:'blank'},
+        {t:`Topology   ${proceduralOrg.topology}`,c:'info'},
+        {t:`           ${getTopologyDesc(proceduralOrg.topology)}`,c:'dim'},
+      ] : []),
       {t:'',c:'blank'},
       {t:'PORT     SERVICE   VERSION                  STATE',c:'cyan'},
     ]);
@@ -5262,7 +6698,7 @@ function fwUnlock(args){
       {t:`[*] Use: connect ${id}`,c:'dim'},
       {t:'',c:'blank'},
     ]);
-    notify(`Firewall bypassed: ${n.label}`,'ok');
+    notify(`Firewall bypassed: ${n.label}`,'ok'); sfx('fw_unlock');
     refreshNetmap();
   } else {
     plines([{t:'[!] FIREWALL: credentials rejected',c:'err'},{t:'[!] ALERT: Failed auth attempt logged',c:'err'},{t:'',c:'blank'}]);
@@ -5277,6 +6713,18 @@ function connect(args){
   if(!id){pline(`connect: unknown target: ${args[0]||'(none)'}`,'err');return;}
   if(connectedNode){pline(`Already connected to ${connectedNode}. Disconnect first.`,'warn');return;}
   const n=NETWORK[id];
+  // M8d — topology routing check
+  if(!topologyCanConnect(id)){
+    const topo = proceduralOrg?.topology;
+    if(topo === 'SEGMENTED'){
+      pline(`[!] SEGMENTED network — must traverse tiers in order`,'err');
+      pline(`[!] Access the previous tier first`,'dim');
+    } else if(topo === 'HUB_SPOKE'){
+      pline(`[!] HUB-SPOKE network — must compromise ${proceduralOrg?.topologyNodes?.[0]||'hub'} first`,'err');
+      pline(`[!] All spokes are inaccessible until the hub is breached`,'dim');
+    }
+    return;
+  }
   if(n.firewall&&!firewallUnlocked[id]){
     plines([
       {t:`[!] FIREWALL ACTIVE — ${n.label}`,c:'err'},
@@ -5297,7 +6745,7 @@ function connect(args){
   }
   plines([{t:'',c:'blank'},{t:`[*] Connecting to ${n.label} (${n.ip})...`,c:'info'},{t:`[*] Negotiating session...`,c:'dim'}]);
   setTimeout(()=>{
-    connectedNode=id; cwd='/'; traceRate=n.traceRate;
+    connectedNode=id; cwd='/'; traceRate=n.traceRate; sfx('connect');
     updatePrompt();
     plines([
       {t:'',c:'blank'},
@@ -5332,7 +6780,7 @@ function disconnect(){
     logsDeleted[connectedNode]=true;
   }
   connectedNode=null; cwd=`/home/${currentUser}`;
-  stopTrace(); updatePrompt();
+  stopTrace(); updatePrompt(); sfx('disconnect');
   document.getElementById('tb-conn').querySelector('span').textContent='OFFLINE';
   document.getElementById('tb-conn').className='tbs';
   document.getElementById('sb-node').querySelector('span').textContent='—';
@@ -5417,17 +6865,24 @@ function cmdExfil(args){
     const entry={name:fname,from:node.label,ip:node.ip,value:fdata.exfil||'low',content:fdata.content,time:ticks};
     exfilVault.push(entry);
     LFS[`/home/${currentUser}/intel/exfil/${fname}`]={t:'f',content:fdata.content};
+    // M_BAL — exfil earns credits immediately based on file value
+    const exfilReward = fdata.exfil==='high' ? 600 : fdata.exfil==='med' ? 300 : 100;
+    rep += exfilReward; credits = rep;
+    document.getElementById('tb-rep')?.querySelector('span') &&
+      (document.getElementById('tb-rep').querySelector('span').textContent = rep);
 
     plines([
       {t:`[+] EXFILTRATED: ${fname}`,c:'ok'},
       {t:`[+] Value: ${(fdata.exfil||'low').toUpperCase()}  |  Banked to ~/intel/exfil/`,c:'ok'},
       {t:'',c:'blank'},
     ]);
-    notify(`Exfil: ${fname} (${(fdata.exfil||'low').toUpperCase()})`,fdata.exfil==='high'?'ok':'info');
+    notify(`Exfil: ${fname} (${(fdata.exfil||'low').toUpperCase()})`,fdata.exfil==='high'?'ok':'info'); sfx('exfil');
     runExfilCount++; // M6 — track for run stats
     // M8c — log for FEED// story generation
     if(proceduralOrg && connectedNode==='PROC-ORG')
       logFeedAction('exfil',{orgName:proceduralOrg.name, industry:proceduralOrg.industry});
+    checkAchievements(); // M9b
+    if(achieveSocialOnly && impersonatedUser) unlockAchievement('social_only'); // M9b
     // M7 — use active exfil tool trace stat
     const exfilTraceBump = getActiveStats().exfilTrace;
     if(traceActive) traceLevel=Math.min(100,traceLevel+exfilTraceBump);
@@ -5473,8 +6928,10 @@ function markObjective(id){
   const obj=OBJECTIVES.find(o=>o.id===id);
   if(obj&&!obj.done){
     obj.done=true;
-    notify(`OBJECTIVE COMPLETE: ${obj.text.substring(0,40)}...`,'ok');
-    rep+=800;
+    notify(`OBJECTIVE COMPLETE: ${obj.text.substring(0,40)}...`,'ok'); sfx('objective');
+    // M_BAL — scale objective reward with difficulty tier
+    const objReward = ({ROOKIE:400, OPERATOR:550, VETERAN:700, GHOST:900})[getDifficultyProfile().name] || 400;
+    rep += objReward;
     credits=rep; // M7 — credits track rep
     unseenMission++; // M8b — badge
     updateBadges();
@@ -5482,6 +6939,7 @@ function markObjective(id){
     document.getElementById('sb-obj').querySelector('span').textContent=`${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}`;
     refreshMission();
     refreshForge(); // M7 — update market affordability
+    checkAchievements(); // M9b
   }
 }
 function checkCleanObjective(){
@@ -5512,6 +6970,11 @@ function stopTrace(){
   document.getElementById('sb-trace').className='sbi';
 }
 function updateTraceUI(){
+  // Sound cues for trace levels
+  if(traceActive){
+    if(traceLevel > 90 && Math.random() > 0.7) sfx('trace_crit');
+    else if(traceLevel > 70 && Math.random() > 0.85) sfx('trace_high');
+  }
   const p=Math.floor(traceLevel);
   const fill=document.getElementById('tr-f');
   const pct=document.getElementById('tr-pct');
@@ -5544,7 +7007,7 @@ function onTraceComplete(){
   ]);
   scrollT();
   // M6 — trigger death screen after brief delay
-  setTimeout(()=>triggerDeath('Trace complete — session logged'), 2000);
+  sfx('death'); setTimeout(()=>triggerDeath('Trace complete — session logged'), 2000);
 }
 
 // ══════════════════════════════════════════════
@@ -5558,16 +7021,241 @@ const NODE_POS={
   'EXEC-TERM':{x:440,y:340},
 };
 
+// ── Pan state ──
+let nmPan = {x:0, y:0, dragging:false, startX:0, startY:0, startPanX:0, startPanY:0};
+
 function buildNetmap(body){
-  body.innerHTML=`<div class="netmap-wrap"><svg id="netmap-svg" viewBox="0 0 560 460" xmlns="http://www.w3.org/2000/svg"></svg></div>`;
+  body.innerHTML=`
+<div class="netmap-wrap" id="netmap-wrap">
+  <svg id="netmap-svg" viewBox="0 0 620 460" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="netmap-legend-bg"></div><div class="netmap-legend">
+    <div class="netmap-legend-item"><div class="netmap-legend-swatch" style="background:#00d4ff"></div>PUBLIC</div>
+    <div class="netmap-legend-item"><div class="netmap-legend-swatch" style="background:#ff2d78"></div>INTERNAL</div>
+    <div class="netmap-legend-item"><div class="netmap-legend-swatch" style="background:#bf5fff"></div>EXEC</div>
+  </div>
+  <div class="netmap-hint">drag to pan</div>
+</div>`;
+  // Reset pan on rebuild
+  nmPan = {x:0, y:0, dragging:false, startX:0, startY:0, startPanX:0, startPanY:0};
   renderNetmap();
+  initNetmapPan();
+}
+
+function initNetmapPan(){
+  const svg = document.getElementById('netmap-svg');
+  if(!svg) return;
+
+  function applyPan(){
+    // Adjust viewBox origin based on pan offset (in SVG coordinate space)
+    const scaleX = 620 / svg.clientWidth;
+    const scaleY = 460 / svg.clientHeight;
+    const ox = -nmPan.x * scaleX;
+    const oy = -nmPan.y * scaleY;
+    svg.setAttribute('viewBox', `${ox} ${oy} 620 460`);
+  }
+
+  // Mouse
+  svg.addEventListener('mousedown', e=>{
+    nmPan.dragging=true; nmPan.startX=e.clientX; nmPan.startY=e.clientY;
+    nmPan.startPanX=nmPan.x; nmPan.startPanY=nmPan.y;
+    svg.classList.add('panning');
+    e.preventDefault();
+  });
+  window.addEventListener('mousemove', e=>{
+    if(!nmPan.dragging) return;
+    nmPan.x = nmPan.startPanX + (e.clientX - nmPan.startX);
+    nmPan.y = nmPan.startPanY + (e.clientY - nmPan.startY);
+    applyPan();
+  });
+  window.addEventListener('mouseup', ()=>{
+    nmPan.dragging=false;
+    svg.classList.remove('panning');
+  });
+
+  // Touch
+  svg.addEventListener('touchstart', e=>{
+    if(e.touches.length!==1) return;
+    const t=e.touches[0];
+    nmPan.dragging=true; nmPan.startX=t.clientX; nmPan.startY=t.clientY;
+    nmPan.startPanX=nmPan.x; nmPan.startPanY=nmPan.y;
+  },{passive:true});
+  svg.addEventListener('touchmove', e=>{
+    if(!nmPan.dragging||e.touches.length!==1) return;
+    const t=e.touches[0];
+    nmPan.x = nmPan.startPanX + (t.clientX - nmPan.startX);
+    nmPan.y = nmPan.startPanY + (t.clientY - nmPan.startY);
+    applyPan();
+    e.preventDefault();
+  },{passive:false});
+  svg.addEventListener('touchend', ()=>{ nmPan.dragging=false; },{passive:true});
 }
 
 function renderNetmap(){
   const svg=document.getElementById('netmap-svg'); if(!svg)return;
   svg.innerHTML='';
 
-  // Draw connections
+  // ── M10 — PIXEL CITY BACKGROUND ──
+  // Procedural city grid using a seeded RNG based on run seed
+  // so the city looks consistent per run but varies between runs
+  const cityRng = (()=>{
+    let s = (runSeed || 12345) % 99999;
+    return ()=>{ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; };
+  })();
+
+  const W=620, H=460;
+  // Street grid — vertical and horizontal lines
+  const streetCols = [0,60,120,180,240,300,360,420,480,540,600,620];
+  const streetRows = [0,55,110,165,220,275,330,385,440,460];
+  const streetW = 4; // street width in px
+
+  // City background
+  const cityBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  cityBg.setAttribute('width',W); cityBg.setAttribute('height',H);
+  cityBg.setAttribute('fill','#030508');
+  svg.appendChild(cityBg);
+
+  // Draw buildings in each city block
+  for(let ci=0; ci<streetCols.length-1; ci++){
+    for(let ri=0; ri<streetRows.length-1; ri++){
+      const bx = streetCols[ci] + streetW;
+      const by = streetRows[ri] + streetW;
+      const bw = streetCols[ci+1] - streetCols[ci] - streetW*2;
+      const bh = streetRows[ri+1] - streetRows[ri] - streetW*2;
+      if(bw <= 0 || bh <= 0) continue;
+
+      // Block background
+      const block = document.createElementNS('http://www.w3.org/2000/svg','rect');
+      block.setAttribute('x',String(bx)); block.setAttribute('y',String(by));
+      block.setAttribute('width',String(bw)); block.setAttribute('height',String(bh));
+      block.setAttribute('fill','#060a14');
+      svg.appendChild(block);
+
+      // Subdivide each block into 2-6 buildings
+      const numBuildings = 2 + Math.floor(cityRng()*5);
+      const padding = 2;
+      for(let b=0; b<numBuildings; b++){
+        // Random building within the block
+        const margin = padding + Math.floor(cityRng()*(bw*0.1));
+        const bldW = 4 + Math.floor(cityRng()*(bw*0.4));
+        const bldH = 4 + Math.floor(cityRng()*(bh*0.5));
+        const bldX = bx + margin + Math.floor(cityRng()*(bw - bldW - margin*2));
+        const bldY = by + margin + Math.floor(cityRng()*(bh - bldH - margin*2));
+        if(bldX + bldW > bx+bw || bldY + bldH > by+bh) continue;
+
+        // Building shade — vary from very dark to slightly lighter
+        const shade = Math.floor(cityRng()*30 + 18);
+        const shadeHex = shade.toString(16).padStart(2,'0');
+        const bldColor = `#${shadeHex}${shadeHex}${shadeHex}`;
+
+        const bld = document.createElementNS('http://www.w3.org/2000/svg','rect');
+        bld.setAttribute('x',String(bldX)); bld.setAttribute('y',String(bldY));
+        bld.setAttribute('width',String(bldW)); bld.setAttribute('height',String(bldH));
+        // Neon building — dark blue fill, pink or cyan edge
+        const neonCol = cityRng()>0.6?'#ff2d78':'#00d4ff';
+        bld.setAttribute('fill','#080d1a');
+        bld.setAttribute('stroke',neonCol);
+        bld.setAttribute('stroke-width','0.4');
+        bld.setAttribute('opacity','0.7');
+        svg.appendChild(bld);
+
+        // Occasional lit window (tiny bright pixel)
+        if(cityRng() > 0.75){
+          const win = document.createElementNS('http://www.w3.org/2000/svg','rect');
+          win.setAttribute('x',String(bldX+2)); win.setAttribute('y',String(bldY+2));
+          win.setAttribute('width','2'); win.setAttribute('height','2');
+          win.setAttribute('fill',cityRng()>0.5?'#ff2d78':'#00d4ff');
+          win.setAttribute('opacity','0.9');
+          svg.appendChild(win);
+        }
+      }
+    }
+  }
+
+  // Street lines (over buildings)
+  streetCols.forEach(cx=>{
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1',String(cx)); l.setAttribute('y1','0');
+    l.setAttribute('x2',String(cx)); l.setAttribute('y2',String(H));
+    l.setAttribute('stroke','#030810'); l.setAttribute('stroke-width',String(streetW));
+    l.setAttribute('opacity','0.95');
+    svg.appendChild(l);
+  });
+  streetRows.forEach(ry=>{
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.setAttribute('x1','0'); l.setAttribute('y1',String(ry));
+    l.setAttribute('x2',String(W)); l.setAttribute('y2',String(ry));
+    l.setAttribute('stroke','#030810'); l.setAttribute('stroke-width',String(streetW));
+    l.setAttribute('opacity','0.95');
+    svg.appendChild(l);
+  });
+
+  // Subtle scanline overlay
+  for(let y=0; y<H; y+=4){
+    const sl=document.createElementNS('http://www.w3.org/2000/svg','line');
+    sl.setAttribute('x1','0'); sl.setAttribute('y1',String(y));
+    sl.setAttribute('x2',String(W)); sl.setAttribute('y2',String(y));
+    sl.setAttribute('stroke','#00d4ff'); sl.setAttribute('stroke-width','0.5');
+    sl.setAttribute('opacity','0.03');
+    svg.appendChild(sl);
+  }
+
+  // Neon street glow — thin cyan centerlines
+  streetCols.slice(1,-1).forEach(cx=>{
+    const gl=document.createElementNS('http://www.w3.org/2000/svg','line');
+    gl.setAttribute('x1',String(cx)); gl.setAttribute('y1','0');
+    gl.setAttribute('x2',String(cx)); gl.setAttribute('y2',String(H));
+    gl.setAttribute('stroke','#00d4ff'); gl.setAttribute('stroke-width','0.5');
+    gl.setAttribute('opacity','0.08');
+    svg.appendChild(gl);
+  });
+  streetRows.slice(1,-1).forEach(ry=>{
+    const gl=document.createElementNS('http://www.w3.org/2000/svg','line');
+    gl.setAttribute('x1','0'); gl.setAttribute('y1',String(ry));
+    gl.setAttribute('x2',String(W)); gl.setAttribute('y2',String(ry));
+    gl.setAttribute('stroke','#ff2d78'); gl.setAttribute('stroke-width','0.5');
+    gl.setAttribute('opacity','0.06');
+    svg.appendChild(gl);
+  });
+
+  // ── Defs: arrowhead markers ──
+  const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
+  const mkMarker=(id,col)=>{
+    const m=document.createElementNS('http://www.w3.org/2000/svg','marker');
+    m.setAttribute('id',id); m.setAttribute('markerWidth','6'); m.setAttribute('markerHeight','6');
+    m.setAttribute('refX','5'); m.setAttribute('refY','3'); m.setAttribute('orient','auto');
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d','M0,0 L0,6 L6,3 Z'); p.setAttribute('fill',col); m.appendChild(p);
+    return m;
+  };
+  defs.appendChild(mkMarker('arrow-dim','#1a2444'));
+  defs.appendChild(mkMarker('arrow-active','#00d4ff'));
+  defs.appendChild(mkMarker('arrow-proc','#39ff14'));
+  svg.appendChild(defs);
+
+  // ── Zone labels (lighter, over city) ──
+  const hasProcOrg = proceduralOrg && Object.keys(NODE_POS).some(k=>k.startsWith('PROC-'));
+  const zoneLabelStyle = (x,y,text,col)=>{
+    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',String(x)); lbl.setAttribute('y',String(y));
+    lbl.setAttribute('font-family','JetBrains Mono,monospace');
+    lbl.setAttribute('font-size','7'); lbl.setAttribute('fill',col);
+    lbl.setAttribute('opacity','0.45'); lbl.setAttribute('letter-spacing','1');
+    lbl.textContent=text; svg.appendChild(lbl);
+  };
+  zoneLabelStyle(185,24,'// PUBLIC ZONE','#00d4ff');
+  zoneLabelStyle(68,160,'// INTERNAL ZONE','#ff2d78');
+  zoneLabelStyle(370,278,'// EXEC ZONE','#bf5fff');
+
+  if(hasProcOrg && proceduralOrg){
+    const procPositions = Object.entries(NODE_POS).filter(([id])=>id.startsWith('PROC-'));
+    if(procPositions.length){
+      const xs=procPositions.map(([,p])=>p.x), ys=procPositions.map(([,p])=>p.y);
+      zoneLabelStyle(Math.min(...xs)-50, Math.min(...ys)-5,
+        `// ${proceduralOrg.name.substring(0,16).toUpperCase()}`, '#39ff14');
+    }
+  }
+
+  // ── Draw connections ──
   const drawn=new Set();
   Object.entries(NETWORK).forEach(([id,n])=>{
     n.links.forEach(lid=>{
@@ -5575,98 +7263,106 @@ function renderNetmap(){
       if(drawn.has(key))return; drawn.add(key);
       const a=NODE_POS[id],b=NODE_POS[lid]; if(!a||!b)return;
       const isActive=connectedNode===id||connectedNode===lid;
+      const isProcLink=id.startsWith('PROC-')||lid.startsWith('PROC-');
+      const markerCol=isActive?'arrow-active':isProcLink?'arrow-proc':'arrow-dim';
+      const dx=b.x-a.x, dy=(b.y+18)-(a.y+18);
+      const dist=Math.sqrt(dx*dx+dy*dy)||1;
+      const shorten=58;
+      const ex=b.x-(dx/dist)*shorten, ey=(b.y+18)-(dy/dist)*shorten;
       const line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',a.x); line.setAttribute('y1',a.y+18);
-      line.setAttribute('x2',b.x); line.setAttribute('y2',b.y+18);
-      line.setAttribute('class',`conn-line ${isActive?'active':''}`);
+      line.setAttribute('x1',String(a.x)); line.setAttribute('y1',String(a.y+18));
+      line.setAttribute('x2',String(ex)); line.setAttribute('y2',String(ey));
+      line.setAttribute('stroke',isActive?'#00b4d8':isProcLink?'#3fb950':'#1a3a4a');
+      line.setAttribute('stroke-width',isActive?'2':'1');
+      line.setAttribute('stroke-dasharray',isActive?'none':'3,5');
+      line.setAttribute('marker-end',`url(#${markerCol})`);
+      if(isActive) line.style.animation='pulse-conn 2s ease-in-out infinite';
       svg.appendChild(line);
     });
   });
 
-  // Draw nodes
+  // ── Node icons by type ──
+  const nodeIcon=(id,n)=>{
+    if(id==='GATEWAY'||id.includes('ENTRY')||id.includes('DMZ')) return '⬡';
+    if(id.includes('MAIL')||id.includes('HR'))  return '@';
+    if(id.includes('DB')||id.includes('SRV'))   return '⬛';
+    if(id.includes('EXEC')||id.includes('SP3')) return '▣';
+    if(id.includes('WEB')||id.includes('WS'))   return '☐';
+    if(n.tier==='exec') return '▣';
+    if(n.tier==='internal') return '⬛';
+    return '○';
+  };
+
+  // ── Draw nodes over city ──
   Object.entries(NETWORK).forEach(([id,n])=>{
     const pos=NODE_POS[id]; if(!pos)return;
     const isConn=connectedNode===id;
     const isFW=n.firewall&&!firewallUnlocked[id];
     const isUnlocked=!n.firewall||firewallUnlocked[id];
-    const tierCol={public:'#0077a8',internal:'#9e6a03',exec:'#da3633'}[n.tier]||'#30363d';
-    const borderCol=isConn?'#00b4d8':isFW?'#da3633':isUnlocked?'#238636':'#30363d';
-    const bgCol=isConn?'rgba(0,180,216,0.15)':isFW?'rgba(218,54,51,0.1)':'rgba(28,35,51,0.9)';
+    const tierCol={public:'#00d4ff',internal:'#ff2d78',exec:'#bf5fff'}[n.tier]||'#1a2444';
+    const borderCol=isConn?'#00d4ff':isFW?'#ff2d78':isUnlocked?'#39ff14':'#1e3050';
+    const bgCol=isConn?'#061420':isFW?'#140610':'#060a14';
 
     const g=document.createElementNS('http://www.w3.org/2000/svg','g');
     g.setAttribute('class','node-group');
     g.setAttribute('transform',`translate(${pos.x-55},${pos.y})`);
     g.onclick=()=>onNodeClick(id);
 
-    // BG rect
     const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
     rect.setAttribute('class','node-rect');
     rect.setAttribute('width','110'); rect.setAttribute('height','64');
     rect.setAttribute('rx','2');
     rect.setAttribute('fill',bgCol);
     rect.setAttribute('stroke',borderCol);
-    rect.setAttribute('stroke-width','1');
+    rect.setAttribute('stroke-width',isConn?'1.5':'1');
     g.appendChild(rect);
 
-    // Tier stripe
     const stripe=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    stripe.setAttribute('width','110'); stripe.setAttribute('height','3');
-    stripe.setAttribute('fill',tierCol); stripe.setAttribute('rx','2');
+    stripe.setAttribute('width','110'); stripe.setAttribute('height','2');
+    stripe.setAttribute('fill',tierCol); stripe.setAttribute('rx','0');
+    stripe.setAttribute('opacity','0.9');
     g.appendChild(stripe);
 
-    // Label
+    const icon=document.createElementNS('http://www.w3.org/2000/svg','text');
+    icon.setAttribute('x','10'); icon.setAttribute('y','22');
+    icon.setAttribute('font-family','JetBrains Mono,monospace');
+    icon.setAttribute('font-size','11');
+    icon.setAttribute('fill',isConn?'#00b4d8':borderCol);
+    icon.setAttribute('opacity','0.7');
+    icon.textContent=nodeIcon(id,n);
+    g.appendChild(icon);
+
     const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
     lbl.setAttribute('x','55'); lbl.setAttribute('y','22');
     lbl.setAttribute('class','node-label');
-    lbl.setAttribute('fill',isConn?'#00b4d8':'#8b949e');
+    lbl.setAttribute('fill',isConn?'#00d4ff':'#c0d0e8');
     lbl.setAttribute('font-weight',isConn?'700':'400');
     lbl.textContent=n.label;
     g.appendChild(lbl);
 
-    // IP
     const ip=document.createElementNS('http://www.w3.org/2000/svg','text');
     ip.setAttribute('x','55'); ip.setAttribute('y','38');
     ip.setAttribute('class','node-sublabel');
-    ip.setAttribute('fill','#484f58');
+    ip.setAttribute('fill','#4a6080');
     ip.textContent=n.ip;
     g.appendChild(ip);
 
-    // Status badge — M3 shows security state
     const badge=document.createElementNS('http://www.w3.org/2000/svg','text');
     badge.setAttribute('x','55'); badge.setAttribute('y','55');
     badge.setAttribute('class','node-status');
     const secState=getSecState(id);
+    const stateColors={NOMINAL:'#39ff14',SUSPICIOUS:'#ffaa00',INCIDENT:'#ff2d78',LOCKDOWN:'#bf5fff'};
     const st=isConn
-      ? {t:`● ${secState}`,f:{NOMINAL:'#00b4d8',SUSPICIOUS:'#d29922',INCIDENT:'#f85149',LOCKDOWN:'#a371f7'}[secState]}
-      : isFW
-      ? {t:'⊘ FIREWALL',f:'#f85149'}
-      : patchedExploits[id]
-      ? {t:'⊗ PATCHED',f:'#f85149'}
-      : {t:`○ ${secState}`,f:{NOMINAL:'#3fb950',SUSPICIOUS:'#d29922',INCIDENT:'#f85149',LOCKDOWN:'#a371f7'}[secState]};
+      ? {t:`● ${secState}`,f:stateColors[secState]||'#00b4d8'}
+      : isFW ? {t:'⊘ FIREWALL',f:'#f85149'}
+      : patchedExploits[id] ? {t:'⊗ PATCHED',f:'#f85149'}
+      : {t:`○ ${secState}`,f:stateColors[secState]||'#3fb950'};
     badge.setAttribute('fill',st.f);
     badge.textContent=st.t;
     g.appendChild(badge);
 
     svg.appendChild(g);
   });
-
-  // Legend
-  const lg=document.createElementNS('http://www.w3.org/2000/svg','g');
-  lg.setAttribute('transform','translate(10,430)');
-  [{t:'PUBLIC',c:'#0077a8'},{t:'INTERNAL',c:'#9e6a03'},{t:'EXEC',c:'#da3633'}].forEach(({t,c},i)=>{
-    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    r.setAttribute('x',String(i*90)); r.setAttribute('y','0');
-    r.setAttribute('width','8'); r.setAttribute('height','8');
-    r.setAttribute('fill',c);
-    const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
-    tx.setAttribute('x',String(i*90+11)); tx.setAttribute('y','8');
-    tx.setAttribute('font-family','JetBrains Mono,monospace');
-    tx.setAttribute('font-size','7');
-    tx.setAttribute('fill','#484f58');
-    tx.textContent=t;
-    lg.appendChild(r); lg.appendChild(tx);
-  });
-  svg.appendChild(lg);
 }
 
 function onNodeClick(id){
@@ -5695,7 +7391,7 @@ function renderMailList(){
   p.innerHTML=`<div class="ml-hdr">INBOX (${all.filter(m=>m.unread).length} UNREAD)</div>`;
   all.forEach(m=>{
     const el=document.createElement('div');
-    el.className=`mi ${m.unread?'unread':''} ${selMail===m.id?'sel':''} ${m.isAlert?'alert':''} ${m.isSpectr?'spectr':''}`;
+    el.className=`mi ${m.unread?'unread':''} ${selMail===m.id?'sel':''} ${m.isAlert?'alert':''} ${m.isSpectr?'spectr':''} ${m.isVoid?'void':''}`;
     el.innerHTML=`<div class="mitime">${m.time}</div><div class="mifrom">${m.from}</div><div class="misubj">${m.subj}</div>`;
     el.onclick=()=>openMail(m.id);
     p.appendChild(el);
@@ -5711,7 +7407,18 @@ function openMail(id){
   m.unread=false; renderMailList();
   const v=document.getElementById('ml-view'); if(!v)return;
   v.className='mv';
-  if(m.isSpectr){
+  if(m.isVoid){
+    // NULL//VOID mail — red-tinted, no from header
+    v.innerHTML=`
+<div class="void-hdr">
+  <div class="void-hdr-from">// [UNSIGNED]</div>
+  <div class="void-hdr-subj">${m.subj}</div>
+  <div class="void-hdr-meta">${m.time} — origin unknown</div>
+</div>
+<div style="padding:10px 14px;">
+  <div class="void-body">${m.body.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+</div>`;
+  } else if(m.isSpectr){
     // SPECTR mail — distinctive purple treatment
     v.innerHTML=`
 <div class="spectr-hdr">
@@ -5848,7 +7555,15 @@ function refreshSysmon(){
 <hr class="smdiv">
 <div><div class="sm-stitle">MISSION</div>
 <div class="sm-row"><span class="sm-k">OBJECTIVES</span><span class="sm-v ok">${OBJECTIVES.filter(o=>o.done).length}/${OBJECTIVES.length}</span></div>
-<div class="sm-row"><span class="sm-k">EXFIL</span><span class="sm-v">${exfilVault.length} file(s)</span></div></div>`;
+<div class="sm-row"><span class="sm-k">EXFIL</span><span class="sm-v">${exfilVault.length} file(s)</span></div></div>
+<hr class="smdiv">
+<div><div class="sm-stitle">DIFFICULTY</div>
+${(()=>{ const d=getDifficultyProfile(); const dl=getDifficultyLabel(); return `
+<div class="sm-row"><span class="sm-k">TIER</span><span class="sm-v ${dl.color}">${d.name}</span></div>
+<div class="sm-row"><span class="sm-k">TRACE</span><span class="sm-v">${Math.round(d.traceBase*100)}%/tick</span></div>
+<div class="sm-row"><span class="sm-k">INCIDENT</span><span class="sm-v ${d.incidentSpeed>1?'warn':'ok'}">${d.incidentSpeed.toFixed(1)}x speed</span></div>
+<div class="sm-row"><span class="sm-k">AWARENESS</span><span class="sm-v ${d.awarenessBoost>0?'warn':'ok'}">+${d.awarenessBoost} shift</span></div>
+`; })()}</div>`;
 }
 
 // ══════════════════════════════════════════════
@@ -5912,11 +7627,7 @@ function closeAppsMenu(){
 
 function appsLaunch(appId){
   closeAppsMenu();
-  if(appId === 'nano-new'){
-    // Open a blank nano
-    openApp('nano-scratch');
-    return;
-  }
+  // NANO// is terminal-only — requires a filename argument
   openApp(appId);
 }
 
