@@ -12,6 +12,8 @@ Every run is different. The target company, its employees, its network topology,
 
 ## Getting Started
 
+**Play directly on GitHub via GitHub Pages! Link in the about for this page.**
+
 **Requirements:** Chrome or Edge (file:// protocol supported). No installation needed.
 
 1. Download `NULL_TRACE_V1.html`
