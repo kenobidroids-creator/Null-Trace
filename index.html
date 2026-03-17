@@ -71,6 +71,8 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .tbs.danger span{color:var(--red);}
 .tbs.ok span{color:var(--green);}
 #tb-clk{font-size:14px;color:var(--text2);}
+.tb-shutdown-btn{background:transparent;border:1px solid var(--border);color:var(--text3);font-size:13px;padding:2px 7px;cursor:pointer;border-radius:2px;font-family:var(--mono);line-height:1;transition:color .15s,border-color .15s;}
+.tb-shutdown-btn:hover{color:var(--red);border-color:var(--red);}
 
 /* WORKSPACE */
 #ws{flex:1;position:relative;overflow:hidden;}
@@ -153,7 +155,7 @@ input,textarea{user-select:text;-webkit-user-select:text;pointer-events:all;posi
 .crack-fill{height:100%;background:var(--amber);transition:width .1s;}
 
 /* NET MAP */
-.netmap-wrap{flex:1;position:relative;overflow:hidden;background:#050810;}
+.netmap-wrap{flex:1;position:relative;overflow:hidden;background:var(--bg);}
 #netmap-svg{width:100%;height:100%;cursor:grab;}
 #netmap-svg.panning{cursor:grabbing;}
 .netmap-legend-bg{position:absolute;bottom:4px;left:6px;width:210px;height:22px;background:#060a14;border:1px solid #1a2444;border-radius:2px;z-index:9;pointer-events:none;}
@@ -912,6 +914,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
       <div class="tbs" id="tb-rep">REP:<span>0</span></div>
       <div id="tb-run">RUN:<span>1</span></div>
       <div id="tb-clk">00:00:00</div>
+      <button class="tb-shutdown-btn" onclick="cmdShutdown()" title="Save &amp; logout">⏻</button>
     </div>
   </div>
 
@@ -1069,6 +1072,7 @@ function escalateSecurity(nodeId,reason,newState){
       pline(`[!] Trace rate increased. Admins notified.`,'warn');
     } else if(newState==='INCIDENT'){
       pline(`[!!] INCIDENT DECLARED — ${NETWORK[nodeId].label}`,'err');
+      if(nodeId.startsWith('PROC-')) markObjective('c-incident');
       pline(`[!!] ${reason}`,'err');
       pline(`[!!] Trace rate CRITICAL. Entry vector being patched.`,'err');
       patchedExploits[nodeId]=true;
@@ -1233,6 +1237,14 @@ const NETWORK = {
     os: 'Ubuntu 20.04', security: 'LOW', firewall: false,
     links: ['WEB-SRV','MAIL-SRV'],
     traceRate: 0.25,
+    webSurface: {
+      tech: 'nginx/1.18.0 (Ubuntu)',
+      paths: ['/','/.env','/robots.txt','/admin/'],
+      hiddenPaths: ['/.env'],
+      injectable: [],
+      vulns: ['robots.txt exposes /admin path','nginx version exposed in headers'],
+      headers: {'Server':'nginx/1.18.0','X-Content-Type-Options':'MISSING'},
+    },
     desc: 'Public-facing gateway. Entry point to the Axiom Corp internal network.',
     fs: {
       '/':{t:'d'},'/var':{t:'d'},'/var/log':{t:'d'},
@@ -1248,6 +1260,15 @@ const NETWORK = {
     os: 'Debian 10', security: 'NOMINAL', firewall: false,
     links: ['GATEWAY','MAIL-SRV','DB-SRV'],
     traceRate: 0.35,
+    webSurface: {
+      tech: 'Apache/2.4.41 (Debian) PHP/7.4.3',
+      cms: 'Custom PHP',
+      paths: ['/index.html','/admin/','/admin/config.bak','/api/','/api/auth','/api/search','/uploads/','/backup/','/staging/','/dev/'],
+      hiddenPaths: ['/admin/config.bak','/backup/','/staging/','/dev/'],
+      injectable: ['/api/search?q='],
+      vulns: ['CVE-2021-41773 (path traversal)','Missing X-Frame-Options header','Directory listing enabled on /dev/','SQL injection in /api/search (UNION-based)'],
+      headers: {'Server':'Apache/2.4.41','X-Powered-By':'PHP/7.4.3','X-Frame-Options':'MISSING','Content-Security-Policy':'MISSING'},
+    },
     desc: 'Axiom Corp public web server. Hosts internal dev notes and staging configs.',
     fs: {
       '/':{t:'d'},'/var':{t:'d'},'/var/www':{t:'d'},'/var/log':{t:'d'},
@@ -1265,6 +1286,14 @@ const NETWORK = {
     services: [{port:22,svc:'ssh',ver:'OpenSSH 8.0'},{port:25,svc:'smtp',ver:'Postfix 3.4'},{port:143,svc:'imap',ver:'Dovecot 2.3'},{port:443,svc:'https',ver:'RoundCube 1.4'}],
     os: 'Ubuntu 18.04', security: 'NOMINAL', firewall: true,
     firewallCred: {user:'ksullivan', pass:'Sull1van#2024', hint:'Stolen from /var/www/notes.txt on WEB-SRV'},
+    webSurface: {
+      tech: 'RoundCube/1.4.11 (PHP/7.2)',
+      paths: ['/','/?login','/?_action=login','/plugins/','/.htaccess'],
+      hiddenPaths: ['/.htaccess','/plugins/'],
+      injectable: [],
+      vulns: ['CVE-2020-35730 (RoundCube XSS)','RoundCube version exposed','Default error pages reveal path info'],
+      headers: {'Server':'Apache/2.4.29','X-Powered-By':'PHP/7.2.24'},
+    },
     links: ['GATEWAY','WEB-SRV','DB-SRV'],
     traceRate: 0.45,
     desc: 'Internal mail server. Holds all Axiom Corp employee communications. FIREWALL ACTIVE.',
@@ -1370,6 +1399,12 @@ const SOCIAL_OBJECTIVES = [
   {id:'compose-mail',  text:'Send internal mail as impersonated user',  hint:'Open MAIL// compose tab while impersonating an identity',      done:false},
 ];
 
+// Auto-save on tab close/refresh
+window.addEventListener('beforeunload', ()=>{
+  if(connectedNode) disconnect();
+  if(currentUser && currentUser !== 'trainee') saveRunState();
+});
+
 // ══════════════════════════════════════════════
 // BOOT
 // ══════════════════════════════════════════════
@@ -1452,6 +1487,9 @@ function doLogin(){
     err.textContent='AUTHENTICATING...'; err.style.color='var(--cyan)';
     setTimeout(()=>{
       initRunState();
+      // Restore mid-run save if one exists for this run number
+      const restored = loadRunState();
+      if(restored) console.log('[SAVE] Mid-run state restored');
       document.getElementById('login').style.display='none';
       launchDesktop();
     },700);
@@ -1483,6 +1521,7 @@ function launchDesktop(){
   d.style.display='flex'; d.classList.add('fade-in');
   document.getElementById('sb-alias').querySelector('span').textContent=currentUser;
   startClock();
+  if(musicEnabled) setTimeout(()=>startAmbientMusic(), 1500);
   setTimeout(()=>openApp('terminal'), 400);
   setTimeout(()=>renderDesktopIcons(), 200);
   setTimeout(()=>initProceduralOrg(), 1200);
@@ -1496,6 +1535,7 @@ function launchDesktopTraining(){
   document.getElementById('sb-alias').querySelector('span').textContent='trainee';
   document.getElementById('sb-node').querySelector('span').textContent='—';
   startClock();
+  if(musicEnabled) setTimeout(()=>startAmbientMusic(), 1500);
   setTimeout(()=>openApp('terminal'), 400);
   setTimeout(()=>{
     renderNetmap();
@@ -1846,7 +1886,8 @@ const ALL_COMMANDS=['help','clear','pwd','ls','cd','cat','mkdir','touch','rm',
   'whoami','status','ifconfig','scan','connect','disconnect','crack','exfil',
   'rm-logs','fw-unlock','secstate','nodes','history','uname','date','echo',
   'man','sudo','exit','reboot','open','nano','note','phish','impersonate',
-  'login','logout','fontsize','proxy','difficulty','sound','newterm','tutorial'];
+  'login','logout','fontsize','proxy','difficulty','sound','newterm','tutorial',
+  'gobuster','nikto','sqlmap','hydra','nc','netcat','enum4linux','music','mv','cp','scp','ps','kill','grep','chmod'];
 
 let tabSuggestions=[], tabIdx=-1;
 
@@ -1861,21 +1902,42 @@ function onTabKey(e, winId){
 
   // Build candidate list
   let candidates=[];
+  const cmd0 = parts[0]?.toLowerCase();
   if(parts.length===1){
     // completing a command
     candidates=ALL_COMMANDS.filter(c=>c.startsWith(last.toLowerCase()));
+  } else if(['scan','connect','fw-unlock','enum4linux','hydra','gobuster','nikto','sqlmap','nc','netcat'].includes(cmd0) && !last.startsWith('-') && !last.startsWith('http') && !last.startsWith('/')){
+    // completing a node name/IP
+    const nodeNames = Object.values(NETWORK).map(n=>n.label);
+    const nodeIPs   = Object.values(NETWORK).map(n=>n.ip);
+    candidates = [...nodeNames,...nodeIPs].filter(n=>n.toLowerCase().startsWith(last.toLowerCase()));
+  } else if(cmd0==='phish' && parts.length===2 && !last.startsWith('-')){
+    // completing an employee email for phish
+    const emails = proceduralOrg?.employees?.map(e=>e.email) || [];
+    candidates = emails.filter(e=>e.toLowerCase().startsWith(last.toLowerCase()));
+  } else if(['gobuster','sqlmap','hydra','nikto','enum4linux'].includes(cmd0) && last.startsWith('-')){
+    // completing tool flags
+    const flagMap = {
+      gobuster:['-u','-w','-x','-d','--help'],
+      sqlmap:['-u','--dbs','--tables','--dump','--os-shell','-D','-T','--help'],
+      hydra:['-l','-L','-P','-t','--help'],
+      nikto:['-h','-p','-ssl','--help'],
+      enum4linux:['-a','-U','-S','-P','--help'],
+    };
+    candidates = (flagMap[cmd0]||[]).filter(f=>f.startsWith(last));
   } else {
     // completing a filepath
     const fs=getCFS();
     const partial=resolvePath(last);
     const dir=partial.substring(0,partial.lastIndexOf('/'))||'/';
     const stem=partial.split('/').pop();
+    // Handle both absolute paths (/var/w) and relative (w or ./w)
     candidates=Object.keys(fs)
       .filter(p=>{
         const parent=p.substring(0,p.lastIndexOf('/'))||'/';
-        return parent===dir && p.split('/').pop().startsWith(stem);
+        return parent===dir && p.split('/').pop().startsWith(stem) && p!==dir;
       })
-      .map(p=>p.split('/').pop()+(fs[p].t==='d'?'/':''));
+      .map(p=>last.startsWith('/')?p+(fs[p].t==='d'?'/':''):p.split('/').pop()+(fs[p].t==='d'?'/':''));
   }
 
   if(candidates.length===0){ hideSuggest(winId); return; }
@@ -4410,7 +4472,7 @@ function markSocialObjective(id){
 // M8c — CONTRACT BOARD
 // ══════════════════════════════════════════════
 
-const CONTRACT_TYPES = ['DATA_EXTRACT','CREDENTIAL_HARVEST','SABOTAGE','GHOST_OP','SOCIAL_ONLY'];
+const CONTRACT_TYPES = ['DATA_EXTRACT','CREDENTIAL_HARVEST','SABOTAGE','GHOST_OP','SOCIAL_ONLY','WEB_EXPLOIT','CREDENTIAL_ATTACK'];
 
 const CONTRACT_CODENAMES = [
   'HOLLOW PINE','STATIC VEIL','IRON MOTH','SILENT EPOCH','BROKEN WIRE',
@@ -4505,6 +4567,8 @@ function generateContract(tier, usedNames){
     SABOTAGE:             `Penetrate ${orgName} systems and plant a disruption file. Trigger incident response, then vanish.`,
     GHOST_OP:             `Full infiltration of ${orgName} — complete all objectives without triggering any security alerts.`,
     SOCIAL_ONLY:          `Reach ${orgName} internal systems using social engineering exclusively. No technical exploits.`,
+    WEB_EXPLOIT:          `${orgName} is running a vulnerable web stack. Use directory enumeration and SQL injection to extract their data. Tools: gobuster, nikto, sqlmap.`,
+    CREDENTIAL_ATTACK:    `${orgName} has weak credential hygiene. Enumerate their users and brute-force access. Tools: enum4linux, hydra.`,
   };
 
   return {
@@ -4529,48 +4593,85 @@ function generateContract(tier, usedNames){
 function buildContractObjectives(type, tier, org){
   const objs = [];
   const empName = org?.employees?.[0] ? `${org.employees[0].fname} ${org.employees[0].lname}` : 'CEO';
+  const orgName = org?.name || 'target';
 
   if(type === 'DATA_EXTRACT' || tier >= 2){
-    objs.push({id:'c-connect',  text:`Connect to ${org?.name || 'target'} network (PROC-ORG)`, done:false});
-    objs.push({id:'c-exfil',    text:'Exfiltrate CONFIDENTIAL.txt from CEO directory',          done:false});
+    objs.push({id:'c-connect',  text:`Connect to ${orgName} network (PROC-ORG)`,               done:false, hint:'Use: nodes → scan → connect'});
+    objs.push({id:'c-exfil',    text:'Exfiltrate CONFIDENTIAL.txt from CEO directory',          done:false, hint:'Use: ls → cat → exfil'});
   }
   if(type === 'CREDENTIAL_HARVEST' || tier >= 2){
-    objs.push({id:'c-phish',    text:'Successfully phish at least one employee',                done:false});
-    objs.push({id:'c-harvest',  text:'Obtain valid credentials via social engineering',         done:false});
+    objs.push({id:'c-phish',    text:'Successfully phish at least one employee',                done:false, hint:'Use: phish list-targets → phish [email]'});
+    objs.push({id:'c-harvest',  text:'Obtain valid credentials via social engineering',         done:false, hint:'Use: login [user] [pass] after phishing'});
   }
   if(type === 'SABOTAGE'){
-    objs.push({id:'c-connect',  text:`Connect to ${org?.name || 'target'} network`,             done:false});
-    objs.push({id:'c-incident', text:'Trigger INCIDENT state on target org',                    done:false});
-    objs.push({id:'c-clean',    text:'Disconnect before trace completion',                      done:false});
+    objs.push({id:'c-connect',  text:`Connect to ${orgName} network`,                          done:false, hint:'Use: scan → connect'});
+    objs.push({id:'c-incident', text:'Trigger INCIDENT state on target org',                   done:false, hint:'Raise trace to 100% on any node'});
+    objs.push({id:'c-clean',    text:'Disconnect before trace completion',                     done:false, hint:'Use: disconnect before trace hits 100%'});
   }
   if(type === 'GHOST_OP'){
-    objs.push({id:'c-connect',  text:`Connect to ${org?.name || 'target'} network`,             done:false});
-    objs.push({id:'c-exfil',    text:'Exfiltrate any HIGH value file',                          done:false});
-    objs.push({id:'c-ghost',    text:'Complete without triggering SUSPICIOUS state',             done:false});
+    objs.push({id:'c-connect',  text:`Connect to ${orgName} network`,                          done:false, hint:'Use: scan → connect'});
+    objs.push({id:'c-exfil',    text:'Exfiltrate any HIGH value file',                         done:false, hint:'HIGH value files show [HIGH VALUE] in ls'});
+    objs.push({id:'c-ghost',    text:'Complete without triggering SUSPICIOUS state',            done:false, hint:'Use proxy tools + low-noise scans'});
   }
   if(type === 'SOCIAL_ONLY'){
-    objs.push({id:'c-phish',    text:`Phish ${empName} (CEO) successfully`,                     done:false});
-    objs.push({id:'c-login',    text:'Login to PROC-ORG using stolen credentials',              done:false});
-    objs.push({id:'c-exfil',    text:'Exfiltrate any file using social access only',            done:false});
+    objs.push({id:'c-phish',    text:`Phish ${empName} (CEO) successfully`,                    done:false, hint:'Use: phish [ceo-email] --template ceo-wire'});
+    objs.push({id:'c-login',    text:'Login to PROC-ORG using stolen credentials',             done:false, hint:'Use: login [user] [pass] on a connected node'});
+    objs.push({id:'c-exfil',    text:'Exfiltrate any file using social access only',           done:false, hint:'No scanning tools — social engineering only'});
   }
-  // Tier 3+ bonus
-  if(tier >= 3){
-    objs.push({id:'c-bonus',    text:'Delete session logs on all visited nodes (bonus)',        done:false});
+
+  // ── M11 — WEB_EXPLOIT contract type ──
+  if(type === 'WEB_EXPLOIT'){
+    objs.push({id:'c-connect',   text:`Connect to ${orgName} network`,                         done:false, hint:'Use: nodes → scan → connect to the entry node'});
+    objs.push({id:'c-webrecon',  text:'Discover hidden web paths on target (gobuster)',         done:false, hint:'Use: gobuster dir -u http://[node] -w medium'});
+    objs.push({id:'c-sqli',      text:'Extract credentials via SQL injection (sqlmap)',         done:false, hint:'Use: sqlmap -u "http://[node]/api/search?q=1" --dump'});
+    objs.push({id:'c-exfil',     text:'Exfiltrate any HIGH value file from the target',        done:false, hint:'Exfil the most sensitive file found in the dump'});
+    if(tier >= 3)
+      objs.push({id:'c-bonus',   text:'Get an OS shell via sqlmap --os-shell (bonus)',         done:false, hint:'Use: sqlmap -u "..." --os-shell'});
   }
-  return objs.length ? objs : [{id:'c-connect', text:`Infiltrate ${org?.name||'target'} network`, done:false}];
+
+  // ── M11 — CREDENTIAL_ATTACK contract type ──
+  if(type === 'CREDENTIAL_ATTACK'){
+    objs.push({id:'c-connect',    text:`Connect to ${orgName} network`,                        done:false, hint:'Use: scan → connect to the entry node'});
+    objs.push({id:'c-enumerate',  text:'Enumerate users and password policy (enum4linux)',      done:false, hint:'Use: enum4linux -a [node] — check lockout policy first'});
+    objs.push({id:'c-bruteforce', text:'Crack credentials via brute-force (hydra)',            done:false, hint:'Use: hydra -L users.txt -P rockyou ssh://[node]'});
+    objs.push({id:'c-exfil',      text:'Exfiltrate any file using compromised credentials',    done:false, hint:'After hydra success, fw-unlock and connect'});
+    if(tier >= 3)
+      objs.push({id:'c-bonus',    text:'Crack credentials on a second node (lateral movement)',done:false, hint:'Use cracked creds to pivot to next node'});
+  }
+
+  // Tier 3+ bonus (non-M11 types)
+  if(tier >= 3 && !['WEB_EXPLOIT','CREDENTIAL_ATTACK'].includes(type)){
+    objs.push({id:'c-bonus',    text:'Delete session logs on all visited nodes (bonus)',        done:false, hint:'Use: rm-logs while connected to each node'});
+  }
+  return objs.length ? objs : [{id:'c-connect', text:`Infiltrate ${orgName} network`, done:false, hint:'Use: scan → connect'}];
 }
 
 function buildContractIntel(type, org, tier){
   if(!org) return ['Target org loading...'];
   const intel = [];
   const ceo = org.employees?.[0];
-  intel.push(`Entry: ${org.ip} (PROC-ORG) — open port`);
+  const entryNode = Object.entries(NETWORK).find(([id])=>id.startsWith('PROC-ENTRY')||id.startsWith('PROC-'));
+  const entryIp = entryNode ? NETWORK[entryNode[0]].ip : org.ip;
+
+  intel.push(`Entry: ${entryIp} — start here, scan first`);
   if(ceo) intel.push(`Key target: ${ceo.fname} ${ceo.lname} — ${ceo.role} (${ceo.awareness} awareness)`);
+
   if(type === 'CREDENTIAL_HARVEST' || type === 'SOCIAL_ONLY'){
-    intel.push(`${org.employees?.length || 0} employees in org — check PHISH// for targets`);
+    intel.push(`${org.employees?.length || 0} employees — check PHISH// for targets`);
+  }
+  if(type === 'WEB_EXPLOIT'){
+    intel.push(`HTTP service detected on entry node — web attack surface available`);
+    intel.push(`Suggested chain: gobuster → nikto → sqlmap --dump`);
+    intel.push(`man gobuster | man sqlmap  — for full command reference`);
+  }
+  if(type === 'CREDENTIAL_ATTACK'){
+    intel.push(`SMB/SSH services on entry node — brute-force viable`);
+    intel.push(`Suggested chain: enum4linux -P → enum4linux -U → hydra`);
+    intel.push(`man enum4linux | man hydra  — for full command reference`);
   }
   if(tier >= 2) intel.push(`Security level: ${org.secLevel || 'NOMINAL'} — trace rate moderate`);
-  return intel.slice(0, 3);
+  if(tier >= 3) intel.push(`Hardened target — use proxy and low-noise tool flags`);
+  return intel.slice(0, 4);
 }
 
 // Accept a contract — loads its objectives into the active mission
@@ -4624,6 +4725,14 @@ function acceptContract(contractId){
 // Check if active contract objectives are all done → complete it
 function checkContractCompletion(){
   if(!activeContract) return;
+  // Auto-complete c-ghost if all proc nodes stayed below SUSPICIOUS
+  const procNodesClear = Object.keys(NETWORK)
+    .filter(id=>id.startsWith('PROC-'))
+    .every(id=>['NOMINAL'].includes(nodeSecState[id]||'NOMINAL'));
+  if(procNodesClear) markObjective('c-ghost');
+  // Auto-complete c-bonus if rm-logs done on all visited proc nodes
+  const visitedCleaned = [...runNodesHit].filter(id=>id.startsWith('PROC-')).every(id=>logsDeleted[id]);
+  if(visitedCleaned && [...runNodesHit].some(id=>id.startsWith('PROC-'))) markObjective('c-bonus');
   const allDone = OBJECTIVES.every(o => o.done);
   if(!allDone) return;
 
@@ -5070,21 +5179,47 @@ function buildTopologyNetwork(org){
 
   const nodes = [];
 
-  const mkNode = (id, label, ip, tier, fw, links, traceRate, extraServices=[])=>({
-    label, ip, tier,
-    services:[
-      {port:22,svc:'ssh',ver:'OpenSSH 8.0'},
-      {port:443,svc:'https',ver:'nginx 1.18'},
-      ...extraServices
-    ],
-    os:`Ubuntu 22.04 — ${org.industry}`,
-    security: secLevel,
-    firewall: fw,
-    links,
-    traceRate,
-    desc:`${label} — ${org.name}`,
-    fs: id === 'PROC-ENTRY' ? org.fs : buildSubFs(org, id),
-  });
+  const mkNode = (id, label, ip, tier, fw, links, traceRate, extraServices=[])=>{
+    const hasHttp = extraServices.some(s=>s.svc==='http'||s.svc==='https') || tier==='public';
+    const node = {
+      label, ip, tier,
+      services:[
+        {port:22,svc:'ssh',ver:'OpenSSH 8.0'},
+        {port:443,svc:'https',ver:'nginx 1.18'},
+        ...extraServices
+      ],
+      os:`Ubuntu 22.04 — ${org.industry}`,
+      security: secLevel,
+      firewall: fw,
+      links,
+      traceRate,
+      desc:`${label} — ${org.name}`,
+      fs: id === 'PROC-ENTRY' ? org.fs : buildSubFs(org, id),
+    };
+    // M11 — web surface for HTTP-bearing nodes
+    if(hasHttp){
+      const webVersions = ['Apache/2.4.41 PHP/7.4','Apache/2.4.29 PHP/7.2','nginx/1.18.0','Apache/2.2.34'];
+      const tech = webVersions[Math.floor(Math.random()*webVersions.length)];
+      const isVuln = tech.includes('2.2') || tech.includes('2.4.29');
+      const hasEnv = Math.random() > 0.5;
+      const hasAdmin = Math.random() > 0.3;
+      node.webSurface = {
+        tech,
+        paths: ['/', '/robots.txt', ...(hasAdmin?['/admin/','/admin/login.php']:[]), ...(hasEnv?['/.env']:[]), '/api/', '/login.php'],
+        hiddenPaths: [...(hasAdmin?['/admin/']:[]),(hasEnv?'/.env':null)].filter(Boolean),
+        injectable: (Math.random() > 0.55) ? ['/api/search?q=','/login.php'] : [],
+        vulns: [
+          'Server version exposed in headers',
+          ...(isVuln?['Outdated server — known CVEs']:[]),
+          ...(hasEnv?['Exposed .env file — credentials at risk']:[]),
+          ...(hasAdmin?['Admin panel accessible — brute-force possible']:[]),
+          ...((Math.random()>0.6)?['Directory listing enabled on /api/']:[] ),
+        ],
+        headers: {'Server':tech,'X-Powered-By':tech.includes('PHP')?tech.split(' ')[1]:'none'},
+      };
+    }
+    return node;
+  };
 
   if(topo === 'FLAT'){
     // All nodes on same subnet, no firewalls, shared security
@@ -5311,9 +5446,14 @@ function saveRunState(){
       contractStates: contractBoard.map(c=>({id:c.id,accepted:c.accepted,completed:c.completed})),
       // Intel
       intelDB: JSON.parse(JSON.stringify(intelDB)),
+      // Mail state
+      adminAlertsCount: adminAlerts.length,
       // Ticks
       ticks,
       savedAt: Date.now(),
+      // Proc org (lightweight — name + domain for UI continuity)
+      procOrgName: proceduralOrg?.name || null,
+      procOrgDomain: proceduralOrg?.domain || null,
     };
     localStorage.setItem(RUN_SAVE_KEY, JSON.stringify(state));
   } catch(e) { console.warn('Save failed:', e); }
@@ -6206,17 +6346,26 @@ function trainingReact(action, data={}){
       {t:'',c:'blank'},
       {t:'// SPECTR: You\'re in. Trace is running — move.',c:'ghost'},
       {t:'// SPECTR: List the filesystem — type: ls',c:'ghost'},
+      {t:'// SPECTR: Then explore: ls /var/www',c:'ghost'},
       {t:'',c:'blank'},
     ],
     'ls': [
       {t:'',c:'blank'},
-      {t:'// SPECTR: Read everything. Credentials hide in plain text.',c:'ghost'},
-      {t:'// SPECTR: Try: cat /var/www/notes.txt',c:'ghost'},
+      {t:'// SPECTR: See the directory structure.',c:'ghost'},
+      {t:'// SPECTR: Credentials hide in plain text files.',c:'ghost'},
+      {t:'// SPECTR: Try: ls /var/www  then  cat /var/www/notes.txt',c:'ghost'},
+      {t:'',c:'blank'},
+    ],
+    'ls_srv': [
+      {t:'',c:'blank'},
+      {t:'// SPECTR: /var/data — that\'s the target directory.',c:'ghost'},
+      {t:'// SPECTR: Navigate there: cd /var/data  then  ls',c:'ghost'},
       {t:'',c:'blank'},
     ],
     'found_creds': [
       {t:'',c:'blank'},
       {t:'// SPECTR: There it is.',c:'ghost'},
+      {t:'// SPECTR: user: admin  pass: training2024',c:'ghost'},
       {t:'// SPECTR: Credentials in a notes file. Classic.',c:'ghost'},
       {t:'// SPECTR: Disconnect first — type: disconnect',c:'ghost'},
       {t:'',c:'blank'},
@@ -6224,39 +6373,44 @@ function trainingReact(action, data={}){
     'disconnect_1': [
       {t:'',c:'blank'},
       {t:'// SPECTR: Good. Now use those credentials.',c:'ghost'},
-      {t:'// SPECTR: TRAIN-SRV has a firewall. Bypass it:',c:'ghost'},
+      {t:'// SPECTR: TRAIN-SRV has a firewall. Bypass it with:',c:'ghost'},
       {t:'// SPECTR: fw-unlock TRAIN-SRV admin training2024',c:'ghost'},
+      {t:'// SPECTR: [node] [username] [password]',c:'ghost'},
       {t:'',c:'blank'},
     ],
     'fw_unlock': [
       {t:'',c:'blank'},
       {t:'// SPECTR: Firewall down.',c:'ghost'},
-      {t:'// SPECTR: Connect to the server — type: connect TRAIN-SRV',c:'ghost'},
+      {t:'// SPECTR: Now connect to the server.',c:'ghost'},
+      {t:'// SPECTR: Type: connect TRAIN-SRV',c:'ghost'},
       {t:'',c:'blank'},
     ],
     'connect_srv': [
       {t:'',c:'blank'},
       {t:'// SPECTR: You\'re on the target system.',c:'ghost'},
-      {t:'// SPECTR: Find the objective — type: ls /var/data',c:'ghost'},
+      {t:'// SPECTR: The file is in /var/data/',c:'ghost'},
+      {t:'// SPECTR: Type: ls /var/data',c:'ghost'},
       {t:'',c:'blank'},
     ],
     'found_target': [
       {t:'',c:'blank'},
-      {t:'// SPECTR: That\'s it.',c:'ghost'},
-      {t:'// SPECTR: Exfiltrate — type: exfil CONFIDENTIAL.txt',c:'ghost'},
-      {t:'// SPECTR: Or navigate there first: cd /var/data',c:'ghost'},
+      {t:'// SPECTR: CONFIDENTIAL.txt — that\'s your objective.',c:'ghost'},
+      {t:'// SPECTR: Navigate there and steal it.',c:'ghost'},
+      {t:'// SPECTR: cd /var/data  then  exfil CONFIDENTIAL.txt',c:'ghost'},
       {t:'',c:'blank'},
     ],
     'exfil': [
       {t:'',c:'blank'},
       {t:'// SPECTR: File secured.',c:'ghost'},
-      {t:'// SPECTR: Delete the logs before you leave.',c:'ghost'},
+      {t:'// SPECTR: One more step — delete your logs.',c:'ghost'},
+      {t:'// SPECTR: Every session leaves traces. Clean them up.',c:'ghost'},
       {t:'// SPECTR: Type: rm-logs',c:'ghost'},
       {t:'',c:'blank'},
     ],
     'rm_logs': [
       {t:'',c:'blank'},
-      {t:'// SPECTR: Good. No trace left behind.',c:'ghost'},
+      {t:'// SPECTR: Clean. No trace left behind.',c:'ghost'},
+      {t:'// SPECTR: Always rm-logs before you leave. Every time.',c:'ghost'},
       {t:'// SPECTR: Disconnect — type: disconnect',c:'ghost'},
       {t:'',c:'blank'},
     ],
@@ -6291,11 +6445,20 @@ function initTrainingMode(){
   trainingStep = 0;
   trainingComplete = false;
 
+  // ── Hide all Axiom nodes from the training map ──
+  // Store them and remove from NETWORK so map only shows training nodes
+  Object.keys(NETWORK).forEach(id=>{
+    if(!id.startsWith('TRAIN-')){
+      NETWORK[id]._trainingHidden = true;
+    }
+  });
+
   // Register training nodes
   NETWORK['TRAIN-GATE'] = TRAINING_NETWORK['TRAIN-GATE'];
   NETWORK['TRAIN-SRV']  = TRAINING_NETWORK['TRAIN-SRV'];
-  NODE_POS['TRAIN-GATE'] = {x:280, y:180};
-  NODE_POS['TRAIN-SRV']  = {x:280, y:320};
+  NODE_POS = {}; // Clear all positions — only show training nodes
+  NODE_POS['TRAIN-GATE'] = {x:280, y:160};
+  NODE_POS['TRAIN-SRV']  = {x:280, y:300};
   nodeSecState['TRAIN-GATE']  = 'NOMINAL';
   nodeSecState['TRAIN-SRV']   = 'NOMINAL';
   nodeSecEvents['TRAIN-GATE'] = [];
@@ -6306,16 +6469,20 @@ function initTrainingMode(){
   // Load training objectives
   OBJECTIVES.length = 0;
   OBJECTIVES.push(
-    {id:'t-scan',    text:'Scan TRAIN-GATE to identify open services',       done:false, hint:'Type: scan TRAIN-GATE'},
-    {id:'t-connect', text:'Connect to TRAIN-GATE',                            done:false, hint:'Type: connect TRAIN-GATE'},
-    {id:'t-creds',   text:'Find admin credentials on TRAIN-GATE',             done:false, hint:'Type: cat /var/www/notes.txt'},
-    {id:'t-fwunlock',text:'Bypass the firewall on TRAIN-SRV',                 done:false, hint:'Type: fw-unlock TRAIN-SRV admin training2024'},
-    {id:'t-exfil',   text:'Exfiltrate CONFIDENTIAL.txt from TRAIN-SRV',       done:false, hint:'Navigate to /var/data and type: exfil CONFIDENTIAL.txt'},
-    {id:'t-rmlogs',  text:'Delete session logs (rm-logs)',                     done:false, hint:'Type: rm-logs while connected'},
-    {id:'t-disconnect',text:'Disconnect cleanly',                             done:false, hint:'Type: disconnect'}
+    {id:'t-scan',      text:'Scan TRAIN-GATE to identify open services',        done:false, hint:'Type: scan TRAIN-GATE'},
+    {id:'t-connect',   text:'Connect to TRAIN-GATE',                             done:false, hint:'Type: connect TRAIN-GATE'},
+    {id:'t-ls',        text:'List files on TRAIN-GATE',                          done:false, hint:'Type: ls  then  ls /var/www'},
+    {id:'t-creds',     text:'Read the admin credentials file',                   done:false, hint:'Type: cat /var/www/notes.txt'},
+    {id:'t-disconnect1',text:'Disconnect from TRAIN-GATE',                       done:false, hint:'Type: disconnect'},
+    {id:'t-fwunlock',  text:'Bypass the firewall on TRAIN-SRV',                  done:false, hint:'Type: fw-unlock TRAIN-SRV admin training2024'},
+    {id:'t-connect2',  text:'Connect to TRAIN-SRV',                              done:false, hint:'Type: connect TRAIN-SRV'},
+    {id:'t-findtarget',text:'Navigate to /var/data and list the directory',       done:false, hint:'Type: cd /var/data  then  ls'},
+    {id:'t-exfil',     text:'Exfiltrate CONFIDENTIAL.txt',                       done:false, hint:'Type: exfil CONFIDENTIAL.txt'},
+    {id:'t-rmlogs',    text:'Delete session logs before leaving',                 done:false, hint:'Type: rm-logs'},
+    {id:'t-disconnect', text:'Disconnect cleanly from TRAIN-SRV',                done:false, hint:'Type: disconnect'}
   );
 
-  // Training contract on board
+  // ── Only show the training contract — lock the board ──
   contractBoard = [{
     id:'training-op',
     codename:'TRAINING PROTOCOL',
@@ -6324,40 +6491,101 @@ function initTrainingMode(){
     client:'SPECTR',
     target:'Training Sandbox',
     targetNode:'TRAIN-GATE',
-    desc:'A controlled exercise. Locate and exfiltrate CONFIDENTIAL.txt from TRAIN-SRV. SPECTR will guide you through each step.',
+    desc:'A controlled exercise. Locate and exfiltrate CONFIDENTIAL.txt from TRAIN-SRV.\n\nSPECTR will guide you through each step. Accept this contract to load your objectives.',
     payout:0,
     bonusPayout:0,
-    intel:['Entry: TRAIN-GATE (10.0.0.1) — no auth required','Target: TRAIN-SRV (10.0.0.2) — firewalled','Objective file: /var/data/CONFIDENTIAL.txt'],
+    intel:[
+      'Entry: TRAIN-GATE (10.0.0.1) — no firewall, connect directly',
+      'Target: TRAIN-SRV (10.0.0.2) — firewalled, find credentials first',
+      'Credential hint: check /var/www/ on TRAIN-GATE carefully',
+      'Objective file: /var/data/CONFIDENTIAL.txt on TRAIN-SRV',
+    ],
     objectives:[],
     isAxiom:false,
     accepted:false,
     completed:false,
   }];
 
-  // Training mail from SPECTR
-  MAILS.push({
+  // ── Only show training mail — clear default mails ──
+  // Save originals then replace
+  const trainingMail = {
     id:9999, from:'SPECTR', subj:'Training Protocol — Read This First',
     time:'00:00', unread:true, isSpectr:true,
-    body:`Operator.\n\nThis is a controlled training environment.\nNothing here is real. No one is watching. No consequences.\n\nYou have one objective:\nLocate and exfiltrate CONFIDENTIAL.txt from TRAIN-SRV.\n\nHere's what you need to know:\n\nYou are an operator. You hack into networks,\nsteal data, and exit without being traced.\n\nThe trace meter is your enemy.\nIf it hits 100%, your session burns.\n\nTools are your advantage.\nCredentials are your skeleton keys.\nLogs are your liability.\n\nStart with the contract board.\nAccept the training contract.\nFollow your objectives.\n\nI'll be watching.\n\n— S`
-  });
+    body:`Operator.
+
+This is a controlled training environment.
+Nothing here is real. No consequences.
+
+You have two nodes available:
+  TRAIN-GATE (10.0.0.1) — your entry point. No firewall.
+  TRAIN-SRV  (10.0.0.2) — your target. Firewalled.
+
+Your objective:
+  Find credentials on TRAIN-GATE.
+  Use them to bypass TRAIN-SRV's firewall.
+  Exfiltrate CONFIDENTIAL.txt from /var/data/.
+  Delete your logs. Disconnect cleanly.
+
+THE CHAIN:
+  1. scan TRAIN-GATE      — learn what's running
+  2. connect TRAIN-GATE   — get inside
+  3. ls                   — list the filesystem
+  4. ls /var/www          — check the web directory
+  5. cat /var/www/notes.txt — read the admin's notes
+  6. disconnect           — leave TRAIN-GATE
+  7. fw-unlock TRAIN-SRV [user] [pass] — use what you found
+  8. connect TRAIN-SRV    — you're on the target
+  9. cd /var/data         — navigate to the data
+  10. ls                  — confirm the file is there
+  11. exfil CONFIDENTIAL.txt — steal it
+  12. rm-logs             — cover your tracks
+  13. disconnect          — clean exit
+
+When you're done — type 'logout' to return to the login screen
+and log in as ghost_0x1 / null1234 to begin real operations.
+
+Open BOARD// and accept the training contract to start.
+
+— S`
+  };
+
+  // Replace ALL mails with just the training mail
+  MAILS.length = 0;
+  adminAlerts.length = 0;
+  MAILS.push(trainingMail);
 
   refreshMailList();
   refreshBoard();
   updateBadges();
 }
-
 function cleanupTrainingMode(){
   delete NETWORK['TRAIN-GATE'];
   delete NETWORK['TRAIN-SRV'];
-  delete NODE_POS['TRAIN-GATE'];
-  delete NODE_POS['TRAIN-SRV'];
   delete nodeSecState['TRAIN-GATE'];
   delete nodeSecState['TRAIN-SRV'];
   delete nodeSecEvents['TRAIN-GATE'];
   delete nodeSecEvents['TRAIN-SRV'];
   delete firewallUnlocked['TRAIN-GATE'];
   delete firewallUnlocked['TRAIN-SRV'];
+  // Restore Axiom node positions
+  NODE_POS['GATEWAY']  = {x:280,y:60};
+  NODE_POS['WEB-SRV']  = {x:120,y:200};
+  NODE_POS['MAIL-SRV'] = {x:280,y:200};
+  NODE_POS['DB-SRV']   = {x:440,y:200};
+  NODE_POS['EXEC-TERM']= {x:440,y:340};
+  // Remove _trainingHidden flag from all nodes
+  Object.values(NETWORK).forEach(n => delete n._trainingHidden);
+  // Restore mail and board to operator defaults
+  MAILS.length = 0;
+  adminAlerts.length = 0;
+  contractBoard = [];
+  generateContractBoard();
+  refreshMailList();
+  refreshBoard();
+  updateBadges();
   trainingMode = false;
+  // Restart ambient music for real game session
+  if(musicEnabled){ stopAmbientMusic(); setTimeout(startAmbientMusic, 800); }
 }
 
 // Mark a training objective done by id
@@ -6478,6 +6706,908 @@ function toggleSound(){
   soundEnabled = !soundEnabled;
   notify(soundEnabled ? 'Sound: ON' : 'Sound: OFF', 'info');
   if(soundEnabled) sfx('connect'); // test beep
+}
+
+// ══════════════════════════════════════════════
+// MUSIC — Procedural ambient synth
+// ══════════════════════════════════════════════
+let musicEnabled = localStorage.getItem('nt_music') !== 'false';
+let musicNodes = []; musicNodes._intervals = [];
+let musicCtx = null;
+
+function getMusicCtx(){
+  if(!musicCtx) try { musicCtx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){}
+  return musicCtx;
+}
+
+function startAmbientMusic(){
+  const ctx = getMusicCtx(); if(!ctx || !musicEnabled) return;
+  stopAmbientMusic();
+
+  // Sub-bass drone — 42Hz, slow fade in
+  const drone = ctx.createOscillator();
+  const droneGain = ctx.createGain();
+  drone.type = 'sine'; drone.frequency.value = 42;
+  droneGain.gain.setValueAtTime(0, ctx.currentTime);
+  droneGain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 5);
+  drone.connect(droneGain); droneGain.connect(ctx.destination);
+  drone.start();
+
+  // Mid pad through slow filter sweep
+  const pad = ctx.createOscillator();
+  const padGain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  pad.type = 'sawtooth'; pad.frequency.value = 84;
+  filter.type = 'lowpass'; filter.frequency.value = 300; filter.Q.value = 2;
+  padGain.gain.setValueAtTime(0, ctx.currentTime);
+  padGain.gain.linearRampToValueAtTime(0.04, ctx.currentTime + 7);
+  pad.connect(filter); filter.connect(padGain); padGain.connect(ctx.destination);
+  pad.start();
+
+  // Slow LFO filter sweep
+  let sweepT = 0;
+  const sweepInterval = setInterval(()=>{
+    if(!musicEnabled){ clearInterval(sweepInterval); return; }
+    sweepT += 0.5;
+    const freq = 250 + Math.sin(sweepT * 0.08 * Math.PI * 2) * 180;
+    filter.frequency.setTargetAtTime(freq, ctx.currentTime, 2);
+  }, 500);
+
+  // Sparse glitch pings
+  const glitchInterval = setInterval(()=>{
+    if(!musicEnabled){ clearInterval(glitchInterval); return; }
+    if(Math.random() > 0.4) return;
+    const c = getMusicCtx(); if(!c) return;
+    const o = c.createOscillator(); const g = c.createGain();
+    o.type = 'square';
+    o.frequency.value = [660,880,1100,1320][Math.floor(Math.random()*4)];
+    g.gain.setValueAtTime(0.022, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.25);
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + 0.25);
+  }, 5000);
+
+  // Slow bass pulse every ~8s
+  const pulseInterval = setInterval(()=>{
+    if(!musicEnabled){ clearInterval(pulseInterval); return; }
+    const c = getMusicCtx(); if(!c) return;
+    const o = c.createOscillator(); const g = c.createGain();
+    o.type = 'sine'; o.frequency.value = 63;
+    g.gain.setValueAtTime(0.08, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 2);
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + 2);
+  }, 8000);
+
+  musicNodes = [drone, pad, droneGain, padGain, filter];
+  musicNodes._intervals = [sweepInterval, glitchInterval, pulseInterval];
+}
+
+function stopAmbientMusic(){
+  if(musicNodes._intervals) musicNodes._intervals.forEach(id => clearInterval(id));
+  musicNodes.forEach(n=>{ try{ if(n.stop) n.stop(); }catch(e){} });
+  musicNodes = []; musicNodes._intervals = [];
+}
+
+function toggleMusic(){
+  musicEnabled = !musicEnabled;
+  localStorage.setItem('nt_music', String(musicEnabled));
+  if(musicEnabled){ startAmbientMusic(); notify('Music: ON','info');
+    plines([{t:'// Ambient music enabled. Type: music to toggle off.',c:'dim'},{t:'',c:'blank'}]);
+  } else { stopAmbientMusic(); notify('Music: OFF','info');
+    plines([{t:'// Ambient music disabled.',c:'dim'},{t:'',c:'blank'}]);
+  }
+}
+// gobuster, nikto, sqlmap, hydra, netcat, enum4linux
+// ══════════════════════════════════════════════
+
+// ── GOBUSTER — web directory brute-forcer ──
+function cmdGobuster(args){
+  if(!args.length){ plines([
+    {t:'Usage: gobuster dir -u http://[node] -w [wordlist]',c:'err'},
+    {t:'       gobuster dns -d [domain] -w subdomains',c:'dim'},
+    {t:'Wordlists: common (fast) | medium | large (thorough, noisy)',c:'dim'},
+    {t:"       gobuster --help  for full usage",c:'dim'},
+  ]); return; }
+  if(args[0]==='--help'||args[0]==='-h'){ showManPage('gobuster'); return; }
+
+  const mode = args[0]; // 'dir' or 'dns'
+  const uIdx = args.indexOf('-u'), wIdx = args.indexOf('-w'), xIdx = args.indexOf('-x');
+  const dIdx = args.indexOf('-d');
+
+  if(mode==='dns'){
+    const domain = dIdx>=0 ? args[dIdx+1] : (connectedNode ? NETWORK[connectedNode]?.ip : null);
+    if(!domain){ pline('gobuster dns: specify domain with -d [domain]','err'); return; }
+    const wordlist = wIdx>=0 ? args[wIdx+1] : 'common';
+    plines([{t:'',c:'blank'},{t:`[*] Gobuster DNS — domain: ${domain} wordlist: ${wordlist}`,c:'info'}]);
+    const subs = ['mail','vpn','dev','staging','api','admin','ftp','intranet','remote','webmail'];
+    const found = subs.filter(()=>Math.random()>(wordlist==='large'?0.3:0.6));
+    setTimeout(()=>{
+      found.forEach(s=>pline(`  Found: ${s}.${domain}`,'ok'));
+      if(!found.length) pline('  No subdomains found','dim');
+      pline('','blank');
+      addNoise(wordlist==='large'?18:wordlist==='medium'?10:5);
+      scrollT();
+    },1200);
+    return;
+  }
+
+  // dir mode
+  const target = uIdx>=0 ? args[uIdx+1] : null;
+  const wordlist = wIdx>=0 ? args[wIdx+1] : 'common';
+  const extensions = xIdx>=0 ? args[xIdx+1].split(',') : [];
+
+  if(!target && !connectedNode){ pline('gobuster: specify target with -u http://[node] or connect first','err'); return; }
+
+  // Resolve target node
+  const nodeId = target
+    ? Object.keys(NETWORK).find(id=>NETWORK[id].ip===target.replace(/https?:\/\//,'').split('/')[0]||NETWORK[id].label===target.replace(/https?:\/\//,'').split('/')[0])
+    : connectedNode;
+
+  const node = nodeId ? NETWORK[nodeId] : null;
+  if(!node){ pline(`gobuster: cannot reach ${target||'target'}. Try connecting first.`,'err'); return; }
+  if(!node.webSurface){ pline(`gobuster: ${node.label} does not appear to be running an HTTP service`,'err'); return; }
+
+  const ws = node.webSurface;
+  const discoveryRate = wordlist==='large' ? 0.95 : wordlist==='medium' ? 0.75 : 0.5;
+  const noise = wordlist==='large' ? 22 : wordlist==='medium' ? 14 : 7;
+
+  plines([
+    {t:'',c:'blank'},
+    {t:`[*] Gobuster dir — target: ${target||node.ip} wordlist: ${wordlist}`,c:'info'},
+    {t:`[*] Tech: ${ws.tech}`,c:'dim'},
+    {t:'[*] Starting directory scan...',c:'dim'},
+  ]);
+
+  setTimeout(()=>{
+    // Always find public paths, hidden paths depend on wordlist
+    const toFind = [
+      ...ws.paths.filter(p=>!ws.hiddenPaths.includes(p)),
+      ...ws.hiddenPaths.filter(()=>Math.random()<discoveryRate),
+    ];
+    // Add extension variants
+    const extPaths = extensions.length ? toFind.filter(p=>p.endsWith('/')).map(p=>extensions.map(e=>`${p}index.${e}`)).flat() : [];
+    const allFound = [...toFind, ...extPaths];
+
+    allFound.forEach(p=>{
+      const status = ws.hiddenPaths.includes(p) ? '200' : Math.random()>0.2?'200':'403';
+      const col = status==='200'?'ok':'warn';
+      pline(`  /${p.replace(/^\//,'')} (Status: ${status})`, col);
+    });
+    pline('','blank');
+    pline(`[+] Found ${allFound.length} paths. Add -x php,html,txt for file extensions.`,'ok');
+    pline('','blank');
+
+    // Store discovered paths in intel
+    if(nodeId) addIntel('web', {key:`${node.ip}-paths`, val: allFound.join(', ')});
+    addNoise(noise);
+    if(trainingMode && nodeId==='TRAIN-GATE') trainingReact('ls');
+    markObjective('c-webrecon'); // M11 — gobuster satisfies web recon objective
+    scrollT();
+  }, 1800);
+}
+
+// ── NIKTO — web vulnerability scanner ──
+function cmdNikto(args){
+  if(!args.length){ plines([
+    {t:'Usage: nikto -h http://[node]',c:'err'},
+    {t:'       nikto -h [node] -p [port]',c:'dim'},
+    {t:'WARNING: Nikto is extremely noisy — expect immediate SOC alerts on hardened targets',c:'warn'},
+    {t:"       nikto --help  for full usage",c:'dim'},
+  ]); return; }
+  if(args[0]==='--help'||args[0]==='-h'&&!args[1]){ showManPage('nikto'); return; }
+
+  const hIdx = args.indexOf('-h');
+  const target = hIdx>=0 ? args[hIdx+1] : (connectedNode ? NETWORK[connectedNode]?.ip : null);
+  if(!target){ pline('nikto: specify host with -h [node]','err'); return; }
+
+  const nodeId = Object.keys(NETWORK).find(id=>
+    NETWORK[id].ip===target.replace(/https?:\/\//,'') ||
+    NETWORK[id].label===target ||
+    (connectedNode && id===connectedNode)
+  ) || connectedNode;
+  const node = nodeId ? NETWORK[nodeId] : null;
+  if(!node?.webSurface){ pline(`nikto: ${target} — no HTTP service detected. Use scan first.`,'err'); return; }
+
+  const ws = node.webSurface;
+  plines([
+    {t:'',c:'blank'},
+    {t:`- Nikto v2.1.6 — Target: ${node.ip}`,c:'cyan'},
+    {t:`- Server: ${ws.tech}`,c:'out'},
+    {t:'- Start Time: '+new Date().toISOString().substring(11,19),c:'dim'},
+    {t:'+ Starting scan...',c:'dim'},
+  ]);
+
+  // Very high noise — nikto is deliberately loud
+  addNoise(35);
+  notify('Nikto scan detected — SOC alert triggered', 'warn');
+
+  setTimeout(()=>{
+    ws.vulns.forEach((v,i)=>{
+      pline(`+ OSVDB-${3092+i*17}: ${v}`, 'warn');
+    });
+    ws.hiddenPaths.forEach(p=>{
+      pline(`+ ${p}: Potentially interesting path`, 'warn');
+    });
+    Object.entries(ws.headers).forEach(([k,v])=>{
+      if(v==='MISSING') pline(`+ The anti-clickjacking header (${k}) is not present.`, 'warn');
+    });
+    plines([
+      {t:'',c:'blank'},
+      {t:`+ ${ws.vulns.length + ws.hiddenPaths.length} items found.`,c:'ok'},
+      {t:'+ End Time: '+new Date().toISOString().substring(11,19),c:'dim'},
+      {t:'',c:'blank'},
+    ]);
+    if(nodeId) addIntel('web', {key:`${node.ip}-vulns`, val: ws.vulns.join(' | ')});
+    scrollT();
+  }, 2200);
+}
+
+// ── SQLMAP — SQL injection automator ──
+function cmdSqlmap(args){
+  if(!args.length){ plines([
+    {t:'Usage: sqlmap -u "http://[node]/path?param=1" --dbs',c:'err'},
+    {t:'       sqlmap -u [url] -D [db] --tables',c:'dim'},
+    {t:'       sqlmap -u [url] -D [db] -T [table] --dump',c:'dim'},
+    {t:'       sqlmap -u [url] --os-shell',c:'dim'},
+    {t:"       sqlmap --help  for full usage",c:'dim'},
+  ]); return; }
+  if(args[0]==='--help'){ showManPage('sqlmap'); return; }
+
+  const uIdx = args.indexOf('-u');
+  const url = uIdx>=0 ? args[uIdx+1]?.replace(/"/g,'') : null;
+  if(!url){ pline('sqlmap: specify URL with -u "http://[node]/path?param=1"','err'); return; }
+
+  // Parse URL to find node
+  const host = url.replace(/https?:\/\//,'').split('/')[0].split('?')[0];
+  const path = '/'+url.replace(/https?:\/\//,'').split('/').slice(1).join('/');
+  const nodeId = Object.keys(NETWORK).find(id=>NETWORK[id].ip===host||NETWORK[id].label===host) || connectedNode;
+  const node = nodeId ? NETWORK[nodeId] : null;
+
+  if(!node){ pline(`sqlmap: cannot reach ${host}. Connect to the network first.`,'err'); return; }
+  if(!node.webSurface){ pline(`sqlmap: ${host} has no web service.`,'err'); return; }
+
+  const ws = node.webSurface;
+  const isInjectable = ws.injectable.some(p=>path.includes(p.split('?')[0]));
+  const isDump = args.includes('--dump');
+  const isOsShell = args.includes('--os-shell');
+  const isDbs = args.includes('--dbs');
+  const dIdx = args.indexOf('-D'); const dbName = dIdx>=0?args[dIdx+1]:null;
+  const tIdx = args.indexOf('-T'); const tblName = tIdx>=0?args[tIdx+1]:null;
+
+  plines([
+    {t:'',c:'blank'},
+    {t:`        ___\n       __H__\n ___ ___[,]_____ ___ ___  {1.7.8#stable}\n|_ -| . ["]     | .'| . |\n|___|_  [']_|_|_|__,|  _|\n      |_|V...       |_|   https://sqlmap.org`,c:'cyan'},
+    {t:'',c:'blank'},
+    {t:`[*] starting @ ${new Date().toISOString().substring(11,19)}`,c:'dim'},
+    {t:`[*] testing connection to target URL...`,c:'info'},
+  ]);
+
+  addNoise(20);
+
+  setTimeout(()=>{
+    if(!isInjectable){
+      plines([
+        {t:`[WARNING] GET parameter 'q' does not seem to be injectable`,c:'warn'},
+        {t:'[INFO] heuristic (basic) test shows that URI parameter might not be injectable','c':'dim'},
+        {t:'[ERROR] all tested parameters do not appear to be injectable','c':'err'},
+        {t:'',c:'blank'},
+        {t:'Tip: try gobuster to find other endpoints, or nikto to identify vuln paths','c':'dim'},
+        {t:'',c:'blank'},
+      ]);
+      scrollT(); return;
+    }
+
+    plines([
+      {t:`[INFO] GET parameter 'q' appears to be 'UNION query' injectable`,c:'ok'},
+      {t:'[INFO] the back-end DBMS is MySQL',c:'info'},
+      {t:'[INFO] target URL appears to be UNION injectable with 4 columns',c:'info'},
+    ]);
+
+    setTimeout(()=>{
+      if(isDbs || (!isDump && !isOsShell && !tblName)){
+        const dbs = node.fs['/var/lib'] ? Object.keys(node.fs).filter(p=>p.startsWith('/var/lib/') && node.fs[p].t==='d').map(p=>p.split('/').pop()) : ['information_schema','main_db','webapp'];
+        plines([
+          {t:'',c:'blank'},
+          {t:'available databases ['+dbs.length+']:',c:'cyan'},
+          ...dbs.map(d=>({t:`  [*] ${d}`,c:'ok'})),
+          {t:'',c:'blank'},
+        ]);
+        addIntel('web',{key:`${node.ip}-sqlmap-dbs`,val:dbs.join(', ')});
+      }
+
+      if(isDump || tblName){
+        // Dump the most sensitive table found in fs
+        const credFiles = Object.entries(node.fs).filter(([p,f])=>f.exfil==='high'||f.exfil==='med');
+        const target = credFiles[0];
+        if(target){
+          plines([
+            {t:'',c:'blank'},
+            {t:`[INFO] fetching entries of table '${tblName||'users'}' in database '${dbName||'main_db'}'`,c:'info'},
+            {t:'Database: '+(dbName||'main_db'),c:'cyan'},
+            {t:'Table: '+(tblName||'users'),c:'cyan'},
+            {t:target[1].content.split('\n').slice(0,5).join('\n'),'c':'ok'},
+            {t:'',c:'blank'},
+            {t:`[+] Table dumped to /tmp/sqlmap-dump-${Date.now()}.csv`,'c':'ok'},
+            {t:'',c:'blank'},
+          ]);
+          addIntel('creds',{key:`${node.ip}-sqldump`,val:target[1].content.substring(0,100)});
+          markObjective('sqli'); markObjective('c-sqli');
+          sfx('exfil');
+        }
+      }
+
+      if(isOsShell){
+        plines([
+          {t:'',c:'blank'},
+          {t:'[INFO] the web application technology: PHP',c:'info'},
+          {t:'[INFO] getting an OS shell... this may take a while',c:'dim'},
+          {t:'[WARNING] database user has FILE privilege — trying into-outfile...',c:'warn'},
+        ]);
+        setTimeout(()=>{
+          plines([
+            {t:'[INFO] os-shell: stty: standard input',c:'ok'},
+            {t:'os-shell> ',c:'ok'},
+            {t:'[!] Type commands at the os-shell prompt above.',c:'dim'},
+            {t:'[!] In a real tool this would give you full command execution.',c:'dim'},
+            {t:'[!] In NULL//TRACE: use connect [node] to interact with a shell.',c:'info'},
+            {t:'',c:'blank'},
+          ]);
+          sfx('fw_unlock');
+          markObjective('sqli'); markObjective('c-sqli');
+          scrollT();
+        },1500);
+      }
+      scrollT();
+    }, 1000);
+  }, 2000);
+}
+
+// ── HYDRA — credential brute-forcer ──
+function cmdHydra(args){
+  if(!args.length){ plines([
+    {t:'Usage: hydra -l [user] -P rockyou ssh://[node]',c:'err'},
+    {t:'       hydra -L users.txt -P passwords.txt [node] ssh',c:'dim'},
+    {t:'       hydra -l admin -P rockyou [node] http-post-form "/login:u=^USER^&p=^PASS^:Invalid"',c:'dim'},
+    {t:'       hydra -l admin -P rockyou [node] ftp',c:'dim'},
+    {t:"       hydra --help  for full usage",c:'dim'},
+  ]); return; }
+  if(args[0]==='--help'){ showManPage('hydra'); return; }
+
+  // Parse: -l user / -L userfile, -P passfile, target, protocol
+  const lIdx = args.indexOf('-l'); const LIdx = args.indexOf('-L');
+  const PIdx = args.indexOf('-P');
+  const user = lIdx>=0 ? args[lIdx+1] : null;
+  const userFile = LIdx>=0 ? args[LIdx+1] : null;
+  const passFile = PIdx>=0 ? args[PIdx+1] : 'rockyou';
+
+  // Target and protocol — last two non-flag args, OR protocol://host format
+  let target=null, protocol='ssh';
+  const protoArg = args.find(a=>/^(ssh|ftp|http|rdp|smb):\/\//.test(a));
+  if(protoArg){
+    protocol = protoArg.split('://')[0];
+    target = protoArg.split('://')[1];
+  } else {
+    const lastArgs = args.filter(a=>!a.startsWith('-') && args[args.indexOf(a)-1]!=='-l' && args[args.indexOf(a)-1]!=='-L' && args[args.indexOf(a)-1]!=='-P');
+    target = lastArgs[lastArgs.length-2] || null;
+    protocol = lastArgs[lastArgs.length-1] || 'ssh';
+  }
+
+  if(!target && !connectedNode){ pline('hydra: specify target host or connect first','err'); return; }
+  const nodeId = target
+    ? Object.keys(NETWORK).find(id=>NETWORK[id].ip===target||NETWORK[id].label===target)
+    : connectedNode;
+  const node = nodeId ? NETWORK[nodeId] : null;
+  if(!node){ pline(`hydra: cannot reach ${target}. Connect to the network first.`,'err'); return; }
+
+  // Check if node has this service
+  const hasService = node.services.some(s=>s.svc===protocol||s.svc.startsWith(protocol));
+  if(!hasService){ pline(`hydra: ${protocol} not running on ${node.label} (port not open)`,'err'); return; }
+
+  const username = user || (userFile ? 'multiple users' : 'admin');
+  plines([
+    {t:'',c:'blank'},
+    {t:`Hydra v9.4 — brute-forcing ${protocol}://${node.ip}`,c:'cyan'},
+    {t:`[DATA] attack: ${user?1:'multiple'} logins, wordlist: ${passFile}`,c:'dim'},
+    {t:`[DATA] max tasks: 16, user: ${username}`,c:'dim'},
+    {t:`[${protocol.toUpperCase()}] target: ${node.ip}`,c:'info'},
+    {t:'[*] Starting brute-force attack...',c:'dim'},
+  ]);
+
+  // High noise — hydra is loud
+  addNoise(25);
+  sfx('crack');
+
+  const attackDuration = 2000 + Math.random()*1500;
+  setTimeout(()=>{
+    // Check if crackable — find node credentials
+    let cracked = null;
+    if(node.firewallCred && (user===node.firewallCred.user || userFile)){
+      // 70% chance with rockyou, higher with targeted wordlist
+      const successChance = passFile==='rockyou'?0.7:passFile==='targeted'?0.9:0.5;
+      if(Math.random() < successChance) cracked = node.firewallCred;
+    }
+    // Check SSH creds in proc org
+    if(!cracked && proceduralOrg){
+      const emp = proceduralOrg.employees.find(e=>
+        user===e.email.split('@')[0] || userFile
+      );
+      if(emp && Math.random()>0.4){
+        cracked = {user:emp.email.split('@')[0], pass:emp.pass||'password123'};
+      }
+    }
+
+    if(cracked){
+      plines([
+        {t:'',c:'blank'},
+        {t:`[${node.ip}][${protocol}] host: ${node.ip} login: ${cracked.user} password: ${cracked.pass}`,c:'ok'},
+        {t:`[STATUS] attack finished — 1 valid password found`,c:'ok'},
+        {t:'',c:'blank'},
+        {t:`[+] Credentials: ${cracked.user} / ${cracked.pass}`,c:'ok'},
+        {t:`[+] Use: fw-unlock ${Object.keys(NETWORK).find(id=>NETWORK[id]===node)||target} ${cracked.user} ${cracked.pass}`,c:'info'},
+        {t:'',c:'blank'},
+      ]);
+      addIntel('creds',{key:`${node.ip}-${protocol}`,val:`${cracked.user}:${cracked.pass}`});
+      sfx('objective');
+      markObjective('bruteforce'); markObjective('c-bruteforce');
+    } else {
+      plines([
+        {t:'',c:'blank'},
+        {t:'[STATUS] attack finished — 0 valid passwords found','c':'warn'},
+        {t:'[INFO] target may have account lockout — try a smaller, targeted wordlist','c':'dim'},
+        {t:'[INFO] try enum4linux first to understand the password policy','c':'dim'},
+        {t:'',c:'blank'},
+      ]);
+    }
+    scrollT();
+  }, attackDuration);
+}
+
+// ── NETCAT — network utility / listener ──
+function cmdNetcat(args){
+  if(!args.length){ plines([
+    {t:'Usage: nc -lvnp [port]          — open listener (catch reverse shells)',c:'err'},
+    {t:'       nc [node] [port]          — connect to service',c:'dim'},
+    {t:'       nc -zv [node] [start]-[end] — port range scan',c:'dim'},
+    {t:"       nc --help  for full usage",c:'dim'},
+  ]); return; }
+  if(args[0]==='--help'){ showManPage('netcat'); return; }
+
+  const isListen = args.includes('-l') || args.includes('-lvnp') || args.includes('-lvp');
+  const portIdx = args.indexOf('-p'); const lvnpIdx = args.indexOf('-lvnp');
+  const port = portIdx>=0 ? args[portIdx+1] : (lvnpIdx>=0 ? args[lvnpIdx+1] : args.find(a=>/^\d+$/.test(a)));
+  const isZv = args.includes('-zv') || args.includes('-z');
+
+  if(isListen){
+    if(!port){ pline('nc: specify port with -p [port] or nc -lvnp [port]','err'); return; }
+    plines([
+      {t:'',c:'blank'},
+      {t:`[*] Listening on 0.0.0.0:${port}`,c:'ok'},
+      {t:'[*] Waiting for connection...',c:'dim'},
+      {t:'',c:'blank'},
+      {t:'[!] Listener active. In NULL//TRACE this confirms your payload will catch.',c:'info'},
+      {t:'[!] Run your exploit now — e.g. sqlmap --os-shell or a Metasploit payload.',c:'dim'},
+      {t:'',c:'blank'},
+    ]);
+    // Register listener so exploit commands can reference it
+    window._ncListeners = window._ncListeners||{};
+    window._ncListeners[port] = true;
+    sfx('connect');
+    return;
+  }
+
+  if(isZv){
+    // Port scan
+    const host = args.find(a=>!a.startsWith('-') && !/^\d+/.test(a));
+    const rangeArg = args.find(a=>/^\d+-\d+$/.test(a));
+    const nodeId = host ? Object.keys(NETWORK).find(id=>NETWORK[id].ip===host||NETWORK[id].label===host) : connectedNode;
+    const node = nodeId ? NETWORK[nodeId] : null;
+    if(!node){ pline(`nc: cannot reach ${host||'target'}. Connect first.`,'err'); return; }
+    pline('','blank');
+    pline(`Connection to ${node.ip} — scanning ports...`,'dim');
+    setTimeout(()=>{
+      node.services.forEach(s=>pline(`${node.ip} ${s.port}/tcp open ${s.svc}`,'ok'));
+      pline('','blank');
+      scrollT();
+    },800);
+    return;
+  }
+
+  // Direct connect
+  const host = args.find(a=>!a.startsWith('-') && !/^\d+$/.test(a));
+  const targetPort = port || args.find(a=>/^\d+$/.test(a));
+  const nodeId = host ? Object.keys(NETWORK).find(id=>NETWORK[id].ip===host||NETWORK[id].label===host) : connectedNode;
+  const node = nodeId ? NETWORK[nodeId] : null;
+  if(!node){ pline(`nc: ${host}: no route to host`,'err'); return; }
+  const svc = node.services.find(s=>String(s.port)===String(targetPort));
+  plines([
+    {t:'',c:'blank'},
+    {t:`Connection to ${node.ip} ${targetPort} port [tcp/${svc?.svc||'unknown'}] succeeded!`,c:'ok'},
+    {t:svc ? `${svc.svc} ${svc.ver}` : '','c':'dim'},
+    {t:'',c:'blank'},
+  ]);
+  sfx('connect');
+}
+
+// ── ENUM4LINUX — SMB/Windows enumerator ──
+function cmdEnum4linux(args){
+  if(!args.length){ plines([
+    {t:'Usage: enum4linux -a [node]    — full enumeration',c:'err'},
+    {t:'       enum4linux -U [node]    — users only',c:'dim'},
+    {t:'       enum4linux -S [node]    — shares only',c:'dim'},
+    {t:'       enum4linux -P [node]    — password policy',c:'dim'},
+    {t:"       enum4linux --help  for full usage",c:'dim'},
+  ]); return; }
+  if(args[0]==='--help'){ showManPage('enum4linux'); return; }
+
+  const flags = args.filter(a=>a.startsWith('-')).join('');
+  const showAll  = flags.includes('a');
+  const showUsers= flags.includes('U') || showAll;
+  const showShares=flags.includes('S') || showAll;
+  const showPolicy=flags.includes('P') || showAll;
+  const target = args.find(a=>!a.startsWith('-'));
+  const nodeId = target
+    ? Object.keys(NETWORK).find(id=>NETWORK[id].ip===target||NETWORK[id].label===target)
+    : connectedNode;
+  const node = nodeId ? NETWORK[nodeId] : null;
+  if(!node){ pline('enum4linux: specify target or connect to a node first','err'); return; }
+
+  // Check SMB is available
+  const hasSMB = node.services.some(s=>s.port===445||s.svc==='smb'||s.svc==='netbios');
+  // Still works via RPC even without explicit SMB listing for Windows nodes
+  const isWindows = node.os?.toLowerCase().includes('windows');
+
+  if(!hasSMB && !isWindows && !node.smb){
+    pline(`enum4linux: ${node.label} does not appear to be running SMB/Windows services (port 445)`,'warn');
+    pline(`enum4linux: Try scanning the node first with: scan ${nodeId||target}`,'dim');
+    return;
+  }
+
+  // Get user list from node data
+  const users = node.smb?.users ||
+    (proceduralOrg ? proceduralOrg.employees.map(e=>e.email.split('@')[0]) : ['admin','guest','jsmith','administrator']);
+  const shares = node.smb?.shares ||
+    ['ADMIN$','IPC$','C$','Shared','Finance','HR'];
+  const policy = node.smb?.policy ||
+    { lockout: Math.random()>0.5, minLen: 8, complexity: true };
+
+  plines([
+    {t:'',c:'blank'},
+    {t:' ================================================== ',c:'cyan'},
+    {t:`|    enum4linux v0.9.1 — target: ${node.ip}         |`,c:'cyan'},
+    {t:' ================================================== ',c:'cyan'},
+    {t:'',c:'blank'},
+  ]);
+  addNoise(12);
+
+  setTimeout(()=>{
+    if(showUsers){
+      plines([
+        {t:'[+] Enumerating users via SAMR',c:'info'},
+        {t:`[+] Found ${users.length} user(s)`,c:'ok'},
+        ...users.map(u=>({t:`  user:[${u}] rid:[0x${(500+Math.floor(Math.random()*500)).toString(16)}]`,c:'out'})),
+        {t:'',c:'blank'},
+      ]);
+      addIntel('users',{key:node.ip, val:users.join(', ')});
+    }
+    if(showShares){
+      plines([
+        {t:'[+] Enumerating shares via SRVSVC',c:'info'},
+        ...shares.map(s=>({t:`  Sharename: ${s.padEnd(20)} Type: DISKTREE`,c:'out'})),
+        {t:'',c:'blank'},
+      ]);
+    }
+    if(showPolicy){
+      plines([
+        {t:'[+] Password Policy',c:'info'},
+        {t:`  Min password length:     ${policy.minLen}`,c:'out'},
+        {t:`  Account lockout:         ${policy.lockout?'Yes — CAUTION: hydra will lock accounts':'No — brute-force viable'}`,c:policy.lockout?'warn':'ok'},
+        {t:`  Password complexity:     ${policy.complexity?'Enabled':'Disabled'}`,c:'out'},
+        {t:`  Lockout threshold:       ${policy.lockout?'5 attempts':'None'}`,c:'out'},
+        {t:'',c:'blank'},
+        {t:policy.lockout
+          ?'[!] Account lockout active — use targeted passwords only with hydra'
+          :'[+] No lockout — hydra brute-force viable',
+          c:policy.lockout?'warn':'ok'},
+        {t:'',c:'blank'},
+      ]);
+      addIntel('policy',{key:node.ip, val:`lockout:${policy.lockout} minLen:${policy.minLen}`});
+    }
+    pline(`enum4linux complete — users and policy stored in INTEL//`,'ok');
+    markObjective('c-enumerate'); // M11 — enum4linux satisfies enumeration objective
+    scrollT();
+  }, 1800);
+}
+
+// ── Shared helper: addNoise ──
+function addNoise(amount){
+  if(!connectedNode) return;
+  traceLevel = Math.min(100, traceLevel + amount * (getDifficultyProfile().traceMult || 1));
+  updateTraceUI();
+}
+
+// ══════════════════════════════════════════════
+// MAN PAGES — in-game documentation
+// ══════════════════════════════════════════════
+const MAN_PAGES = {
+  gobuster: [
+    {t:'',c:'blank'},
+    {t:'GOBUSTER(1)                 NULL//TRACE Manual                GOBUSTER(1)',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'NAME',c:'cyan'},
+    {t:'       gobuster — web directory and DNS brute-forcer',c:'out'},
+    {t:'',c:'blank'},
+    {t:'SYNOPSIS',c:'cyan'},
+    {t:'       gobuster dir  -u http://[target] -w [wordlist] [options]',c:'out'},
+    {t:'       gobuster dns  -d [domain] -w [wordlist]',c:'out'},
+    {t:'',c:'blank'},
+    {t:'DESCRIPTION',c:'cyan'},
+    {t:'       Gobuster discovers hidden directories, files, and subdomains on web',c:'out'},
+    {t:'       servers by testing paths from a wordlist. Use it against any HTTP node',c:'out'},
+    {t:'       to find admin panels, backup files, APIs, and config files.',c:'out'},
+    {t:'',c:'blank'},
+    {t:'OPTIONS',c:'cyan'},
+    {t:'       -u URL         Target URL (http://node or https://node)',c:'out'},
+    {t:'       -w WORDLIST    Wordlist: common | medium | large',c:'out'},
+    {t:'       -x EXTENSIONS  File extensions: php,txt,html,bak',c:'out'},
+    {t:'       -d DOMAIN      Target domain (DNS mode)',c:'out'},
+    {t:'',c:'blank'},
+    {t:'WORDLISTS',c:'cyan'},
+    {t:'       common   Fast. Finds obvious paths. Low noise.     (5 noise)',c:'out'},
+    {t:'       medium   Balanced. Finds most hidden paths.        (14 noise)',c:'out'},
+    {t:'       large    Thorough. Finds everything. High noise.   (22 noise)',c:'out'},
+    {t:'',c:'blank'},
+    {t:'EXAMPLES',c:'cyan'},
+    {t:'       gobuster dir -u http://192.168.1.10 -w common',c:'ok'},
+    {t:'       gobuster dir -u http://192.168.1.10 -w large -x php,bak',c:'ok'},
+    {t:'       gobuster dns -d axiom.corp -w subdomains',c:'ok'},
+    {t:'',c:'blank'},
+    {t:'CHAINING',c:'cyan'},
+    {t:'       scan [node] → find HTTP port → gobuster → find /admin/login.php',c:'dim'},
+    {t:'       → sqlmap against injectable endpoints → dump credentials',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'SEE ALSO',c:'cyan'},
+    {t:'       nikto(1), sqlmap(1), scan(1)',c:'dim'},
+    {t:'',c:'blank'},
+  ],
+  nikto: [
+    {t:'',c:'blank'},
+    {t:'NIKTO(1)                   NULL//TRACE Manual                  NIKTO(1)',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'NAME',c:'cyan'},
+    {t:'       nikto — web server vulnerability scanner',c:'out'},
+    {t:'',c:'blank'},
+    {t:'SYNOPSIS',c:'cyan'},
+    {t:'       nikto -h [target]',c:'out'},
+    {t:'',c:'blank'},
+    {t:'DESCRIPTION',c:'cyan'},
+    {t:'       Nikto scans web servers for known vulnerabilities, outdated software,',c:'out'},
+    {t:'       dangerous files, and misconfigurations. It is extremely noisy and will',c:'out'},
+    {t:'       trigger SOC alerts on any hardened target. Use when speed > stealth.',c:'out'},
+    {t:'',c:'blank'},
+    {t:'WARNING',c:'cyan'},
+    {t:'       Nikto generates 35 noise points per scan. Expect SUSPICIOUS state',c:'warn'},
+    {t:'       or higher immediately on VETERAN/GHOST difficulty targets.',c:'warn'},
+    {t:'',c:'blank'},
+    {t:'OPTIONS',c:'cyan'},
+    {t:'       -h HOST    Target host IP or label',c:'out'},
+    {t:'       -p PORT    Target port (default: 80)',c:'out'},
+    {t:'       -ssl       Force SSL',c:'out'},
+    {t:'',c:'blank'},
+    {t:'OUTPUT',c:'cyan'},
+    {t:'       OSVDB entries — specific vulnerabilities found',c:'out'},
+    {t:'       Missing headers — security header gaps',c:'out'},
+    {t:'       Interesting paths — potential attack surface',c:'out'},
+    {t:'',c:'blank'},
+    {t:'EXAMPLES',c:'cyan'},
+    {t:'       nikto -h 192.168.1.10',c:'ok'},
+    {t:'       nikto -h 10.10.0.5 -p 443 -ssl',c:'ok'},
+    {t:'',c:'blank'},
+    {t:'SEE ALSO',c:'cyan'},
+    {t:'       gobuster(1), sqlmap(1)',c:'dim'},
+    {t:'',c:'blank'},
+  ],
+  sqlmap: [
+    {t:'',c:'blank'},
+    {t:'SQLMAP(1)                  NULL//TRACE Manual                 SQLMAP(1)',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'NAME',c:'cyan'},
+    {t:'       sqlmap — automatic SQL injection and database takeover tool',c:'out'},
+    {t:'',c:'blank'},
+    {t:'SYNOPSIS',c:'cyan'},
+    {t:'       sqlmap -u "http://[node]/path?param=1" [options]',c:'out'},
+    {t:'',c:'blank'},
+    {t:'DESCRIPTION',c:'cyan'},
+    {t:'       sqlmap detects and exploits SQL injection vulnerabilities in web apps.',c:'out'},
+    {t:'       It can enumerate databases, dump tables, and escalate to OS shell.',c:'out'},
+    {t:'       Requires an injectable endpoint — use gobuster/nikto to find them.',c:'out'},
+    {t:'',c:'blank'},
+    {t:'OPTIONS',c:'cyan'},
+    {t:'       -u URL         Target URL with injectable parameter',c:'out'},
+    {t:'       --dbs          Enumerate databases',c:'out'},
+    {t:'       -D DB          Select database',c:'out'},
+    {t:'       --tables       List tables in selected database',c:'out'},
+    {t:'       -T TABLE       Select table',c:'out'},
+    {t:'       --dump         Dump table contents',c:'out'},
+    {t:'       --os-shell     Attempt OS shell via SQLi',c:'out'},
+    {t:'',c:'blank'},
+    {t:'ATTACK CHAIN',c:'cyan'},
+    {t:'       1. gobuster → find /api/search?q= endpoint',c:'dim'},
+    {t:'       2. sqlmap -u "http://node/api/search?q=1" --dbs',c:'dim'},
+    {t:'       3. sqlmap -u "..." -D main_db --tables',c:'dim'},
+    {t:'       4. sqlmap -u "..." -D main_db -T users --dump',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'EXAMPLES',c:'cyan'},
+    {t:'       sqlmap -u "http://192.168.1.10/api/search?q=1" --dbs',c:'ok'},
+    {t:'       sqlmap -u "http://192.168.1.10/login.php" --dump',c:'ok'},
+    {t:'       sqlmap -u "http://192.168.1.10/api/search?q=1" --os-shell',c:'ok'},
+    {t:'',c:'blank'},
+    {t:'SEE ALSO',c:'cyan'},
+    {t:'       gobuster(1), nikto(1), crack(1)',c:'dim'},
+    {t:'',c:'blank'},
+  ],
+  hydra: [
+    {t:'',c:'blank'},
+    {t:'HYDRA(1)                   NULL//TRACE Manual                  HYDRA(1)',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'NAME',c:'cyan'},
+    {t:'       hydra — parallelised login cracker',c:'out'},
+    {t:'',c:'blank'},
+    {t:'SYNOPSIS',c:'cyan'},
+    {t:'       hydra -l USER -P WORDLIST PROTOCOL://TARGET',c:'out'},
+    {t:'       hydra -L USERFILE -P WORDLIST TARGET PROTOCOL',c:'out'},
+    {t:'',c:'blank'},
+    {t:'DESCRIPTION',c:'cyan'},
+    {t:'       Hydra brute-forces login credentials against network services.',c:'out'},
+    {t:'       Use enum4linux first to get usernames and check lockout policy.',c:'out'},
+    {t:'       Generates 25 noise points per run. Locked accounts waste attempts.',c:'out'},
+    {t:'',c:'blank'},
+    {t:'OPTIONS',c:'cyan'},
+    {t:'       -l USER       Single username to test',c:'out'},
+    {t:'       -L FILE       File containing usernames (use users from enum4linux)',c:'out'},
+    {t:'       -P FILE       Password wordlist: rockyou | medium | targeted',c:'out'},
+    {t:'       -t TASKS      Number of parallel tasks (default: 16)',c:'out'},
+    {t:'',c:'blank'},
+    {t:'PROTOCOLS',c:'cyan'},
+    {t:'       ssh     ftp     rdp     smb',c:'out'},
+    {t:'       http-post-form "/path:user=^USER^&pass=^PASS^:Invalid"',c:'out'},
+    {t:'',c:'blank'},
+    {t:'WORKFLOW',c:'cyan'},
+    {t:'       1. enum4linux -U [node]  → get usernames',c:'dim'},
+    {t:'       2. enum4linux -P [node]  → check lockout policy',c:'dim'},
+    {t:'       3. hydra -L users.txt -P rockyou ssh://[node]',c:'dim'},
+    {t:'       4. fw-unlock [node] [cracked-user] [cracked-pass]',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'EXAMPLES',c:'cyan'},
+    {t:'       hydra -l admin -P rockyou ssh://10.10.0.5',c:'ok'},
+    {t:'       hydra -L users.txt -P targeted 10.10.0.5 ssh',c:'ok'},
+    {t:'',c:'blank'},
+    {t:'SEE ALSO',c:'cyan'},
+    {t:'       enum4linux(1), fw-unlock(1), crack(1)',c:'dim'},
+    {t:'',c:'blank'},
+  ],
+  netcat: [
+    {t:'',c:'blank'},
+    {t:'NETCAT(1)                  NULL//TRACE Manual                 NETCAT(1)',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'NAME',c:'cyan'},
+    {t:'       nc, netcat — network utility / reverse shell listener',c:'out'},
+    {t:'',c:'blank'},
+    {t:'SYNOPSIS',c:'cyan'},
+    {t:'       nc -lvnp [port]           — open listener',c:'out'},
+    {t:'       nc [host] [port]           — connect to service',c:'out'},
+    {t:'       nc -zv [host] [range]      — port scan',c:'out'},
+    {t:'',c:'blank'},
+    {t:'DESCRIPTION',c:'cyan'},
+    {t:'       Netcat creates arbitrary network connections. Its primary use in',c:'out'},
+    {t:'       NULL//TRACE is setting up listeners to catch reverse shells from',c:'out'},
+    {t:'       exploited targets. Always set up a listener BEFORE firing an exploit.',c:'out'},
+    {t:'',c:'blank'},
+    {t:'THE LISTENER WORKFLOW',c:'cyan'},
+    {t:'       1. nc -lvnp 4444          — open listener on port 4444',c:'dim'},
+    {t:'       2. [fire exploit]         — sqlmap --os-shell or Metasploit payload',c:'dim'},
+    {t:'       3. [shell connects back]  — connection appears in listener',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'OPTIONS',c:'cyan'},
+    {t:'       -l     Listen mode',c:'out'},
+    {t:'       -v     Verbose output',c:'out'},
+    {t:'       -n     No DNS resolution',c:'out'},
+    {t:'       -p     Port number',c:'out'},
+    {t:'       -z     Zero I/O (scan mode)',c:'out'},
+    {t:'',c:'blank'},
+    {t:'EXAMPLES',c:'cyan'},
+    {t:'       nc -lvnp 4444',c:'ok'},
+    {t:'       nc 10.10.0.5 22',c:'ok'},
+    {t:'       nc -zv 192.168.1.10 1-1000',c:'ok'},
+    {t:'',c:'blank'},
+    {t:'SEE ALSO',c:'cyan'},
+    {t:'       sqlmap(1), connect(1)',c:'dim'},
+    {t:'',c:'blank'},
+  ],
+  enum4linux: [
+    {t:'',c:'blank'},
+    {t:'ENUM4LINUX(1)              NULL//TRACE Manual             ENUM4LINUX(1)',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'NAME',c:'cyan'},
+    {t:'       enum4linux — enumerate SMB/Windows targets',c:'out'},
+    {t:'',c:'blank'},
+    {t:'SYNOPSIS',c:'cyan'},
+    {t:'       enum4linux [-a] [-U] [-S] [-P] [target]',c:'out'},
+    {t:'',c:'blank'},
+    {t:'DESCRIPTION',c:'cyan'},
+    {t:'       enum4linux queries Windows and Samba hosts via SMB/RPC to discover',c:'out'},
+    {t:'       usernames, shares, password policies, and group memberships.',c:'out'},
+    {t:'       Critical first step before hydra — reveals users and lockout policy.',c:'out'},
+    {t:'',c:'blank'},
+    {t:'OPTIONS',c:'cyan'},
+    {t:'       -a     All enumeration (equivalent to -U -S -P)',c:'out'},
+    {t:'       -U     Enumerate users via SAMR',c:'out'},
+    {t:'       -S     Enumerate shares via SRVSVC',c:'out'},
+    {t:'       -P     Get password policy (CRITICAL for hydra planning)',c:'out'},
+    {t:'',c:'blank'},
+    {t:'OUTPUT',c:'cyan'},
+    {t:'       User list      → feed into hydra -L users.txt',c:'out'},
+    {t:'       Password policy → determines hydra viability',c:'out'},
+    {t:'       Shares         → accessible network shares for ls/cat',c:'out'},
+    {t:'',c:'blank'},
+    {t:'WORKFLOW',c:'cyan'},
+    {t:'       enum4linux -P [node]  — check if lockout active FIRST',c:'dim'},
+    {t:'       enum4linux -U [node]  — get username list',c:'dim'},
+    {t:'       hydra -L users.txt -P rockyou ssh://[node]',c:'dim'},
+    {t:'',c:'blank'},
+    {t:'EXAMPLES',c:'cyan'},
+    {t:'       enum4linux -a 10.10.0.5',c:'ok'},
+    {t:'       enum4linux -P 10.10.0.5    (check lockout before brute-forcing)',c:'ok'},
+    {t:'       enum4linux -U 10.10.0.5    (get usernames for hydra)',c:'ok'},
+    {t:'',c:'blank'},
+    {t:'SEE ALSO',c:'cyan'},
+    {t:'       hydra(1), fw-unlock(1), scan(1)',c:'dim'},
+    {t:'',c:'blank'},
+  ],
+};
+
+function showManPage(tool){
+  const page = MAN_PAGES[tool];
+  if(!page){
+    pline(`No manual entry for ${tool}. Available: ${Object.keys(MAN_PAGES).join(', ')}`,'warn');
+    return;
+  }
+  plines(page);
+  scrollT();
+}
+
+// ── SHUTDOWN / LOGOUT ──
+function cmdShutdown(){
+  // If connected, disconnect cleanly first
+  if(connectedNode){
+    plines([{t:'',c:'blank'},{t:'[*] Disconnecting active session before logout...',c:'warn'},{t:'',c:'blank'}]);
+    disconnect();
+  }
+  // Save run state before leaving
+  if(!trainingMode){
+    saveRunState();
+    plines([{t:'[+] Run state saved.',c:'ok'},{t:'',c:'blank'}]);
+  }
+  // Stop music
+  stopAmbientMusic();
+  // Small delay so player sees the save message
+  setTimeout(()=>{
+    // Clean up training if active
+    if(trainingMode) cleanupTrainingMode();
+    // Close all windows
+    Object.keys(WINS).forEach(id=>closeApp(id));
+    // Reset volatile state
+    connectedNode = null;
+    traceLevel = 0;
+    stopTrace();
+    // Show login
+    document.getElementById('desktop').style.display='none';
+    document.getElementById('login').style.display='flex';
+    document.getElementById('lu').value = 'ghost_0x1';
+    document.getElementById('lp').value = '';
+    document.getElementById('le').textContent = '';
+    document.getElementById('le').style.color = '';
+  }, connectedNode ? 600 : 0);
 }
 
 // ── PROXY COMMAND ──
@@ -6619,22 +7749,26 @@ function runCmd(raw){
       sendPhish(tmplId, email, fromEmail);
     },
     login:(args)=>cmdLogin(args),
-    logout:()=>cmdLogout(),
     proxy:(args)=>cmdProxy(args),
+    mv:(args)=>mv(args),
+    cp:(args)=>cp(args),
+    scp:(args)=>cmdScp(args),
+    ps:()=>cmdPs(),
+    kill:(args)=>cmdKill(args),
+    grep:(args)=>cmdGrep(args),
+    chmod:(args)=>cmdChmod(args),
+    // ── M11 tools ──
+    gobuster:(args)=>cmdGobuster(args),
+    nikto:(args)=>cmdNikto(args),
+    sqlmap:(args)=>cmdSqlmap(args),
+    hydra:(args)=>cmdHydra(args),
+    nc:(args)=>cmdNetcat(args),
+    netcat:(args)=>cmdNetcat(args),
+    enum4linux:(args)=>cmdEnum4linux(args),
     sound:()=>toggleSound(),
+    music:()=>toggleMusic(),
     newterm:()=>{ openApp('terminal'); pline('[+] New terminal opened','ok'); },
-    logout:()=>{
-      if(trainingMode) cleanupTrainingMode();
-      // Reset desktop and return to login
-      Object.keys(WINS).forEach(id=>closeApp(id));
-      document.getElementById('desktop').style.display='none';
-      document.getElementById('login').style.display='flex';
-      document.getElementById('lu').value='ghost_0x1';
-      document.getElementById('lp').value='';
-      document.getElementById('le').textContent='';
-      ticks=0; connectedNode=null;
-      pline('Logged out.','dim');
-    },
+    logout:()=>cmdShutdown(),
     tutorial:()=>{
       plines([
         {t:'',c:'blank'},
@@ -6698,7 +7832,10 @@ function runCmd(raw){
     nodes:(args)=>listNodes(),
     date:(args)=>pline(new Date().toISOString()),
     uname:(args)=>pline('phantom-3.8 NULL//TRACE-OS x86_64'),
-    man:(args)=>pline('Manual pages not installed. Use \'help\'.','warn'),
+    man:(args)=>{
+      if(!args[0]){ pline('Usage: man [command]  e.g. man gobuster','warn'); pline('Available: '+Object.keys(MAN_PAGES).join(', '),'dim'); return; }
+      showManPage(args[0]);
+    },
     sudo:(args)=>pline('Permission denied. Operator already has full access.','err'),
     exit:(args)=>pline('Cannot exit — operator session is persistent.','warn'),
     reboot:(args)=>pline('Reboot disabled in stealth mode.','warn'),
@@ -6746,10 +7883,34 @@ function help(){
     {t:'  proxy help               proxy setup guide',c:'out'},
     {t:'  (Equip ProxyChain in FORGE// → LOADOUT to activate)',c:'dim'},
     {t:'',c:'blank'},
+    {t:'  FILESYSTEM EXTRAS',c:'cyan'},
+    {t:'  rm *                      remove all files in current directory',c:'out'},
+    {t:'  rm -rf [dir]              remove directory and contents',c:'out'},
+    {t:'  mv [src] [dest]           move or rename a file',c:'out'},
+    {t:'  cp [src] [dest]           copy a file locally',c:'out'},
+    {t:'  scp [remote] [local]      copy from node to local (quiet, 3 noise)',c:'out'},
+    {t:'  grep [pattern] [file]     search file contents',c:'out'},
+    {t:'  grep -r [pattern] [dir]   recursive search',c:'out'},
+    {t:'  ps                        list running processes on node',c:'out'},
+    {t:'  kill [pid]                terminate a process',c:'out'},
+    {t:'  chmod [mode] [file]       change file permissions',c:'out'},
+    {t:'',c:'blank'},
     {t:'  OPERATIONS',c:'cyan'},
     {t:'  crack [file]             run password cracker on file',c:'out'},
     {t:'  exfil [file]             exfiltrate file to local vault',c:'out'},
     {t:'  rm-logs                  delete session logs on current node',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  HACKING TOOLS  (M11)                        man [tool] for full docs',c:'cyan'},
+    {t:'  gobuster dir -u http://[node] -w [wordlist]  brute-force web paths',c:'out'},
+    {t:'  nikto -h [node]                              web vulnerability scan',c:'out'},
+    {t:'  sqlmap -u "http://[node]/path?q=1" --dbs     SQL injection + dump',c:'out'},
+    {t:'  hydra -l [user] -P rockyou ssh://[node]      credential brute-force',c:'out'},
+    {t:'  nc -lvnp [port]                              open reverse shell listener',c:'out'},
+    {t:'  enum4linux -a [node]                         SMB/Windows enumeration',c:'out'},
+    {t:'',c:'blank'},
+    {t:'  TOOL CHAIN:  scan → gobuster → nikto → sqlmap --dump → crack → connect',c:'dim'},
+    {t:'               enum4linux -P → hydra → fw-unlock → connect',c:'dim'},
+    {t:'',c:'blank'},{t:'  Type: man gobuster  (or any tool name) for full documentation',c:'dim'},
     {t:'',c:'blank'},
     {t:'  SOCIAL ENGINEERING',c:'cyan'},
     {t:'  phish list-targets       show all phishable employees + awareness',c:'out'},
@@ -6811,8 +7972,14 @@ function ls(args){
   pline('','blank');
   // Training reactions — SPECTR guides based on which node you're on
   if(trainingMode){
-    if(connectedNode==='TRAIN-GATE') trainingReact('ls');
-    if(connectedNode==='TRAIN-SRV')  trainingReact('found_target');
+    if(connectedNode==='TRAIN-GATE'){
+      markTrainingObj('t-ls');
+      trainingReact('ls');
+    }
+    if(connectedNode==='TRAIN-SRV'){
+      markTrainingObj('t-findtarget');
+      trainingReact(cwd.includes('/var/data') ? 'found_target' : 'ls_srv');
+    }
   }
 }
 function cd(args){
@@ -6898,20 +8065,203 @@ function touch(args){
 }
 function rm(args){
   if(!args[0]){pline('rm: missing operand','err');return;}
+  const cfs=getCFS();
+  if(args[0]==='*'){
+    const toDelete=Object.keys(cfs).filter(p=>{
+      const parent=p.substring(0,p.lastIndexOf('/'))||'/';
+      return parent===cwd && cfs[p].t==='f';
+    });
+    if(!toDelete.length){pline('rm: no files in current directory','warn');return;}
+    toDelete.forEach(p=>delete cfs[p]);
+    pline('[+] Removed '+toDelete.length+' file(s) from '+cwd,'ok');
+    return;
+  }
+  if(args[0]==='-rf'||args[0]==='-r'){
+    const dirTarget=resolvePath(args[1]||'');
+    if(!dirTarget||!cfs[dirTarget]){pline('rm: specify a valid directory','err');return;}
+    const toDelete=Object.keys(cfs).filter(p=>p===dirTarget||p.startsWith(dirTarget+'/'));
+    toDelete.forEach(p=>delete cfs[p]);
+    pline('[+] Removed '+toDelete.length+' item(s)','ok');
+    return;
+  }
   const target=resolvePath(args[0]);
-  if(!LFS[target]){pline(`rm: no such file: ${args[0]}`,'err');return;}
-  delete LFS[target];pline(`Removed: ${args[0]}`,'ok');
+  if(!cfs[target]){pline('rm: '+args[0]+': no such file or directory','err');return;}
+  if(cfs[target].t==='d'){
+    const children=Object.keys(cfs).filter(p=>p.startsWith(target+'/'));
+    if(children.length){pline('rm: '+args[0]+': is a directory — use rm -rf to remove','err');return;}
+    delete cfs[target]; pline('Removed directory: '+args[0],'ok');
+  } else {
+    delete cfs[target]; pline('Removed: '+args[0],'ok');
+  }
 }
 
+
+function mv(args){
+  if(args.length<2){pline('Usage: mv [source] [destination]','err');return;}
+  const cfs=getCFS();
+  const from=resolvePath(args[0]);
+  if(!cfs[from]){pline('mv: '+args[0]+': no such file','err');return;}
+  let dest=resolvePath(args[1]);
+  if(cfs[dest]&&cfs[dest].t==='d') dest=dest+'/'+from.split('/').pop();
+  if(cfs[dest]){pline('mv: '+args[1]+': destination already exists','err');return;}
+  cfs[dest]={...cfs[from]}; delete cfs[from];
+  pline('[+] Moved: '+args[0]+' → '+dest,'ok');
+}
+
+function cp(args){
+  if(args.length<2){pline('Usage: cp [source] [destination]','err');return;}
+  const cfs=getCFS();
+  const from=resolvePath(args[0]);
+  if(!cfs[from]){pline('cp: '+args[0]+': no such file','err');return;}
+  let dest=resolvePath(args[1]);
+  if(cfs[dest]&&cfs[dest].t==='d') dest=dest+'/'+from.split('/').pop();
+  cfs[dest]={...cfs[from]};
+  pline('[+] Copied: '+args[0]+' → '+dest,'ok');
+}
+
+function cmdScp(args){
+  if(!args[0]){
+    plines([
+      {t:'Usage: scp [remotefile] [localdest]',c:'err'},
+      {t:'       scp /etc/passwd ~/intel/passwd.txt',c:'dim'},
+      {t:'Copies file from connected node to local fs. Quieter than exfil.',c:'dim'},
+      {t:'Low noise (3). Does not log to vault or trigger contract objectives.',c:'dim'},
+    ]); return;
+  }
+  if(!connectedNode){pline('scp: not connected to a remote node','err');return;}
+  const remoteFs=NETWORK[connectedNode]?.fs;
+  const remotePath=resolvePath(args[0]);
+  if(!remoteFs?.[remotePath]){pline('scp: '+args[0]+': no such file on '+NETWORK[connectedNode].label,'err');return;}
+  const fdata=remoteFs[remotePath];
+  if(fdata.t==='d'){pline('scp: cannot copy directory','err');return;}
+  const fname=remotePath.split('/').pop();
+  const localDest=args[1]?resolvePath(args[1]):'/home/'+currentUser+'/intel/'+fname;
+  const destDir=localDest.substring(0,localDest.lastIndexOf('/'))||'/';
+  if(!LFS[destDir]) LFS[destDir]={t:'d'};
+  LFS[localDest]={t:'f',content:fdata.content||'',exfil:fdata.exfil};
+  plines([
+    {t:'',c:'blank'},
+    {t:'[+] scp: '+NETWORK[connectedNode].label+':'+remotePath+' → '+localDest,c:'ok'},
+    {t:'[+] '+fname+' ('+( (fdata.content||'').length)+' bytes)',c:'ok'},
+    {t:'',c:'blank'},
+  ]);
+  addNoise(3); sfx('exfil'); scrollT();
+}
+
+function cmdPs(){
+  if(!connectedNode){pline('ps: not connected to a remote node','err');return;}
+  const node=NETWORK[connectedNode];
+  plines([{t:'',c:'blank'},{t:'  PID   USER       COMMAND',c:'cyan'}]);
+  const procs=[
+    {pid:1,   user:'root',     cmd:'systemd'},
+    {pid:89,  user:'root',     cmd:'sshd'},
+    {pid:312, user:'root',     cmd:'cron'},
+  ];
+  const svcUsers=['root','www-data','mysql','postfix','nobody'];
+  node.services.forEach((svc,i)=>{
+    procs.push({pid:1000+i*37, user:svcUsers[i%svcUsers.length], cmd:svc.svc+'d ('+svc.ver+')'});
+  });
+  const nodeFs=node.fs||{};
+  Object.keys(nodeFs).filter(p=>p.endsWith('.sh')||p.endsWith('.py')).slice(0,2)
+    .forEach((s,i)=>procs.push({pid:2200+i*11,user:'admin',cmd:'bash '+s}));
+  procs.push({pid:Math.floor(Math.random()*900)+3000, user:currentUser, cmd:'bash'});
+  procs.forEach(p=>pline('  '+String(p.pid).padEnd(6)+' '+p.user.padEnd(10)+' '+p.cmd,'out'));
+  pline('','blank');
+}
+
+function cmdKill(args){
+  if(!args[0]){pline('Usage: kill [pid]  or  kill -9 [pid]','err');return;}
+  if(!connectedNode){pline('kill: not connected to a remote node','err');return;}
+  const pid=parseInt(args[args.length-1]);
+  if(isNaN(pid)){pline('kill: '+args[args.length-1]+': not a valid PID','err');return;}
+  if(pid<=300){
+    plines([{t:'[+] kill: signal sent to PID '+pid,c:'ok'},{t:'[!] System process killed — security alert triggered',c:'warn'},{t:'',c:'blank'}]);
+    addNoise(20);
+    escalateSecurity(connectedNode,'Process termination anomaly detected','SUSPICIOUS');
+    scrollT(); return;
+  }
+  const svcIdx=Math.floor((pid-1000)/37);
+  const svc=NETWORK[connectedNode].services[svcIdx];
+  plines([
+    {t:'[+] kill: signal sent to PID '+pid,c:'ok'},
+    {t:svc?'[+] Service disrupted: '+svc.svc+' ('+svc.ver+')':'[+] Process terminated',c:'ok'},
+    {t:'',c:'blank'},
+  ]);
+  addNoise(8); scrollT();
+}
+
+function cmdGrep(args){
+  if(args.length<2){
+    plines([{t:'Usage: grep [pattern] [file]',c:'err'},{t:'       grep -r [pattern] [dir]',c:'dim'},{t:'       grep password /etc/passwd',c:'dim'}]);
+    return;
+  }
+  const recursive=args[0]==='-r'||args[0]==='-ri'||args[0]==='-ir';
+  const caseless=args[0]==='-i'||args[0]==='-ri'||args[0]==='-ir';
+  const pattern=recursive||caseless?args[1]:args[0];
+  const targetPath=resolvePath((recursive||caseless)?args[2]||'.':args[1]);
+  const cfs=getCFS();
+  // Escape regex special chars except * which becomes .*
+  const escaped=pattern.split('').map(function(c){ return '-[]/{}()+?^$|\\'.indexOf(c)>=0?'\\'+c:c==='*'?'.*':c; }).join('');
+  const regex=new RegExp(escaped, caseless?'i':'');
+  let filesToSearch=[];
+  if(recursive){
+    filesToSearch=Object.keys(cfs).filter(p=>p.startsWith(targetPath)&&cfs[p].t==='f');
+  } else {
+    if(!cfs[targetPath]){pline('grep: '+args[args.length-1]+': no such file','err');return;}
+    if(cfs[targetPath].t==='d'){pline('grep: '+args[args.length-1]+': is a directory — use grep -r','err');return;}
+    filesToSearch=[targetPath];
+  }
+  let matchCount=0;
+  pline('','blank');
+  filesToSearch.forEach(fpath=>{
+    const content=cfs[fpath]?.content||'';
+    content.split('\n').forEach(function(line){
+      if(regex.test(line)){
+        pline('  '+(recursive?fpath+':':'')+line,'ok');
+        matchCount++;
+      }
+    });
+  });
+  if(!matchCount) pline("grep: no match for '"+pattern+"'",'dim');
+  pline('','blank'); scrollT();
+}
+
+function cmdChmod(args){
+  if(!args[0]||!args[1]){pline('Usage: chmod [mode] [file]  e.g. chmod +x script.sh','err');return;}
+  const cfs=getCFS(); const target=resolvePath(args[1]);
+  if(!cfs[target]){pline('chmod: '+args[1]+': no such file or directory','err');return;}
+  pline('[+] chmod '+args[0]+' '+args[1],'ok');
+  pline('[*] Permissions updated','dim');
+}
+
+
 function listNodes(){
+  if(trainingMode){
+    // Training mode — only show training nodes, note Axiom is off-limits
+    plines([{t:'',c:'blank'},{t:'  TRAINING NETWORK',c:'cyan'}]);
+    ['TRAIN-GATE','TRAIN-SRV'].forEach(id=>{
+      const n=NETWORK[id]; if(!n) return;
+      const fw=n.firewall?(!firewallUnlocked[id]?'[FW:LOCKED]':'[FW:OPEN]'):'[NO FW]';
+      const conn=connectedNode===id?'◉ CONNECTED':'○';
+      pline(`  ${conn} ${n.label.padEnd(14)} ${n.ip.padEnd(14)} ${fw}`,'ok');
+    });
+    plines([
+      {t:'',c:'blank'},
+      {t:'  // AXIOM CORP NETWORK — not in scope for this exercise',c:'dim'},
+      {t:'  // Complete training first, then log in as ghost_0x1',c:'dim'},
+      {t:'',c:'blank'},
+    ]);
+    trainingReact('nodes');
+    return;
+  }
   plines([{t:'',c:'blank'},{t:'  AXIOM CORP NETWORK',c:'cyan'}]);
   Object.entries(NETWORK).forEach(([id,n])=>{
+    if(n._trainingHidden) return; // hide during training
     const fw=n.firewall?(!firewallUnlocked[id]?'[FW:LOCKED]':'[FW:OPEN]'):'[NO FW]';
     const conn=connectedNode===id?'◉ CONNECTED':'○';
     pline(`  ${conn} ${n.label.padEnd(14)} ${n.ip.padEnd(14)} ${fw}`,'out');
   });
   pline('','blank');
-  if(trainingMode) trainingReact('nodes');
 }
 
 function ifconfig(){
@@ -7111,12 +8461,13 @@ function connect(args){
     startTrace();
     checkSecOnConnect(id);
     runNodesHit.add(id); // M6 — track for run stats
+    if(id.startsWith('PROC-')) markObjective('c-connect');
     if(runNodesHit.size === 1) fireSpectrTrigger('first_connect'); // M8a
     if(id==='EXEC-TERM') setTimeout(()=>{ if(connectedNode==='EXEC-TERM') markObjective('access'); },900);
     // Training reactions
     if(trainingMode){
       if(id==='TRAIN-GATE'){ markTrainingObj('t-connect'); trainingReact('connect'); }
-      if(id==='TRAIN-SRV') { trainingReact('connect_srv'); }
+      if(id==='TRAIN-SRV') { markTrainingObj('t-connect2'); trainingReact('connect_srv'); }
     }
     refreshNetmap();
     scrollT();
@@ -7149,10 +8500,9 @@ function disconnect(){
   saveRunState(); // M8c — autosave on disconnect
   if(trainingMode){
     const wasGate = old.label === 'TRAIN-GATE';
-    markTrainingObj('t-disconnect');
-    if(wasGate) trainingReact('disconnect_1');
-    else if(trainingComplete){ /* already reacted */ }
-    else trainingReact('rm_logs');
+    const wasSrv  = old.label === 'TRAIN-SRV';
+    if(wasGate){ markTrainingObj('t-disconnect1'); trainingReact('disconnect_1'); }
+    else if(wasSrv && !trainingComplete){ markTrainingObj('t-disconnect'); }
   }
 }
 
@@ -7255,6 +8605,7 @@ function cmdExfil(args){
 
     // Check mission objectives
     if(fname==='acquisition_plan.pdf.txt'){ markObjective('exfil'); }
+    markObjective('c-exfil'); // any exfil satisfies contract objective
     refreshExfil();
     scrollT();
   },1100);
@@ -7456,128 +8807,12 @@ function renderNetmap(){
   const svg=document.getElementById('netmap-svg'); if(!svg)return;
   svg.innerHTML='';
 
-  // ── M10 — PIXEL CITY BACKGROUND ──
-  // Procedural city grid using a seeded RNG based on run seed
-  // so the city looks consistent per run but varies between runs
-  const cityRng = (()=>{
-    let s = (runSeed || 12345) % 99999;
-    return ()=>{ s=(s*1664525+1013904223)&0xffffffff; return (s>>>0)/0xffffffff; };
-  })();
-
-  const W=620, H=460;
-  // Street grid — vertical and horizontal lines
-  const streetCols = [0,60,120,180,240,300,360,420,480,540,600,620];
-  const streetRows = [0,55,110,165,220,275,330,385,440,460];
-  const streetW = 4; // street width in px
-
-  // City background
-  const cityBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
-  cityBg.setAttribute('width',W); cityBg.setAttribute('height',H);
-  cityBg.setAttribute('fill','#030508');
-  svg.appendChild(cityBg);
-
-  // Draw buildings in each city block
-  for(let ci=0; ci<streetCols.length-1; ci++){
-    for(let ri=0; ri<streetRows.length-1; ri++){
-      const bx = streetCols[ci] + streetW;
-      const by = streetRows[ri] + streetW;
-      const bw = streetCols[ci+1] - streetCols[ci] - streetW*2;
-      const bh = streetRows[ri+1] - streetRows[ri] - streetW*2;
-      if(bw <= 0 || bh <= 0) continue;
-
-      // Block background
-      const block = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      block.setAttribute('x',String(bx)); block.setAttribute('y',String(by));
-      block.setAttribute('width',String(bw)); block.setAttribute('height',String(bh));
-      block.setAttribute('fill','#060a14');
-      svg.appendChild(block);
-
-      // Subdivide each block into 2-6 buildings
-      const numBuildings = 2 + Math.floor(cityRng()*5);
-      const padding = 2;
-      for(let b=0; b<numBuildings; b++){
-        // Random building within the block
-        const margin = padding + Math.floor(cityRng()*(bw*0.1));
-        const bldW = 4 + Math.floor(cityRng()*(bw*0.4));
-        const bldH = 4 + Math.floor(cityRng()*(bh*0.5));
-        const bldX = bx + margin + Math.floor(cityRng()*(bw - bldW - margin*2));
-        const bldY = by + margin + Math.floor(cityRng()*(bh - bldH - margin*2));
-        if(bldX + bldW > bx+bw || bldY + bldH > by+bh) continue;
-
-        // Building shade — vary from very dark to slightly lighter
-        const shade = Math.floor(cityRng()*30 + 18);
-        const shadeHex = shade.toString(16).padStart(2,'0');
-        const bldColor = `#${shadeHex}${shadeHex}${shadeHex}`;
-
-        const bld = document.createElementNS('http://www.w3.org/2000/svg','rect');
-        bld.setAttribute('x',String(bldX)); bld.setAttribute('y',String(bldY));
-        bld.setAttribute('width',String(bldW)); bld.setAttribute('height',String(bldH));
-        // Neon building — dark blue fill, pink or cyan edge
-        const neonCol = cityRng()>0.6?'#ff2d78':'#00d4ff';
-        bld.setAttribute('fill','#080d1a');
-        bld.setAttribute('stroke',neonCol);
-        bld.setAttribute('stroke-width','0.4');
-        bld.setAttribute('opacity','0.7');
-        svg.appendChild(bld);
-
-        // Occasional lit window (tiny bright pixel)
-        if(cityRng() > 0.75){
-          const win = document.createElementNS('http://www.w3.org/2000/svg','rect');
-          win.setAttribute('x',String(bldX+2)); win.setAttribute('y',String(bldY+2));
-          win.setAttribute('width','2'); win.setAttribute('height','2');
-          win.setAttribute('fill',cityRng()>0.5?'#ff2d78':'#00d4ff');
-          win.setAttribute('opacity','0.9');
-          svg.appendChild(win);
-        }
-      }
-    }
-  }
-
-  // Street lines (over buildings)
-  streetCols.forEach(cx=>{
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1',String(cx)); l.setAttribute('y1','0');
-    l.setAttribute('x2',String(cx)); l.setAttribute('y2',String(H));
-    l.setAttribute('stroke','#030810'); l.setAttribute('stroke-width',String(streetW));
-    l.setAttribute('opacity','0.95');
-    svg.appendChild(l);
-  });
-  streetRows.forEach(ry=>{
-    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-    l.setAttribute('x1','0'); l.setAttribute('y1',String(ry));
-    l.setAttribute('x2',String(W)); l.setAttribute('y2',String(ry));
-    l.setAttribute('stroke','#030810'); l.setAttribute('stroke-width',String(streetW));
-    l.setAttribute('opacity','0.95');
-    svg.appendChild(l);
-  });
-
-  // Subtle scanline overlay
-  for(let y=0; y<H; y+=4){
-    const sl=document.createElementNS('http://www.w3.org/2000/svg','line');
-    sl.setAttribute('x1','0'); sl.setAttribute('y1',String(y));
-    sl.setAttribute('x2',String(W)); sl.setAttribute('y2',String(y));
-    sl.setAttribute('stroke','#00d4ff'); sl.setAttribute('stroke-width','0.5');
-    sl.setAttribute('opacity','0.03');
-    svg.appendChild(sl);
-  }
-
-  // Neon street glow — thin cyan centerlines
-  streetCols.slice(1,-1).forEach(cx=>{
-    const gl=document.createElementNS('http://www.w3.org/2000/svg','line');
-    gl.setAttribute('x1',String(cx)); gl.setAttribute('y1','0');
-    gl.setAttribute('x2',String(cx)); gl.setAttribute('y2',String(H));
-    gl.setAttribute('stroke','#00d4ff'); gl.setAttribute('stroke-width','0.5');
-    gl.setAttribute('opacity','0.08');
-    svg.appendChild(gl);
-  });
-  streetRows.slice(1,-1).forEach(ry=>{
-    const gl=document.createElementNS('http://www.w3.org/2000/svg','line');
-    gl.setAttribute('x1','0'); gl.setAttribute('y1',String(ry));
-    gl.setAttribute('x2',String(W)); gl.setAttribute('y2',String(ry));
-    gl.setAttribute('stroke','#ff2d78'); gl.setAttribute('stroke-width','0.5');
-    gl.setAttribute('opacity','0.06');
-    svg.appendChild(gl);
-  });
+  // ── Simple solid background ──
+  const mapBg = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  mapBg.setAttribute('x','0'); mapBg.setAttribute('y','0');
+  mapBg.setAttribute('width','620'); mapBg.setAttribute('height','460');
+  mapBg.setAttribute('fill','var(--bg)');
+  svg.appendChild(mapBg);
 
   // ── Defs: arrowhead markers ──
   const defs=document.createElementNS('http://www.w3.org/2000/svg','defs');
@@ -7829,8 +9064,13 @@ function refreshMission(){
   const el=document.getElementById('mission-inner'); if(!el)return;
   const done=OBJECTIVES.filter(o=>o.done).length;
   const socialDone=SOCIAL_OBJECTIVES.filter(o=>o.done).length;
-  let html=`<div class="mission-title">OP-VORTEX</div>
-<div class="mission-sub">TARGET: AXIOM INDUSTRIES CORP  |  ${done}/${OBJECTIVES.length} OBJECTIVES</div>`;
+  const activeC = contractBoard.find(c=>c.id===activeContract);
+  const missionTitle = activeC ? activeC.codename : 'OP-VORTEX';
+  const missionTarget = activeC ? activeC.target : 'AXIOM INDUSTRIES CORP';
+  const missionPayout = activeC ? activeC.payout : 4200;
+  const missionBonus  = activeC ? activeC.bonusPayout : 800;
+  let html=`<div class="mission-title">${missionTitle}</div>
+<div class="mission-sub">TARGET: ${missionTarget}  |  ${done}/${OBJECTIVES.length} OBJECTIVES</div>`;
 
   OBJECTIVES.forEach(o=>{
     html+=`<div class="obj-item">
@@ -7841,7 +9081,7 @@ function refreshMission(){
 
   html+=`<div class="mission-reward">
 <div class="mission-reward-lbl">PAYOUT</div>
-<div class="mission-reward-val">4,200 cr base  +  800 cr clean exit bonus</div>
+<div class="mission-reward-val">${missionPayout.toLocaleString()} cr base  +  ${missionBonus} cr bonus</div>
 </div>`;
 
   // M5b — Alternate path display
@@ -7869,7 +9109,7 @@ function refreshMission(){
   html+=`<div style="font-size:8px;color:var(--purple);margin-top:4px;">+400 cr per bonus objective</div></div>`;
 
   if(done===OBJECTIVES.length){
-    html+=`<div style="margin-top:10px;padding:10px;background:var(--gbg);border:1px solid var(--gdim);font-size:11px;color:var(--green);letter-spacing:1px;">✓ ALL OBJECTIVES COMPLETE — OP-VORTEX SUCCESS</div>`;
+    html+=`<div style="margin-top:10px;padding:10px;background:var(--gbg);border:1px solid var(--gdim);font-size:11px;color:var(--green);letter-spacing:1px;">✓ ALL OBJECTIVES COMPLETE — ${missionTitle} SUCCESS</div>`;
   }
   el.innerHTML=html;
 }
